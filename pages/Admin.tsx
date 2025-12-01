@@ -19,10 +19,11 @@ import {
   MessageCircle,
   Database,
   RefreshCw,
-  ShieldCheck
+  ShieldCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isUsingEnv } from '../services/supabase';
+import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isConfigured } from '../services/supabase';
 
 interface AdminProps {
   cars: Car[];
@@ -47,18 +48,10 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   const [telegramChatId, setTelegramChatId] = useState('');
   const [settingsStatus, setSettingsStatus] = useState('');
   
-  // Supabase Settings State
-  const [supabaseUrl, setSupabaseUrl] = useState('');
-  const [supabaseKey, setSupabaseKey] = useState('');
-
   const navigate = useNavigate();
 
   // Load Settings
   useEffect(() => {
-    // Load local storage keys for Supabase
-    setSupabaseUrl(localStorage.getItem('supabase_project_url') || '');
-    setSupabaseKey(localStorage.getItem('supabase_anon_key') || '');
-
     if (activeTab === 'settings' && isAuthenticated) {
       getTelegramSettings().then(settings => {
         setTelegramToken(settings.botToken);
@@ -79,15 +72,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       }
     } catch (err) {
       console.error(err);
-      setLoginError('Ошибка входа. Попробуйте пароль "admin", если база не настроена.');
-    }
-  };
-
-  const handleResetSettings = () => {
-    if(window.confirm('Это сбросит настройки подключения к Supabase в браузере. Продолжить?')) {
-      localStorage.removeItem('supabase_project_url');
-      localStorage.removeItem('supabase_anon_key');
-      window.location.reload();
+      setLoginError('Ошибка входа. Попробуйте пароль "admin".');
     }
   };
 
@@ -165,23 +150,6 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
     }
   };
 
-  const handleSaveDatabase = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Validate URL
-    if (supabaseUrl && !supabaseUrl.startsWith('http')) {
-      setSettingsStatus('Ошибка: URL должен начинаться с https://');
-      return;
-    }
-
-    setSettingsStatus('Сохранение подключения...');
-    localStorage.setItem('supabase_project_url', supabaseUrl);
-    localStorage.setItem('supabase_anon_key', supabaseKey);
-    setSettingsStatus('Сохранено! Перезагрузка страницы...');
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
-
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -209,13 +177,6 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                <p className="text-xs text-center text-gray-600">
                   * По умолчанию пароль: <b>admin</b>
                </p>
-               <button 
-                type="button"
-                onClick={handleResetSettings}
-                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors"
-               >
-                 <RefreshCw size={10} /> Сбросить настройки подключения
-               </button>
             </div>
           </form>
         </div>
@@ -431,66 +392,44 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
-              {/* Database Settings */}
+              {/* Database Status */}
               <div className="bg-dark-900 p-6 rounded-xl border border-white/5 lg:col-span-2">
                  <div className="flex items-center gap-3 mb-6">
                   <div className="p-3 bg-purple-500/10 rounded-lg text-purple-500"><Database size={24} /></div>
-                  <h3 className="text-xl font-bold text-white">База Данных (Supabase)</h3>
+                  <h3 className="text-xl font-bold text-white">Статус Базы Данных</h3>
                 </div>
                 
-                {isUsingEnv ? (
+                {isConfigured ? (
                   <div className="bg-green-500/5 border border-green-500/10 p-6 rounded-lg">
                     <div className="flex items-start gap-4">
                       <div className="p-2 bg-green-500/10 rounded-full shrink-0">
                          <ShieldCheck className="w-6 h-6 text-green-400" />
                       </div>
                       <div>
-                        <h4 className="text-white font-bold mb-2">Безопасное подключение активно</h4>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                          Приложение использует ключи доступа из переменных окружения (<code>.env</code> или Vercel Env). 
-                          Это наиболее безопасный способ подключения (Option B).
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Чтобы изменить базу данных, обновите переменные <code>VITE_SUPABASE_URL</code> и <code>VITE_SUPABASE_KEY</code> в конфигурации вашего сервера или локальном файле.
+                        <h4 className="text-white font-bold mb-2">Supabase Подключен</h4>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                          Приложение успешно использует ключи из переменных окружения (<code>.env</code>).
                         </p>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleSaveDatabase} className="space-y-4">
-                    <div className="text-sm text-gray-400 bg-white/5 p-4 rounded mb-4">
-                      <p>Для работы админ-панели и сохранения данных укажите ключи вашего проекта Supabase.</p>
-                      <p className="mt-2 text-xs opacity-70">Project Settings &rarr; API &rarr; Project URL / Anon Key</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-xs uppercase text-gray-500 mb-2">Project URL</label>
-                        <input 
-                          type="text" 
-                          value={supabaseUrl}
-                          onChange={e => setSupabaseUrl(e.target.value)}
-                          placeholder="https://xyz.supabase.co"
-                          className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                        />
+                  <div className="bg-yellow-500/5 border border-yellow-500/10 p-6 rounded-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-yellow-500/10 rounded-full shrink-0">
+                         <AlertTriangle className="w-6 h-6 text-yellow-400" />
                       </div>
                       <div>
-                        <label className="block text-xs uppercase text-gray-500 mb-2">Anon API Key</label>
-                        <input 
-                          type="password" 
-                          value={supabaseKey}
-                          onChange={e => setSupabaseKey(e.target.value)}
-                          placeholder="eyJhbGciOiJIUzI1NiIsInR5..."
-                          className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                        />
+                        <h4 className="text-white font-bold mb-2">Работа в Демо-режиме</h4>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-2">
+                           Ключи <code>VITE_SUPABASE_URL</code> и <code>VITE_SUPABASE_ANON_KEY</code> не найдены в окружении.
+                        </p>
+                        <p className="text-gray-500 text-xs">
+                           Все изменения (добавление/удаление авто) будут работать только локально до перезагрузки страницы.
+                        </p>
                       </div>
                     </div>
-                    <div className="pt-4 border-t border-white/5">
-                      <button className="bg-purple-600 text-white font-bold uppercase px-6 py-3 rounded hover:bg-purple-500 transition-colors w-full md:w-auto">
-                        Сохранить настройки БД
-                      </button>
-                    </div>
-                  </form>
+                  </div>
                 )}
               </div>
 
