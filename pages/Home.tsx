@@ -10,21 +10,7 @@ interface HomeProps {
   onBookCar: (car: Car) => void;
 }
 
-const promoBgSvg = `
-<svg width="1920" height="600" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="gradPromo" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#000000;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#111111;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#gradPromo)" />
-  <path d="M0 600 Q 960 300 1920 600" fill="none" stroke="#222" stroke-width="100" opacity="0.5"/>
-  <path d="M0 600 Q 960 300 1920 600" fill="none" stroke="#D4AF37" stroke-width="2" opacity="0.3" stroke-dasharray="20,20"/>
-</svg>
-`;
-
-const promoBg = `data:image/svg+xml;base64,${btoa(promoBgSvg)}`;
+const promoBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/maindown.png";
 
 export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
   // Select top 3 cars for display (ensure we have at least some cars if array is empty)
@@ -71,7 +57,7 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
       {/* Promo Section */}
       <section className="relative py-32 bg-dark-900 overflow-hidden border-t border-white/5">
          <div className="absolute inset-0">
-           <img src={promoBg} alt="Road Abstract" className="w-full h-full object-cover opacity-40 grayscale" />
+           <img src={promoBg} alt="Road Abstract" className="w-full h-full object-cover opacity-60" />
            <div className="absolute inset-0 bg-gradient-to-r from-dark-900 via-dark-900/80 to-transparent" />
          </div>
          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
