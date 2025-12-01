@@ -1,23 +1,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-const aboutImgSvg = `
-<svg width="800" height="1000" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="gradAbout" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0f0f0f;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#202020;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#gradAbout)" />
-  <path d="M0 0 L800 1000" stroke="#333" stroke-width="1" opacity="0.5"/>
-  <path d="M800 0 L0 1000" stroke="#333" stroke-width="1" opacity="0.5"/>
-  <rect x="100" y="200" width="600" height="600" fill="none" stroke="#D4AF37" stroke-width="2" opacity="0.2"/>
-  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#D4AF37" font-family="serif" font-size="60" opacity="0.1" transform="rotate(-90, 400, 500)">LUXURY</text>
-</svg>
-`;
-
-const aboutImg = `data:image/svg+xml;base64,${btoa(aboutImgSvg)}`;
+const aboutImg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/about.jpg";
 
 export const About: React.FC = () => {
   return (

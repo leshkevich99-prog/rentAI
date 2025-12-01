@@ -2,26 +2,7 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const heroBgSvg = `
-<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="gradHero" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#050505;stop-opacity:1" />
-    </radialGradient>
-    <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
-      <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#222" stroke-width="1"/>
-    </pattern>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#gradHero)" />
-  <rect width="100%" height="100%" fill="url(#grid)" opacity="0.3" />
-  <circle cx="960" cy="540" r="300" fill="none" stroke="#D4AF37" stroke-width="1" opacity="0.05" />
-  <circle cx="960" cy="540" r="400" fill="none" stroke="#D4AF37" stroke-width="1" opacity="0.03" />
-  <circle cx="960" cy="540" r="500" fill="none" stroke="#D4AF37" stroke-width="1" opacity="0.02" />
-</svg>
-`;
-
-const heroBg = `data:image/svg+xml;base64,${btoa(heroBgSvg)}`;
+const heroBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/about.jpg";
 
 export const Hero: React.FC = () => {
   return (
