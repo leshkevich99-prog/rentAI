@@ -17,7 +17,8 @@ import {
   Upload,
   Lock,
   MessageCircle,
-  Database
+  Database,
+  RefreshCw
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings } from '../services/supabase';
@@ -77,9 +78,15 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       }
     } catch (err) {
       console.error(err);
-      // Even if error occurs (e.g. no DB connection), checkAdminPassword might handle it, 
-      // but if it throws, we catch here.
-      setLoginError('Ошибка проверки пароля. Попробуйте "admin" если база не настроена.');
+      setLoginError('Ошибка входа. Попробуйте пароль "admin", если база не настроена.');
+    }
+  };
+
+  const handleResetSettings = () => {
+    if(window.confirm('Это сбросит настройки подключения к Supabase в браузере. Продолжить?')) {
+      localStorage.removeItem('supabase_project_url');
+      localStorage.removeItem('supabase_anon_key');
+      window.location.reload();
     }
   };
 
@@ -159,6 +166,12 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
 
   const handleSaveDatabase = (e: React.FormEvent) => {
     e.preventDefault();
+    // Validate URL
+    if (supabaseUrl && !supabaseUrl.startsWith('http')) {
+      setSettingsStatus('Ошибка: URL должен начинаться с https://');
+      return;
+    }
+
     setSettingsStatus('Сохранение подключения...');
     localStorage.setItem('supabase_project_url', supabaseUrl);
     localStorage.setItem('supabase_anon_key', supabaseKey);
@@ -171,7 +184,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-dark-900 border border-white/10 p-8 rounded-2xl shadow-2xl">
+        <div className="max-w-md w-full bg-dark-900 border border-white/10 p-8 rounded-2xl shadow-2xl relative">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-serif text-white mb-2">EliteDrive <span className="text-gold-400">Admin</span></h2>
             <p className="text-gray-400">Безопасный вход</p>
@@ -191,9 +204,18 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
             <button className="w-full bg-gold-500 text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded">
               Войти
             </button>
-            <p className="text-xs text-center text-gray-600">
-               * Если база не подключена, используйте пароль: <b>admin</b>
-            </p>
+            <div className="flex flex-col gap-2 items-center">
+               <p className="text-xs text-center text-gray-600">
+                  * По умолчанию пароль: <b>admin</b>
+               </p>
+               <button 
+                type="button"
+                onClick={handleResetSettings}
+                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors"
+               >
+                 <RefreshCw size={10} /> Сбросить настройки подключения
+               </button>
+            </div>
           </form>
         </div>
       </div>

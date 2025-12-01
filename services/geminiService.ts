@@ -3,8 +3,17 @@ import { AI_SYSTEM_INSTRUCTION } from '../constants';
 
 let chatSession: Chat | null = null;
 
+const getEnv = (key: string) => {
+  try {
+    // @ts-ignore
+    return typeof process !== 'undefined' && process.env ? process.env[key] : undefined;
+  } catch (e) {
+    return undefined;
+  }
+};
+
 const getAiClient = () => {
-  const apiKey = process.env.API_KEY;
+  const apiKey = getEnv('API_KEY');
   if (!apiKey) {
     console.warn("API Key not found in environment variables");
     return null;
