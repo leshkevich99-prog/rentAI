@@ -71,7 +71,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     type="text" 
                     required 
                     placeholder="Александр"
-                    value={formData.name}
+                    value={formData.name || ''}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors"
                   />
@@ -86,7 +86,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     type="tel" 
                     required 
                     placeholder="+375 (29) 000-00-00"
-                    value={formData.phone}
+                    value={formData.phone || ''}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors"
                   />
@@ -101,7 +101,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     <input 
                       type="date" 
                       required 
-                      value={formData.startDate}
+                      value={formData.startDate || ''}
                       onChange={(e) => setFormData({...formData, startDate: e.target.value})}
                       className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input"
                     />
@@ -114,7 +114,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     <input 
                       type="date" 
                       required 
-                      value={formData.endDate}
+                      value={formData.endDate || ''}
                       onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input"
                     />

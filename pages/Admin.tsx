@@ -594,7 +594,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                   <input 
                     required
                     type="text" 
-                    value={currentCar.name}
+                    value={currentCar.name || ''}
                     onChange={e => setCurrentCar({...currentCar, name: e.target.value})}
                     className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
                   />
@@ -602,7 +602,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                 <div>
                   <label className="block text-xs uppercase text-gray-500 mb-2">Категория</label>
                   <select 
-                    value={currentCar.category}
+                    value={currentCar.category || CarCategory.SEDAN}
                     onChange={e => setCurrentCar({...currentCar, category: e.target.value as CarCategory})}
                     className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
                   >
@@ -636,7 +636,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                         <span className="absolute -top-2 left-3 bg-dark-800 px-2 text-[10px] text-gray-500">Или вставьте ссылку</span>
                         <input 
                             type="text" 
-                            value={currentCar.imageUrl}
+                            value={currentCar.imageUrl || ''}
                             onChange={e => setCurrentCar({...currentCar, imageUrl: e.target.value})}
                             className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
                             placeholder="https://..."
@@ -651,7 +651,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                    <input 
                       required
                       type="number" 
-                      value={currentCar.pricePerDay}
+                      value={currentCar.pricePerDay || 0}
                       onChange={e => setCurrentCar({...currentCar, pricePerDay: Number(e.target.value)})}
                       className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
                    />
@@ -660,7 +660,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                    <input 
                       type="checkbox" 
                       id="available"
-                      checked={currentCar.available}
+                      checked={currentCar.available || false}
                       onChange={e => setCurrentCar({...currentCar, available: e.target.checked})}
                       className="w-5 h-5 accent-gold-500"
                    />
@@ -675,10 +675,10 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                     <label className="block text-xs uppercase text-gray-500 mb-2">Мощность (л.с.)</label>
                     <input 
                       type="number" 
-                      value={currentCar.specs?.hp}
+                      value={currentCar.specs?.hp || 0}
                       onChange={e => setCurrentCar({
                         ...currentCar, 
-                        specs: { ...currentCar.specs!, hp: Number(e.target.value) }
+                        specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), hp: Number(e.target.value) }
                       })}
                       className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
                     />
@@ -688,10 +688,10 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                     <input 
                       type="number" 
                       step="0.1"
-                      value={currentCar.specs?.zeroToSixty}
+                      value={currentCar.specs?.zeroToSixty || 0}
                       onChange={e => setCurrentCar({
                         ...currentCar, 
-                        specs: { ...currentCar.specs!, zeroToSixty: Number(e.target.value) }
+                        specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), zeroToSixty: Number(e.target.value) }
                       })}
                       className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
                     />
@@ -700,10 +700,10 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                     <label className="block text-xs uppercase text-gray-500 mb-2">Макс. скорость</label>
                     <input 
                       type="number" 
-                      value={currentCar.specs?.maxSpeed}
+                      value={currentCar.specs?.maxSpeed || 0}
                       onChange={e => setCurrentCar({
                         ...currentCar, 
-                        specs: { ...currentCar.specs!, maxSpeed: Number(e.target.value) }
+                        specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), maxSpeed: Number(e.target.value) }
                       })}
                       className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
                     />

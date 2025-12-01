@@ -104,11 +104,13 @@ export const saveCar = async (car: Car) => {
     available: car.available
   };
 
-  if (car.id && car.id.length > 5) { // Check if it's a real UUID or similar
+  // Only update if it looks like a valid UUID (length > 20 is a safe heuristic for UUIDs)
+  // This prevents sending Mock IDs "1", "2" to Postgres which expects UUID
+  if (car.id && car.id.length > 20) { 
     const { error } = await supabase.from('cars').update(carData).eq('id', car.id);
     if (error) throw error;
   } else {
-    // New car
+    // Insert as new
     const { error } = await supabase.from('cars').insert([carData]);
     if (error) throw error;
   }
@@ -116,6 +118,13 @@ export const saveCar = async (car: Car) => {
 
 export const deleteCarById = async (id: string) => {
   if (!configured) throw new Error("Database not configured");
+  
+  // Prevent deleting Mock items from DB (they don't exist in DB anyway, but ID format causes error)
+  if (!id || id.length < 20) {
+    console.warn("Skipping DB delete for mock/invalid ID:", id);
+    return;
+  }
+
   const { error } = await supabase.from('cars').delete().eq('id', id);
   if (error) throw error;
 };
