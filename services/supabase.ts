@@ -1,29 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 import { Car } from '../types';
 
-// Helper to safely get env vars regardless of bundler (Vite vs CRA vs Node)
+// Safe environment variable access
 const getEnv = (key: string) => {
   try {
-    // 1. Check Vite (import.meta.env)
-    // We look for standard key or VITE_ prefixed key
-    // @ts-ignore
-    if (typeof import.meta !== 'undefined' && import.meta.env) {
-       // @ts-ignore
-       if (import.meta.env[key]) return import.meta.env[key];
-       // @ts-ignore
-       if (import.meta.env[`VITE_${key}`]) return import.meta.env[`VITE_${key}`];
-    }
-    
-    // 2. Check process.env (Create React App / Node / Webpack)
-    // @ts-ignore
+    // Check process.env (Standard for Vercel, CRA, Node)
     if (typeof process !== 'undefined' && process.env) {
        // @ts-ignore
        if (process.env[key]) return process.env[key];
        // @ts-ignore
        if (process.env[`REACT_APP_${key}`]) return process.env[`REACT_APP_${key}`];
+       // @ts-ignore
+       if (process.env[`VITE_${key}`]) return process.env[`VITE_${key}`];
     }
   } catch (e) {
-    // Ignore errors in environments where these are accessed incorrectly
+    console.warn('Error reading env vars', e);
   }
   return undefined;
 };
@@ -32,87 +23,79 @@ const getEnv = (key: string) => {
 const getCredentials = () => {
   const envUrl = getEnv('SUPABASE_URL');
   const envKey = getEnv('SUPABASE_KEY');
-  const lsUrl = localStorage.getItem('supabase_project_url');
-  const lsKey = localStorage.getItem('supabase_anon_key');
+  
+  // Safe localStorage access
+  let lsUrl = '';
+  let lsKey = '';
+  try {
+    lsUrl = localStorage.getItem('supabase_project_url') || '';
+    lsKey = localStorage.getItem('supabase_anon_key') || '';
+  } catch (e) {
+    // Ignore localStorage errors
+  }
 
-  // Use env var if it's set and not the default placeholder, otherwise use localStorage
+  // Use env var if available, otherwise localStorage
   let url = (envUrl && !envUrl.includes('YOUR_PROJECT_URL')) ? envUrl : lsUrl;
   let key = (envKey && !envKey.includes('YOUR_ANON_KEY')) ? envKey : lsKey;
 
-  // Basic validation to prevent createClient crash
-  if (!url || !url.startsWith('http')) {
-    url = 'https://placeholder.supabase.co';
-  }
-  if (!key) {
-    key = 'placeholder';
+  // Basic validation
+  const isValidUrl = url && (url.startsWith('http://') || url.startsWith('https://'));
+  const isValidKey = key && key.length > 20; // Basic length check
+
+  if (!isValidUrl || !isValidKey) {
+    return { url: 'https://placeholder.supabase.co', key: 'placeholder', configured: false };
   }
 
-  return { url, key };
+  return { url, key, configured: true };
 };
 
-const { url, key } = getCredentials();
-// Check if we are using real credentials or placeholders
-const isConfigured = url !== 'https://placeholder.supabase.co' && key !== 'placeholder';
+const { url, key, configured } = getCredentials();
+export const isConfigured = configured;
 
-// Initialize Supabase
-let supabaseClient;
-try {
-  supabaseClient = createClient(url, key);
-} catch (error) {
-  console.error("Supabase init failed:", error);
-  supabaseClient = createClient('https://placeholder.supabase.co', 'placeholder');
-}
+// Initialize Supabase safely
+const supabase = createClient(url, key);
 
-export const supabase = supabaseClient;
-
-// --- Hashing Utility ---
+// Helper for Hashing
 async function sha256(message: string) {
   const msgBuffer = new TextEncoder().encode(message);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// --- Cars API ---
+// Default fallback hash for 'admin'
+const DEFAULT_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; 
+
+// --- CARS API ---
+
 export const fetchCars = async (): Promise<Car[]> => {
-  // If not configured, don't even try to fetch, return empty so App falls back to mocks
-  if (!isConfigured) {
-    return [];
+  if (!configured) throw new Error("Database not configured");
+  
+  const { data, error } = await supabase
+    .from('cars')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Supabase fetch error:", error);
+    throw error;
   }
 
-  try {
-    const { data, error } = await supabase.from('cars').select('*').order('created_at', { ascending: false });
-    
-    if (error) {
-      throw error;
-    }
-    
-    return data.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      category: item.category,
-      pricePerDay: item.price_per_day,
-      specs: item.specs,
-      imageUrl: item.image_url,
-      available: item.available
-    }));
-  } catch (err: any) {
-    // Suppress "Failed to fetch" noise which happens when URL is wrong or network down
-    if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('Network request failed'))) {
-        console.warn("Could not connect to Supabase (Network/Config error). Using fallback data.");
-    } else {
-        console.error('Failed to fetch cars:', err.message || err);
-    }
-    return [];
-  }
+  return data.map((car: any) => ({
+    id: car.id,
+    name: car.name,
+    category: car.category,
+    pricePerDay: car.price_per_day,
+    specs: car.specs,
+    imageUrl: car.image_url,
+    available: car.available
+  }));
 };
 
 export const saveCar = async (car: Car) => {
-  if (!isConfigured) throw new Error("Database not configured");
+  if (!configured) throw new Error("Database not configured");
 
-  // Convert to DB format
-  const dbCar = {
+  const carData = {
     name: car.name,
     category: car.category,
     price_per_day: car.pricePerDay,
@@ -121,81 +104,96 @@ export const saveCar = async (car: Car) => {
     available: car.available
   };
 
-  if (car.id && car.id.length > 10) { // Assuming UUID length
-    // Update
-    const { error } = await supabase.from('cars').update(dbCar).eq('id', car.id);
+  if (car.id && car.id.length > 5) { // Check if it's a real UUID or similar
+    const { error } = await supabase.from('cars').update(carData).eq('id', car.id);
     if (error) throw error;
   } else {
-    // Insert
-    const { error } = await supabase.from('cars').insert([dbCar]);
+    // New car
+    const { error } = await supabase.from('cars').insert([carData]);
     if (error) throw error;
   }
 };
 
 export const deleteCarById = async (id: string) => {
-  if (!isConfigured) throw new Error("Database not configured");
+  if (!configured) throw new Error("Database not configured");
   const { error } = await supabase.from('cars').delete().eq('id', id);
   if (error) throw error;
 };
 
-// --- Settings & Auth API ---
+// --- AUTH API ---
 
 export const checkAdminPassword = async (password: string): Promise<boolean> => {
   const hash = await sha256(password);
-  const defaultHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // hash for 'admin'
   
-  // Quick fallback if clearly not configured
-  if (!isConfigured && hash === defaultHash) {
-    return true;
+  if (!configured) {
+    // Fallback if DB is not connected: allow 'admin'
+    return hash === DEFAULT_HASH;
   }
 
   try {
-    // 1. Try to check against DB
     const { data, error } = await supabase
       .from('settings')
       .select('value')
       .eq('key', 'admin_password_hash')
       .single();
+    
+    if (error || !data) {
+      // If setting doesn't exist, fallback to default 'admin' check
+      console.warn("Password setting not found in DB, using default");
+      return hash === DEFAULT_HASH;
+    }
 
-    if (error) throw error;
-    if (!data) return false;
     return data.value === hash;
-
-  } catch (error: any) {
-    console.warn("Database auth check failed, using local fallback. Error:", error.message || "Unknown");
-    // 2. If DB connection fails (e.g. not configured), fallback to local check for 'admin'
-    return hash === defaultHash;
+  } catch (e) {
+    console.error("Auth check failed", e);
+    // Fallback
+    return hash === DEFAULT_HASH;
   }
 };
 
 export const updateAdminPassword = async (newPassword: string) => {
-  if (!isConfigured) throw new Error("Database not configured");
+  if (!configured) throw new Error("Database not configured");
+  
   const hash = await sha256(newPassword);
+  
   const { error } = await supabase
     .from('settings')
     .upsert({ key: 'admin_password_hash', value: hash });
-  
+    
   if (error) throw error;
 };
 
-export const getTelegramSettings = async () => {
-  if (!isConfigured) return { botToken: '', chatId: '' };
+// --- TELEGRAM API ---
 
-  try {
-    const { data: tokenData } = await supabase.from('settings').select('value').eq('key', 'telegram_bot_token').single();
-    const { data: chatData } = await supabase.from('settings').select('value').eq('key', 'telegram_chat_id').single();
-    
-    return {
-      botToken: tokenData?.value || '',
-      chatId: chatData?.value || ''
-    };
-  } catch (e) {
-    return { botToken: '', chatId: '' };
-  }
+export const getTelegramSettings = async () => {
+  if (!configured) return { botToken: '', chatId: '' };
+
+  const { data } = await supabase
+    .from('settings')
+    .select('key, value')
+    .in('key', ['telegram_bot_token', 'telegram_chat_id']);
+
+  const settings: any = {};
+  data?.forEach((item: any) => {
+    settings[item.key] = item.value;
+  });
+
+  return {
+    botToken: settings['telegram_bot_token'] || '',
+    chatId: settings['telegram_chat_id'] || ''
+  };
 };
 
-export const saveTelegramSettings = async (botToken: string, chatId: string) => {
-  if (!isConfigured) throw new Error("Database not configured");
-  await supabase.from('settings').upsert({ key: 'telegram_bot_token', value: botToken });
-  await supabase.from('settings').upsert({ key: 'telegram_chat_id', value: chatId });
+export const saveTelegramSettings = async (token: string, chatId: string) => {
+  if (!configured) throw new Error("Database not configured");
+
+  const { error: err1 } = await supabase
+    .from('settings')
+    .upsert({ key: 'telegram_bot_token', value: token });
+    
+  const { error: err2 } = await supabase
+    .from('settings')
+    .upsert({ key: 'telegram_chat_id', value: chatId });
+
+  if (err1 || err2) throw new Error("Failed to save settings");
 };
