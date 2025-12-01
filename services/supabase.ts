@@ -1,161 +1,139 @@
 import { createClient } from '@supabase/supabase-js';
 import { Car } from '../types';
-import { CARS } from '../constants';
 
-// Initialize Supabase client
-// NOTE: In a real production app, ensure these are loaded from environment variables
-// For this demo, we assume process.env is populated or you can replace strings here.
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_KEY || '';
+// Helper to get credentials from Env or LocalStorage
+const getCredentials = () => {
+  const envUrl = process.env.SUPABASE_URL;
+  const envKey = process.env.SUPABASE_KEY;
+  const lsUrl = localStorage.getItem('supabase_project_url');
+  const lsKey = localStorage.getItem('supabase_anon_key');
 
-const supabase = (supabaseUrl && supabaseKey) 
-  ? createClient(supabaseUrl, supabaseKey) 
-  : null;
+  // Use env var if it's set and not the default placeholder, otherwise use localStorage
+  const url = (envUrl && envUrl !== 'https://YOUR_PROJECT_URL.supabase.co') ? envUrl : lsUrl;
+  const key = (envKey && envKey !== 'YOUR_ANON_KEY') ? envKey : lsKey;
 
-// --- CARS API ---
+  return { url, key };
+};
 
+const { url, key } = getCredentials();
+
+// Initialize with valid URL or a dummy one to prevent crash. 
+// If keys are missing, requests will simply fail (and be caught), which is handled in the UI.
+export const supabase = createClient(
+  url || 'https://placeholder.supabase.co', 
+  key || 'placeholder'
+);
+
+// --- Hashing Utility ---
+async function sha256(message: string) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
+
+// --- Cars API ---
 export const fetchCars = async (): Promise<Car[]> => {
-  if (!supabase) {
-    console.warn("Supabase not configured. Using local fallback.");
-    const stored = localStorage.getItem('fleet_data');
-    return stored ? JSON.parse(stored) : CARS;
-  }
-
-  const { data, error } = await supabase
-    .from('cars')
-    .select('*')
-    .order('created_at', { ascending: true });
-
-  if (error) {
-    console.error('Error fetching cars:', error);
+  try {
+    const { data, error } = await supabase.from('cars').select('*').order('created_at', { ascending: false });
+    
+    if (error) {
+      console.warn('Supabase error fetching cars:', JSON.stringify(error, null, 2));
+      throw error;
+    }
+    
+    return data.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      pricePerDay: item.price_per_day,
+      specs: item.specs,
+      imageUrl: item.image_url,
+      available: item.available
+    }));
+  } catch (err) {
+    console.error('Failed to fetch cars (check connection settings in Admin):', err);
     return [];
   }
-
-  // Map database columns (snake_case) to application types (camelCase)
-  return data.map((item: any) => ({
-    id: item.id,
-    name: item.name,
-    category: item.category,
-    pricePerDay: item.price_per_day,
-    specs: item.specs,
-    imageUrl: item.image_url,
-    available: item.available
-  }));
 };
 
-export const addCarToDb = async (car: Car): Promise<Car | null> => {
-  if (!supabase) return null;
-
-  // We don't send 'id' for new records to let DB generate UUID
-  const { id, ...carData } = car;
-
-  const { data, error } = await supabase
-    .from('cars')
-    .insert([{
-      name: carData.name,
-      category: carData.category,
-      price_per_day: carData.pricePerDay,
-      specs: carData.specs,
-      image_url: carData.imageUrl,
-      available: carData.available
-    }])
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error adding car:', error);
-    throw error;
-  }
-
-  return {
-    id: data.id,
-    name: data.name,
-    category: data.category,
-    pricePerDay: data.price_per_day,
-    specs: data.specs,
-    imageUrl: data.image_url,
-    available: data.available
+export const saveCar = async (car: Car) => {
+  // Convert to DB format
+  const dbCar = {
+    name: car.name,
+    category: car.category,
+    price_per_day: car.pricePerDay,
+    specs: car.specs,
+    image_url: car.imageUrl,
+    available: car.available
   };
+
+  if (car.id && car.id.length > 10) { // Assuming UUID length
+    // Update
+    const { error } = await supabase.from('cars').update(dbCar).eq('id', car.id);
+    if (error) throw error;
+  } else {
+    // Insert
+    const { error } = await supabase.from('cars').insert([dbCar]);
+    if (error) throw error;
+  }
 };
 
-export const updateCarInDb = async (car: Car): Promise<boolean> => {
-  if (!supabase) return false;
-
-  const { error } = await supabase
-    .from('cars')
-    .update({
-      name: car.name,
-      category: car.category,
-      price_per_day: car.pricePerDay,
-      specs: car.specs,
-      image_url: car.imageUrl,
-      available: car.available
-    })
-    .eq('id', car.id);
-
-  if (error) {
-    console.error('Error updating car:', error);
-    throw error;
-  }
-  return true;
+export const deleteCarById = async (id: string) => {
+  const { error } = await supabase.from('cars').delete().eq('id', id);
+  if (error) throw error;
 };
 
-export const deleteCarFromDb = async (id: string): Promise<boolean> => {
-  if (!supabase) return false;
+// --- Settings & Auth API ---
 
-  const { error } = await supabase
-    .from('cars')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error deleting car:', error);
-    throw error;
-  }
-  return true;
-};
-
-// --- SECURITY API ---
-
-export const getAdminPasswordHash = async (): Promise<string | null> => {
-  if (!supabase) {
-    return localStorage.getItem('admin_pwh') || '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-  }
-
+export const checkAdminPassword = async (password: string): Promise<boolean> => {
+  const hash = await sha256(password);
+  
+  // 1. Try to check against DB
   const { data, error } = await supabase
     .from('settings')
     .select('value')
     .eq('key', 'admin_password_hash')
     .single();
 
-  if (error || !data) {
-    // If not found in DB, try to insert default
-    if (error?.code === 'PGRST116') { // No rows found
-         await supabase.from('settings').insert({
-             key: 'admin_password_hash',
-             value: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918' // 'admin'
-         });
-         return '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-    }
-    return null;
+  // 2. If DB connection fails (e.g. not configured), fallback to local check for 'admin'
+  // This ensures you can login to the admin panel to configure the keys!
+  if (error) {
+    console.warn("Database check failed, using fallback authentication for initial setup.");
+    // Hash for 'admin'
+    const defaultHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+    return hash === defaultHash;
   }
 
-  return data.value;
+  if (!data) return false;
+  return data.value === hash;
 };
 
-export const updateAdminPasswordHash = async (newHash: string): Promise<boolean> => {
-  if (!supabase) {
-    localStorage.setItem('admin_pwh', newHash);
-    return true;
-  }
-
+export const updateAdminPassword = async (newPassword: string) => {
+  const hash = await sha256(newPassword);
   const { error } = await supabase
     .from('settings')
-    .upsert({ key: 'admin_password_hash', value: newHash });
+    .upsert({ key: 'admin_password_hash', value: hash });
+  
+  if (error) throw error;
+};
 
-  if (error) {
-    console.error('Error updating password:', error);
-    throw error;
+export const getTelegramSettings = async () => {
+  try {
+    const { data: tokenData } = await supabase.from('settings').select('value').eq('key', 'telegram_bot_token').single();
+    const { data: chatData } = await supabase.from('settings').select('value').eq('key', 'telegram_chat_id').single();
+    
+    return {
+      botToken: tokenData?.value || '',
+      chatId: chatData?.value || ''
+    };
+  } catch (e) {
+    return { botToken: '', chatId: '' };
   }
-  return true;
+};
+
+export const saveTelegramSettings = async (botToken: string, chatId: string) => {
+  await supabase.from('settings').upsert({ key: 'telegram_bot_token', value: botToken });
+  await supabase.from('settings').upsert({ key: 'telegram_chat_id', value: chatId });
 };

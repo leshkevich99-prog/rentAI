@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { X, Calendar, User, Phone, CheckCircle } from 'lucide-react';
+import { X, Calendar, User, Phone, CheckCircle, Loader2 } from 'lucide-react';
 import { Car } from '../types';
+import { BookingDetails } from '../types';
+import { sendTelegramBooking } from '../services/telegram';
 
 interface BookingModalProps {
   car: Car | null;
@@ -8,14 +10,32 @@ interface BookingModalProps {
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
-  const [step, setStep] = useState<'form' | 'success'>('form');
+  const [step, setStep] = useState<'form' | 'sending' | 'success'>('form');
+  const [formData, setFormData] = useState<Partial<BookingDetails>>({
+    name: '',
+    phone: '',
+    startDate: '',
+    endDate: ''
+  });
 
   if (!car) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
-    setTimeout(() => setStep('success'), 1000);
+    setStep('sending');
+
+    const booking: BookingDetails = {
+      carId: car.id,
+      name: formData.name || '',
+      phone: formData.phone || '',
+      startDate: formData.startDate || '',
+      endDate: formData.endDate || ''
+    };
+
+    // Send to Telegram
+    await sendTelegramBooking(booking, car);
+    
+    setStep('success');
   };
 
   return (
@@ -51,6 +71,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     type="text" 
                     required 
                     placeholder="Александр"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors"
                   />
                 </div>
@@ -64,6 +86,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     type="tel" 
                     required 
                     placeholder="+375 (29) 000-00-00"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors"
                   />
                 </div>
@@ -77,6 +101,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     <input 
                       type="date" 
                       required 
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
                       className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input"
                     />
                   </div>
@@ -88,6 +114,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     <input 
                       type="date" 
                       required 
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input"
                     />
                   </div>
@@ -108,6 +136,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                 </button>
               </div>
             </form>
+          </div>
+        ) : step === 'sending' ? (
+          <div className="p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
+             <Loader2 className="w-12 h-12 text-gold-400 animate-spin mb-4" />
+             <p className="text-white text-lg">Обработка заявки...</p>
           </div>
         ) : (
           <div className="p-12 text-center flex flex-col items-center justify-center min-h-[400px]">

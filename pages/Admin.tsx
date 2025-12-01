@@ -13,13 +13,14 @@ import {
   DollarSign,
   Users,
   Menu,
+  Settings,
   Upload,
   Lock,
-  ShieldAlert,
-  Loader2
+  MessageCircle,
+  Database
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getAdminPasswordHash, updateAdminPasswordHash } from '../services/supabase';
+import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings } from '../services/supabase';
 
 interface AdminProps {
   cars: Car[];
@@ -28,101 +29,64 @@ interface AdminProps {
   onDeleteCar: (id: string) => void;
 }
 
-// Utility to hash passwords
-const hashPassword = async (password: string): Promise<string> => {
-  const msgBuffer = new TextEncoder().encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-};
-
 export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDeleteCar }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'fleet' | 'bookings' | 'security'>('dashboard');
+  const [loginError, setLoginError] = useState('');
+  
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'fleet' | 'bookings' | 'settings'>('dashboard');
   const [isEditing, setIsEditing] = useState(false);
   const [currentCar, setCurrentCar] = useState<Partial<Car>>({});
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [loginError, setLoginError] = useState('');
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
   
-  // Security State
+  // Settings State
   const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [securityMessage, setSecurityMessage] = useState('');
+  const [telegramToken, setTelegramToken] = useState('');
+  const [telegramChatId, setTelegramChatId] = useState('');
+  const [settingsStatus, setSettingsStatus] = useState('');
+  
+  // Supabase Settings State
+  const [supabaseUrl, setSupabaseUrl] = useState('');
+  const [supabaseKey, setSupabaseKey] = useState('');
 
   const navigate = useNavigate();
 
-  // Initialize Admin Auth
+  // Load Settings
   useEffect(() => {
-    const checkSession = () => {
-        // Check if already logged in (session storage)
-        const sessionAuth = sessionStorage.getItem('admin_session');
-        if (sessionAuth === 'true') {
-            setIsAuthenticated(true);
-        }
-        setIsAuthChecking(false);
-    };
-    checkSession();
-  }, []);
+    // Load local storage keys for Supabase
+    setSupabaseUrl(localStorage.getItem('supabase_project_url') || '');
+    setSupabaseKey(localStorage.getItem('supabase_anon_key') || '');
+
+    if (activeTab === 'settings' && isAuthenticated) {
+      getTelegramSettings().then(settings => {
+        setTelegramToken(settings.botToken);
+        setTelegramChatId(settings.chatId);
+      });
+    }
+  }, [activeTab, isAuthenticated]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
-
-    if (email !== 'admin@elitedrive.by') {
-      setLoginError('Неверный Email');
-      return;
-    }
-
     try {
-        const storedHash = await getAdminPasswordHash();
-        const inputHash = await hashPassword(password);
-
-        // Fallback or exact match
-        if (storedHash && inputHash === storedHash) {
-            setIsAuthenticated(true);
-            sessionStorage.setItem('admin_session', 'true');
-        } else {
-            setLoginError('Неверный пароль');
-        }
+      const isValid = await checkAdminPassword(password);
+      if (isValid) {
+        setIsAuthenticated(true);
+      } else {
+        setLoginError('Неверный пароль');
+      }
     } catch (err) {
-        setLoginError('Ошибка соединения с сервером');
-        console.error(err);
+      console.error(err);
+      // Even if error occurs (e.g. no DB connection), checkAdminPassword might handle it, 
+      // but if it throws, we catch here.
+      setLoginError('Ошибка проверки пароля. Попробуйте "admin" если база не настроена.');
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    sessionStorage.removeItem('admin_session');
+    setPassword('');
     navigate('/');
-  };
-
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSecurityMessage('');
-
-    if (newPassword.length < 5) {
-      setSecurityMessage('Пароль слишком короткий (минимум 5 символов)');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setSecurityMessage('Пароли не совпадают');
-      return;
-    }
-
-    try {
-        const newHash = await hashPassword(newPassword);
-        await updateAdminPasswordHash(newHash);
-        setSecurityMessage('Пароль успешно изменен!');
-        setNewPassword('');
-        setConfirmPassword('');
-    } catch (err) {
-        setSecurityMessage('Ошибка при сохранении пароля');
-        console.error(err);
-    }
   };
 
   // Car Editor Handlers
@@ -131,7 +95,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       setCurrentCar({ ...car });
     } else {
       setCurrentCar({
-        // Do not set ID here for new cars, Supabase will generate UUID
+        id: '', 
         name: '',
         category: CarCategory.SEDAN,
         pricePerDay: 0,
@@ -146,15 +110,9 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit warning
-        alert("Внимание: Изображение более 2МБ может замедлить работу сайта.");
-      }
-
       const reader = new FileReader();
       reader.onloadend = () => {
-        // In a full implementation, we would upload to Supabase Storage here and get a public URL
-        // For now, we will save the Base64 string to the DB text field as requested by the constraints
-        setCurrentCar(prev => ({ ...prev, imageUrl: reader.result as string }));
+        setCurrentCar({ ...currentCar, imageUrl: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -163,9 +121,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   const handleSaveCar = (e: React.FormEvent) => {
     e.preventDefault();
     if (currentCar.name) {
-      // Check if it's an existing car or new
-      const existing = cars.find(c => c.id === currentCar.id);
-      if (existing && currentCar.id) {
+      if (currentCar.id) {
         onUpdateCar(currentCar as Car);
       } else {
         onAddCar(currentCar as Car);
@@ -174,9 +130,43 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
     }
   };
 
-  if (isAuthChecking) {
-      return <div className="min-h-screen bg-black flex items-center justify-center text-white"><Loader2 className="animate-spin" /></div>;
-  }
+  // Settings Handlers
+  const handleSaveTelegram = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSettingsStatus('Сохранение Telegram...');
+    try {
+      await saveTelegramSettings(telegramToken, telegramChatId);
+      setSettingsStatus('Telegram настройки сохранены!');
+      setTimeout(() => setSettingsStatus(''), 3000);
+    } catch (error) {
+      setSettingsStatus('Ошибка сохранения. Проверьте подключение к БД.');
+    }
+  };
+  
+  const handleSavePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword) return;
+    setSettingsStatus('Обновление пароля...');
+    try {
+      await updateAdminPassword(newPassword);
+      setNewPassword('');
+      setSettingsStatus('Пароль успешно обновлен!');
+      setTimeout(() => setSettingsStatus(''), 3000);
+    } catch (error) {
+      setSettingsStatus('Ошибка обновления пароля.');
+    }
+  };
+
+  const handleSaveDatabase = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSettingsStatus('Сохранение подключения...');
+    localStorage.setItem('supabase_project_url', supabaseUrl);
+    localStorage.setItem('supabase_anon_key', supabaseKey);
+    setSettingsStatus('Сохранено! Перезагрузка страницы...');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -184,19 +174,9 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
         <div className="max-w-md w-full bg-dark-900 border border-white/10 p-8 rounded-2xl shadow-2xl">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-serif text-white mb-2">EliteDrive <span className="text-gold-400">Admin</span></h2>
-            <p className="text-gray-400">Вход в панель управления</p>
+            <p className="text-gray-400">Безопасный вход</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-xs uppercase text-gray-500 mb-2 tracking-widest">Email</label>
-              <input 
-                type="email" 
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none rounded"
-                placeholder="admin@elitedrive.by"
-              />
-            </div>
             <div>
               <label className="block text-xs uppercase text-gray-500 mb-2 tracking-widest">Пароль</label>
               <input 
@@ -204,15 +184,15 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none rounded"
-                placeholder="Ввод пароля"
+                placeholder="Введите пароль администратора"
               />
             </div>
             {loginError && <p className="text-red-500 text-sm text-center">{loginError}</p>}
             <button className="w-full bg-gold-500 text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded">
               Войти
             </button>
-            <p className="text-xs text-gray-600 text-center mt-4">
-               Стандартный пароль при первом входе: <span className="text-gray-400">admin</span>
+            <p className="text-xs text-center text-gray-600">
+               * Если база не подключена, используйте пароль: <b>admin</b>
             </p>
           </form>
         </div>
@@ -276,11 +256,11 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
             <span className="font-medium">Заявки</span>
           </button>
           <button 
-             onClick={() => { setActiveTab('security'); setSidebarOpen(false); }}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'security' ? 'bg-gold-500/10 text-gold-400' : 'text-gray-400 hover:bg-white/5'}`}
+             onClick={() => { setActiveTab('settings'); setSidebarOpen(false); }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'settings' ? 'bg-gold-500/10 text-gold-400' : 'text-gray-400 hover:bg-white/5'}`}
           >
-            <Lock size={20} />
-            <span className="font-medium">Безопасность</span>
+            <Settings size={20} />
+            <span className="font-medium">Настройки</span>
           </button>
         </nav>
 
@@ -326,6 +306,26 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                 </div>
                 <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-1">Новые клиенты</h3>
                 <p className="text-2xl md:text-3xl font-bold text-white">145</p>
+              </div>
+            </div>
+
+            <div className="bg-dark-900 rounded-xl border border-white/5 p-6">
+              <h3 className="text-xl font-serif text-white mb-6">Последние действия</h3>
+              <div className="space-y-4">
+                {[1, 2, 3].map((_, i) => (
+                  <div key={i} className="flex flex-col md:flex-row md:items-center justify-between py-3 border-b border-white/5 last:border-0 gap-2 md:gap-0">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+                        <Check size={16} className="text-green-500" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm md:text-base">Новая бронь: Rolls-Royce Cullinan</p>
+                        <p className="text-xs text-gray-500">2 минуты назад • Иван Петров</p>
+                      </div>
+                    </div>
+                    <span className="text-gold-400 font-bold ml-14 md:ml-0">4 200 BYN</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -401,6 +401,141 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
           </div>
         )}
 
+        {/* Settings View */}
+        {activeTab === 'settings' && (
+          <div className="animate-fade-in-up pb-12">
+            <h1 className="text-2xl md:text-3xl font-serif text-white mb-8">Настройки и Безопасность</h1>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              {/* Database Settings */}
+              <div className="bg-dark-900 p-6 rounded-xl border border-white/5 lg:col-span-2">
+                 <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-purple-500/10 rounded-lg text-purple-500"><Database size={24} /></div>
+                  <h3 className="text-xl font-bold text-white">База Данных (Supabase)</h3>
+                </div>
+                
+                <form onSubmit={handleSaveDatabase} className="space-y-4">
+                  <div className="text-sm text-gray-400 bg-white/5 p-4 rounded mb-4">
+                    <p>Для работы админ-панели и сохранения данных укажите ключи вашего проекта Supabase.</p>
+                    <p className="mt-2 text-xs opacity-70">Project Settings &rarr; API &rarr; Project URL / Anon Key</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs uppercase text-gray-500 mb-2">Project URL</label>
+                      <input 
+                        type="text" 
+                        value={supabaseUrl}
+                        onChange={e => setSupabaseUrl(e.target.value)}
+                        placeholder="https://xyz.supabase.co"
+                        className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase text-gray-500 mb-2">Anon API Key</label>
+                      <input 
+                        type="password" 
+                        value={supabaseKey}
+                        onChange={e => setSupabaseKey(e.target.value)}
+                        placeholder="eyJhbGciOiJIUzI1NiIsInR5..."
+                        className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t border-white/5">
+                     <button className="bg-purple-600 text-white font-bold uppercase px-6 py-3 rounded hover:bg-purple-500 transition-colors w-full md:w-auto">
+                       Сохранить настройки БД
+                     </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Telegram Settings */}
+              <div className="bg-dark-900 p-6 rounded-xl border border-white/5">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-blue-500/10 rounded-lg text-blue-500"><MessageCircle size={24} /></div>
+                  <h3 className="text-xl font-bold text-white">Уведомления Telegram</h3>
+                </div>
+                
+                <form onSubmit={handleSaveTelegram} className="space-y-4">
+                  <div className="text-sm text-gray-400 bg-white/5 p-4 rounded mb-4">
+                    <p className="mb-2"><b>Важно:</b> Telegram бот НЕ может писать вам первым по username. Он может отвечать только по Chat ID.</p>
+                    <ol className="list-decimal list-inside space-y-1 text-xs">
+                      <li>Создайте бота в <b>@BotFather</b> и получите Token.</li>
+                      <li>Напишите своему боту <code>/start</code>.</li>
+                      <li>Узнайте свой Chat ID в боте <b>@getmyid_bot</b>.</li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase text-gray-500 mb-2">Telegram Bot Token</label>
+                    <input 
+                      type="text" 
+                      value={telegramToken}
+                      onChange={e => setTelegramToken(e.target.value)}
+                      placeholder="123456:ABC-DEF..."
+                      className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase text-gray-500 mb-2">Ваш Chat ID</label>
+                    <input 
+                      type="text" 
+                      value={telegramChatId}
+                      onChange={e => setTelegramChatId(e.target.value)}
+                      placeholder="12345678"
+                      className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                    />
+                  </div>
+                  
+                  <div className="pt-4 border-t border-white/5">
+                     <button className="bg-gold-500 text-black font-bold uppercase px-6 py-3 rounded hover:bg-gold-400 transition-colors w-full">
+                       Сохранить настройки Telegram
+                     </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Password Settings */}
+              <div className="bg-dark-900 p-6 rounded-xl border border-white/5">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-red-500/10 rounded-lg text-red-500"><Lock size={24} /></div>
+                  <h3 className="text-xl font-bold text-white">Смена пароля</h3>
+                </div>
+
+                <form onSubmit={handleSavePassword} className="space-y-4">
+                   <p className="text-sm text-gray-400 mb-4">
+                     Пароль шифруется (SHA-256) и хранится в базе Supabase. Если база не подключена, работает пароль 'admin'.
+                   </p>
+                   <div>
+                    <label className="block text-xs uppercase text-gray-500 mb-2">Новый пароль</label>
+                    <input 
+                      type="password" 
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      placeholder="Введите новый пароль"
+                      className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                    />
+                  </div>
+                   <div className="pt-4 border-t border-white/5">
+                     <button className="bg-white/10 text-white font-bold uppercase px-6 py-3 rounded hover:bg-white/20 transition-colors w-full border border-white/10">
+                       Обновить пароль
+                     </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {settingsStatus && (
+              <div className="fixed bottom-8 right-8 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl animate-fade-in-up z-50">
+                 {settingsStatus}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Bookings View - Mock */}
         {activeTab === 'bookings' && (
            <div className="animate-fade-in-up">
@@ -408,64 +543,11 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
              <div className="bg-dark-900 rounded-xl border border-white/5 overflow-hidden">
                 <div className="p-8 text-center text-gray-500">
                     <CalendarDays size={48} className="mx-auto mb-4 opacity-50" />
-                    <p>Здесь будут отображаться активные заявки с сайта.</p>
+                    <p>Заявки отправляются напрямую в ваш Telegram.</p>
+                    <button onClick={() => setActiveTab('settings')} className="mt-4 text-gold-400 hover:text-white underline text-sm">Настроить Telegram</button>
                 </div>
              </div>
            </div>
-        )}
-
-        {/* Security View */}
-        {activeTab === 'security' && (
-          <div className="animate-fade-in-up">
-            <h1 className="text-2xl md:text-3xl font-serif text-white mb-8">Настройки безопасности</h1>
-            
-            <div className="max-w-xl">
-              <div className="bg-dark-900 rounded-xl border border-white/5 p-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3 bg-red-500/10 rounded-lg text-red-500">
-                    <ShieldAlert size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white">Смена пароля администратора</h3>
-                    <p className="text-gray-400 text-sm">Пароль будет захэширован и сохранен в Supabase.</p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleChangePassword} className="space-y-6">
-                  <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2 tracking-widest">Новый пароль</label>
-                    <input 
-                      type="password" 
-                      value={newPassword}
-                      onChange={e => setNewPassword(e.target.value)}
-                      className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none rounded"
-                      placeholder="Минимум 5 символов"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2 tracking-widest">Подтвердите пароль</label>
-                    <input 
-                      type="password" 
-                      value={confirmPassword}
-                      onChange={e => setConfirmPassword(e.target.value)}
-                      className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none rounded"
-                      placeholder="Повторите пароль"
-                    />
-                  </div>
-                  
-                  {securityMessage && (
-                    <div className={`p-3 rounded text-sm ${securityMessage.includes('успешно') ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                      {securityMessage}
-                    </div>
-                  )}
-
-                  <button className="w-full bg-white text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded">
-                    Обновить пароль
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
         )}
 
       </main>
@@ -512,41 +594,33 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
               <div>
                  <label className="block text-xs uppercase text-gray-500 mb-2">Изображение</label>
                  
-                 {/* File Upload Input */}
-                 <div className="mb-4">
-                   <div className="relative border border-dashed border-white/20 bg-dark-900 p-6 rounded hover:border-gold-400 transition-colors group cursor-pointer">
-                      <input 
-                        type="file" 
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      />
-                      <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-gold-400">
-                        <Upload size={32} className="mb-2" />
-                        <span className="text-sm">Нажмите для загрузки фото</span>
-                        <span className="text-xs text-gray-600 mt-1">Макс. 2MB (хранение в БД)</span>
-                      </div>
-                   </div>
-                 </div>
-
-                 {/* URL Fallback */}
-                 <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs text-gray-500">Или укажите прямую ссылку:</span>
-                 </div>
-                  <input 
-                    type="text" 
-                    value={currentCar.imageUrl}
-                    onChange={e => setCurrentCar({...currentCar, imageUrl: e.target.value})}
-                    className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none text-sm text-gray-400"
-                    placeholder="https://..."
-                  />
-
-                  {/* Preview */}
-                  {currentCar.imageUrl && (
-                    <div className="mt-4 w-full h-40 rounded border border-white/10 overflow-hidden bg-black">
-                      <img src={currentCar.imageUrl} alt="Preview" className="w-full h-full object-cover opacity-80" />
+                 <div className="flex flex-col gap-4">
+                    {/* Preview */}
+                    {currentCar.imageUrl && (
+                        <div className="relative h-40 w-full rounded overflow-hidden border border-white/10">
+                            <img src={currentCar.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                    )}
+                    
+                    <div className="flex gap-2">
+                        <label className="flex-1 cursor-pointer bg-dark-900 border border-white/10 p-3 text-white rounded hover:border-gold-400 transition-colors flex items-center justify-center gap-2">
+                            <Upload size={18} />
+                            <span>Загрузить фото (файл)</span>
+                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                        </label>
                     </div>
-                  )}
+                    
+                    <div className="relative">
+                        <span className="absolute -top-2 left-3 bg-dark-800 px-2 text-[10px] text-gray-500">Или вставьте ссылку</span>
+                        <input 
+                            type="text" 
+                            value={currentCar.imageUrl}
+                            onChange={e => setCurrentCar({...currentCar, imageUrl: e.target.value})}
+                            className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
+                            placeholder="https://..."
+                        />
+                    </div>
+                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

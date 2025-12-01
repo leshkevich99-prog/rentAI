@@ -13,8 +13,8 @@ import { UserAgreement } from './components/UserAgreement';
 import { Home } from './pages/Home';
 import { Admin } from './pages/Admin';
 import { Car } from './types';
-import { fetchCars, addCarToDb, updateCarInDb, deleteCarFromDb } from './services/supabase';
-import { Loader2 } from 'lucide-react';
+import { CARS as MOCK_CARS } from './constants';
+import { fetchCars, saveCar, deleteCarById } from './services/supabase';
 
 function App() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -22,26 +22,31 @@ function App() {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const location = useLocation();
 
-  // Load cars from Supabase on mount
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const data = await fetchCars();
-        setCars(data);
-      } catch (error) {
-        console.error("Failed to load fleet data", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Load cars from Supabase
+  useEffect(() => {
+    const loadCars = async () => {
+      try {
+        const data = await fetchCars();
+        if (data.length > 0) {
+          setCars(data);
+        } else {
+          // Fallback if DB is empty, use mock but generally we want DB
+          setCars(MOCK_CARS); 
+        }
+      } catch (error) {
+        console.error("Failed to load cars", error);
+        setCars(MOCK_CARS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadCars();
+  }, []);
 
   const handleBookCar = (car: Car) => {
     setSelectedCar(car);
@@ -51,56 +56,44 @@ function App() {
     setSelectedCar(null);
   };
 
-  // Admin handlers wrapping Supabase calls
+  // Admin handlers wrapper
   const handleAddCar = async (newCar: Car) => {
+    // Optimistic update
+    setCars(prev => [newCar, ...prev]);
     try {
-      // Optimistic update
-      const tempId = Date.now().toString();
-      const optimisitcCar = { ...newCar, id: tempId };
-      setCars(prev => [...prev, optimisitcCar]);
-
-      const addedCar = await addCarToDb(newCar);
-      if (addedCar) {
-        // Replace temp car with real DB data (real ID)
-        setCars(prev => prev.map(c => c.id === tempId ? addedCar : c));
-      }
+      await saveCar(newCar);
+      // Reload to get real ID
+      const updated = await fetchCars();
+      setCars(updated);
     } catch (e) {
-      alert("Ошибка сохранения в базу данных");
-      // Revert optimistic update? For simplicity, we just reload or let user try again.
+      console.error(e);
+      alert('Ошибка при сохранении');
     }
   };
 
   const handleUpdateCar = async (updatedCar: Car) => {
+    setCars(prev => prev.map(c => c.id === updatedCar.id ? updatedCar : c));
     try {
-      setCars(cars.map(c => c.id === updatedCar.id ? updatedCar : c));
-      await updateCarInDb(updatedCar);
+      await saveCar(updatedCar);
     } catch (e) {
       console.error(e);
-      alert("Ошибка обновления базы данных");
+      alert('Ошибка при обновлении');
     }
   };
 
   const handleDeleteCar = async (id: string) => {
     if (window.confirm('Вы уверены, что хотите удалить этот автомобиль?')) {
+      setCars(prev => prev.filter(c => c.id !== id));
       try {
-        setCars(cars.filter(c => c.id !== id));
-        await deleteCarFromDb(id);
+        await deleteCarById(id);
       } catch (e) {
         console.error(e);
-        alert("Ошибка удаления из базы данных");
+        alert('Ошибка при удалении');
       }
     }
   };
 
   const isAdminRoute = location.pathname.startsWith('/admin');
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-gold-400 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-gold-500 selection:text-black">
