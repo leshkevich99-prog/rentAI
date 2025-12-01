@@ -14,7 +14,7 @@ import { Home } from './pages/Home';
 import { Admin } from './pages/Admin';
 import { Car } from './types';
 import { CARS as MOCK_CARS } from './constants';
-import { fetchCars, saveCar, deleteCarById } from './services/supabase';
+import { fetchCars, saveCar, deleteCarById, isConfigured } from './services/supabase';
 
 function App() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -30,6 +30,14 @@ function App() {
   // Load cars from Supabase
   useEffect(() => {
     const loadCars = async () => {
+      // Check configuration first to avoid console errors
+      if (!isConfigured) {
+        console.log("Supabase not configured, using mock data");
+        setCars(MOCK_CARS);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const data = await fetchCars();
         if (data.length > 0) {
@@ -58,6 +66,14 @@ function App() {
 
   // Admin handlers wrapper
   const handleAddCar = async (newCar: Car) => {
+    // Handle demo mode
+    if (!isConfigured) {
+      const demoCar = { ...newCar, id: Math.random().toString(36).substring(2, 9) };
+      setCars(prev => [demoCar, ...prev]);
+      alert("Демо режим: Автомобиль добавлен локально (не сохранено в БД)");
+      return;
+    }
+
     // Optimistic update
     setCars(prev => [newCar, ...prev]);
     try {
@@ -73,6 +89,12 @@ function App() {
 
   const handleUpdateCar = async (updatedCar: Car) => {
     setCars(prev => prev.map(c => c.id === updatedCar.id ? updatedCar : c));
+    
+    if (!isConfigured) {
+      alert("Демо режим: Автомобиль обновлен локально (не сохранено в БД)");
+      return;
+    }
+
     try {
       await saveCar(updatedCar);
     } catch (e) {
@@ -84,6 +106,12 @@ function App() {
   const handleDeleteCar = async (id: string) => {
     if (window.confirm('Вы уверены, что хотите удалить этот автомобиль?')) {
       setCars(prev => prev.filter(c => c.id !== id));
+      
+      if (!isConfigured) {
+        alert("Демо режим: Автомобиль удален локально (не сохранено в БД)");
+        return;
+      }
+
       try {
         await deleteCarById(id);
       } catch (e) {
