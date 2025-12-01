@@ -6,7 +6,19 @@ let chatSession: Chat | null = null;
 // Helper to safely get env vars
 const getEnv = (key: string) => {
   try {
-    // Check process.env (Standard for Vercel, CRA, Node)
+     // 1. Vite Standard (import.meta.env)
+     // @ts-ignore
+     if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+        // @ts-ignore
+        return import.meta.env[key];
+     }
+     // @ts-ignore
+     if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[`VITE_${key}`]) {
+        // @ts-ignore
+        return import.meta.env[`VITE_${key}`];
+     }
+
+    // 2. Process Env (Fallback)
     if (typeof process !== 'undefined' && process.env) {
        // @ts-ignore
        if (process.env[key]) return process.env[key];

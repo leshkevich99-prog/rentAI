@@ -1,56 +1,62 @@
 import { createClient } from '@supabase/supabase-js';
 import { Car } from '../types';
 
-// Safe environment variable access
-const getEnv = (key: string) => {
+// --- КОНФИГУРАЦИЯ (OPTION B: ENV VARS) ---
+
+const getEnvVar = (key: string): string => {
+  // 1. Vite Standard (import.meta.env)
   try {
-    // Check process.env (Standard for Vercel, CRA, Node)
-    if (typeof process !== 'undefined' && process.env) {
-       // @ts-ignore
-       if (process.env[key]) return process.env[key];
-       // @ts-ignore
-       if (process.env[`REACT_APP_${key}`]) return process.env[`REACT_APP_${key}`];
-       // @ts-ignore
-       if (process.env[`VITE_${key}`]) return process.env[`VITE_${key}`];
+    // @ts-ignore
+    if (import.meta.env && import.meta.env[key]) {
+      // @ts-ignore
+      return import.meta.env[key];
     }
-  } catch (e) {
-    console.warn('Error reading env vars', e);
-  }
-  return undefined;
-};
+  } catch (e) {}
 
-// Helper to get credentials from Env or LocalStorage
-const getCredentials = () => {
-  const envUrl = getEnv('SUPABASE_URL');
-  const envKey = getEnv('SUPABASE_KEY');
-  
-  // Safe localStorage access
-  let lsUrl = '';
-  let lsKey = '';
+  // 2. Process Env (Fallback)
   try {
-    lsUrl = localStorage.getItem('supabase_project_url') || '';
-    lsKey = localStorage.getItem('supabase_anon_key') || '';
-  } catch (e) {
-    // Ignore localStorage errors
-  }
+    // @ts-ignore
+    if (typeof process !== 'undefined' && process.env && process.env[key]) {
+      // @ts-ignore
+      return process.env[key];
+    }
+  } catch (e) {}
 
-  // Use env var if available, otherwise localStorage
-  let url = (envUrl && !envUrl.includes('YOUR_PROJECT_URL')) ? envUrl : lsUrl;
-  let key = (envKey && !envKey.includes('YOUR_ANON_KEY')) ? envKey : lsKey;
-
-  // Basic validation
-  const isValidUrl = url && (url.startsWith('http://') || url.startsWith('https://'));
-  const isValidKey = key && key.length > 20; // Basic length check
-
-  if (!isValidUrl || !isValidKey) {
-    return { url: 'https://placeholder.supabase.co', key: 'placeholder', configured: false };
-  }
-
-  return { url, key, configured: true };
+  return '';
 };
 
-const { url, key, configured } = getCredentials();
+// Проверяем переменные окружения
+const envUrl = getEnvVar('VITE_SUPABASE_URL');
+const envKey = getEnvVar('VITE_SUPABASE_KEY');
+
+// Проверяем LocalStorage (как резервный вариант, если .env не создан)
+let lsUrl = '';
+let lsKey = '';
+try {
+  lsUrl = localStorage.getItem('supabase_project_url') || '';
+  lsKey = localStorage.getItem('supabase_anon_key') || '';
+} catch (e) {}
+
+// Логика выбора кредов
+const getCredentials = () => {
+  // Приоритет 1: .env файл (Самый безопасный)
+  if (envUrl && envKey) {
+    return { url: envUrl, key: envKey, configured: true, usingEnv: true };
+  }
+
+  // Приоритет 2: LocalStorage (Настройка через UI)
+  if (lsUrl && lsKey) {
+    return { url: lsUrl, key: lsKey, configured: true, usingEnv: false };
+  }
+
+  // Fallback: Заглушка
+  return { url: 'https://placeholder.supabase.co', key: 'placeholder', configured: false, usingEnv: false };
+};
+
+const { url, key, configured, usingEnv } = getCredentials();
+
 export const isConfigured = configured;
+export const isUsingEnv = usingEnv;
 
 // Initialize Supabase safely
 const supabase = createClient(url, key);

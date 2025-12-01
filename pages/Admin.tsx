@@ -18,10 +18,11 @@ import {
   Lock,
   MessageCircle,
   Database,
-  RefreshCw
+  RefreshCw,
+  ShieldCheck
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings } from '../services/supabase';
+import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isUsingEnv } from '../services/supabase';
 
 interface AdminProps {
   cars: Car[];
@@ -437,40 +438,60 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                   <h3 className="text-xl font-bold text-white">База Данных (Supabase)</h3>
                 </div>
                 
-                <form onSubmit={handleSaveDatabase} className="space-y-4">
-                  <div className="text-sm text-gray-400 bg-white/5 p-4 rounded mb-4">
-                    <p>Для работы админ-панели и сохранения данных укажите ключи вашего проекта Supabase.</p>
-                    <p className="mt-2 text-xs opacity-70">Project Settings &rarr; API &rarr; Project URL / Anon Key</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-xs uppercase text-gray-500 mb-2">Project URL</label>
-                      <input 
-                        type="text" 
-                        value={supabaseUrl}
-                        onChange={e => setSupabaseUrl(e.target.value)}
-                        placeholder="https://xyz.supabase.co"
-                        className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase text-gray-500 mb-2">Anon API Key</label>
-                      <input 
-                        type="password" 
-                        value={supabaseKey}
-                        onChange={e => setSupabaseKey(e.target.value)}
-                        placeholder="eyJhbGciOiJIUzI1NiIsInR5..."
-                        className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                      />
+                {isUsingEnv ? (
+                  <div className="bg-green-500/5 border border-green-500/10 p-6 rounded-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-green-500/10 rounded-full shrink-0">
+                         <ShieldCheck className="w-6 h-6 text-green-400" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-bold mb-2">Безопасное подключение активно</h4>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                          Приложение использует ключи доступа из переменных окружения (<code>.env</code> или Vercel Env). 
+                          Это наиболее безопасный способ подключения (Option B).
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Чтобы изменить базу данных, обновите переменные <code>VITE_SUPABASE_URL</code> и <code>VITE_SUPABASE_KEY</code> в конфигурации вашего сервера или локальном файле.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="pt-4 border-t border-white/5">
-                     <button className="bg-purple-600 text-white font-bold uppercase px-6 py-3 rounded hover:bg-purple-500 transition-colors w-full md:w-auto">
-                       Сохранить настройки БД
-                     </button>
-                  </div>
-                </form>
+                ) : (
+                  <form onSubmit={handleSaveDatabase} className="space-y-4">
+                    <div className="text-sm text-gray-400 bg-white/5 p-4 rounded mb-4">
+                      <p>Для работы админ-панели и сохранения данных укажите ключи вашего проекта Supabase.</p>
+                      <p className="mt-2 text-xs opacity-70">Project Settings &rarr; API &rarr; Project URL / Anon Key</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-xs uppercase text-gray-500 mb-2">Project URL</label>
+                        <input 
+                          type="text" 
+                          value={supabaseUrl}
+                          onChange={e => setSupabaseUrl(e.target.value)}
+                          placeholder="https://xyz.supabase.co"
+                          className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs uppercase text-gray-500 mb-2">Anon API Key</label>
+                        <input 
+                          type="password" 
+                          value={supabaseKey}
+                          onChange={e => setSupabaseKey(e.target.value)}
+                          placeholder="eyJhbGciOiJIUzI1NiIsInR5..."
+                          className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="pt-4 border-t border-white/5">
+                      <button className="bg-purple-600 text-white font-bold uppercase px-6 py-3 rounded hover:bg-purple-500 transition-colors w-full md:w-auto">
+                        Сохранить настройки БД
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
 
               {/* Telegram Settings */}
