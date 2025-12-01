@@ -20,10 +20,11 @@ import {
   Database,
   RefreshCw,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isConfigured } from '../services/supabase';
+import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isConfigured, uploadCarImage } from '../services/supabase';
 
 interface AdminProps {
   cars: Car[];
@@ -47,6 +48,9 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   const [telegramToken, setTelegramToken] = useState('');
   const [telegramChatId, setTelegramChatId] = useState('');
   const [settingsStatus, setSettingsStatus] = useState('');
+  
+  // Image Upload State
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   
   const navigate = useNavigate();
 
@@ -100,14 +104,30 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
     setIsEditing(true);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    // Demo mode fallback
+    if (!isConfigured) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setCurrentCar({ ...currentCar, imageUrl: reader.result as string });
       };
       reader.readAsDataURL(file);
+      alert('Демо режим: Картинка загружена локально как Base64 (не ссылка).');
+      return;
+    }
+
+    try {
+      setIsUploadingImage(true);
+      const publicUrl = await uploadCarImage(file);
+      setCurrentCar({ ...currentCar, imageUrl: publicUrl });
+    } catch (error: any) {
+      console.error(error);
+      alert(`Ошибка загрузки: ${error.message || 'Проверьте bucket "car-images" в Supabase'}`);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -579,27 +599,28 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                  <div className="flex flex-col gap-4">
                     {/* Preview */}
                     {currentCar.imageUrl && (
-                        <div className="relative h-40 w-full rounded overflow-hidden border border-white/10">
+                        <div className="relative h-40 w-full rounded overflow-hidden border border-white/10 bg-black/20">
                             <img src={currentCar.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                         </div>
                     )}
                     
                     <div className="flex gap-2">
-                        <label className="flex-1 cursor-pointer bg-dark-900 border border-white/10 p-3 text-white rounded hover:border-gold-400 transition-colors flex items-center justify-center gap-2">
-                            <Upload size={18} />
-                            <span>Загрузить фото (файл)</span>
-                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                        <label className={`flex-1 cursor-pointer bg-dark-900 border border-white/10 p-3 text-white rounded hover:border-gold-400 transition-colors flex items-center justify-center gap-2 ${isUploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
+                            {isUploadingImage ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                            <span>{isUploadingImage ? 'Загрузка...' : 'Загрузить фото (Server)'}</span>
+                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploadingImage} />
                         </label>
                     </div>
                     
                     <div className="relative">
-                        <span className="absolute -top-2 left-3 bg-dark-800 px-2 text-[10px] text-gray-500">Или вставьте ссылку</span>
+                        <span className="absolute -top-2 left-3 bg-dark-800 px-2 text-[10px] text-gray-500">Ссылка (генерируется автоматически)</span>
                         <input 
                             type="text" 
                             value={currentCar.imageUrl || ''}
                             onChange={e => setCurrentCar({...currentCar, imageUrl: e.target.value})}
                             className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
                             placeholder="https://..."
+                            readOnly
                         />
                     </div>
                  </div>
@@ -675,8 +696,9 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                 <button 
                   type="submit" 
                   className="flex-1 bg-gold-500 text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded"
+                  disabled={isUploadingImage}
                 >
-                  Сохранить
+                  {isUploadingImage ? 'Ждем загрузку...' : 'Сохранить'}
                 </button>
                 <button 
                   type="button" 

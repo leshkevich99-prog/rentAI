@@ -93,6 +93,34 @@ export const deleteCarById = async (id: string) => {
   if (error) throw error;
 };
 
+// --- STORAGE API ---
+
+export const uploadCarImage = async (file: File): Promise<string> => {
+  if (!isConfigured) throw new Error("Database not configured");
+
+  // 1. Создаем уникальное имя файла
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  // 2. Загружаем в бакет 'car-images'
+  const { error: uploadError } = await supabase.storage
+    .from('car-images')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    console.error("Upload error:", uploadError);
+    throw new Error(`Ошибка загрузки: ${uploadError.message}`);
+  }
+
+  // 3. Получаем публичную ссылку
+  const { data } = supabase.storage
+    .from('car-images')
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+};
+
 // --- AUTH API ---
 
 export const checkAdminPassword = async (password: string): Promise<boolean> => {
