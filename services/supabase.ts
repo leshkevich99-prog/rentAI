@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import { Car } from '../types';
 
-// 1. Достаем ключи из настроек (process.env)
-// VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY должны быть в файле .env или настройках Vercel
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+// В Vite проектах переменные окружения доступны через import.meta.env
+// Vercel автоматически подставляет их во время сборки, если они начинаются с VITE_
+const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL;
+const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
 
 // 2. Проверяем статус конфигурации
 // Мы не выбрасываем фатальную ошибку (throw), чтобы приложение могло запуститься
