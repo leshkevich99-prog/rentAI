@@ -3,13 +3,30 @@ import { AI_SYSTEM_INSTRUCTION } from '../constants';
 
 let chatSession: Chat | null = null;
 
+// Helper to safely get env vars regardless of bundler (Vite vs CRA vs Node)
 const getEnv = (key: string) => {
   try {
+    // 1. Check Vite (import.meta.env)
     // @ts-ignore
-    return typeof process !== 'undefined' && process.env ? process.env[key] : undefined;
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+       // @ts-ignore
+       if (import.meta.env[key]) return import.meta.env[key];
+       // @ts-ignore
+       if (import.meta.env[`VITE_${key}`]) return import.meta.env[`VITE_${key}`];
+    }
+    
+    // 2. Check process.env (Create React App / Node / Webpack)
+    // @ts-ignore
+    if (typeof process !== 'undefined' && process.env) {
+       // @ts-ignore
+       if (process.env[key]) return process.env[key];
+       // @ts-ignore
+       if (process.env[`REACT_APP_${key}`]) return process.env[`REACT_APP_${key}`];
+    }
   } catch (e) {
-    return undefined;
+    // ignore
   }
+  return undefined;
 };
 
 const getAiClient = () => {

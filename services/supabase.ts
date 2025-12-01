@@ -1,14 +1,31 @@
 import { createClient } from '@supabase/supabase-js';
 import { Car } from '../types';
 
-// Helper to safely get env vars without crashing in browser if process is undefined
+// Helper to safely get env vars regardless of bundler (Vite vs CRA vs Node)
 const getEnv = (key: string) => {
   try {
+    // 1. Check Vite (import.meta.env)
+    // We look for standard key or VITE_ prefixed key
     // @ts-ignore
-    return typeof process !== 'undefined' && process.env ? process.env[key] : undefined;
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+       // @ts-ignore
+       if (import.meta.env[key]) return import.meta.env[key];
+       // @ts-ignore
+       if (import.meta.env[`VITE_${key}`]) return import.meta.env[`VITE_${key}`];
+    }
+    
+    // 2. Check process.env (Create React App / Node / Webpack)
+    // @ts-ignore
+    if (typeof process !== 'undefined' && process.env) {
+       // @ts-ignore
+       if (process.env[key]) return process.env[key];
+       // @ts-ignore
+       if (process.env[`REACT_APP_${key}`]) return process.env[`REACT_APP_${key}`];
+    }
   } catch (e) {
-    return undefined;
+    // Ignore errors in environments where these are accessed incorrectly
   }
+  return undefined;
 };
 
 // Helper to get credentials from Env or LocalStorage
@@ -19,8 +36,8 @@ const getCredentials = () => {
   const lsKey = localStorage.getItem('supabase_anon_key');
 
   // Use env var if it's set and not the default placeholder, otherwise use localStorage
-  let url = (envUrl && envUrl !== 'https://YOUR_PROJECT_URL.supabase.co') ? envUrl : lsUrl;
-  let key = (envKey && envKey !== 'YOUR_ANON_KEY') ? envKey : lsKey;
+  let url = (envUrl && !envUrl.includes('YOUR_PROJECT_URL')) ? envUrl : lsUrl;
+  let key = (envKey && !envKey.includes('YOUR_ANON_KEY')) ? envKey : lsKey;
 
   // Basic validation to prevent createClient crash
   if (!url || !url.startsWith('http')) {
@@ -34,16 +51,15 @@ const getCredentials = () => {
 };
 
 const { url, key } = getCredentials();
+// Check if we are using real credentials or placeholders
+const isConfigured = url !== 'https://placeholder.supabase.co' && key !== 'placeholder';
 
 // Initialize Supabase
-// We use a try-catch block during initialization wrapper to be extra safe, 
-// though createClient usually handles valid strings fine.
 let supabaseClient;
 try {
   supabaseClient = createClient(url, key);
 } catch (error) {
   console.error("Supabase init failed:", error);
-  // Fallback to a dummy client to prevent app crash
   supabaseClient = createClient('https://placeholder.supabase.co', 'placeholder');
 }
 
@@ -60,12 +76,15 @@ async function sha256(message: string) {
 
 // --- Cars API ---
 export const fetchCars = async (): Promise<Car[]> => {
+  // If not configured, don't even try to fetch, return empty so App falls back to mocks
+  if (!isConfigured) {
+    return [];
+  }
+
   try {
     const { data, error } = await supabase.from('cars').select('*').order('created_at', { ascending: false });
     
     if (error) {
-      // Log the error message properly
-      console.warn('Supabase error fetching cars:', error.message || error);
       throw error;
     }
     
@@ -79,12 +98,19 @@ export const fetchCars = async (): Promise<Car[]> => {
       available: item.available
     }));
   } catch (err: any) {
-    console.error('Failed to fetch cars:', err.message || err);
+    // Suppress "Failed to fetch" noise which happens when URL is wrong or network down
+    if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('Network request failed'))) {
+        console.warn("Could not connect to Supabase (Network/Config error). Using fallback data.");
+    } else {
+        console.error('Failed to fetch cars:', err.message || err);
+    }
     return [];
   }
 };
 
 export const saveCar = async (car: Car) => {
+  if (!isConfigured) throw new Error("Database not configured");
+
   // Convert to DB format
   const dbCar = {
     name: car.name,
@@ -107,6 +133,7 @@ export const saveCar = async (car: Car) => {
 };
 
 export const deleteCarById = async (id: string) => {
+  if (!isConfigured) throw new Error("Database not configured");
   const { error } = await supabase.from('cars').delete().eq('id', id);
   if (error) throw error;
 };
@@ -115,27 +142,34 @@ export const deleteCarById = async (id: string) => {
 
 export const checkAdminPassword = async (password: string): Promise<boolean> => {
   const hash = await sha256(password);
+  const defaultHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // hash for 'admin'
   
-  // 1. Try to check against DB
-  const { data, error } = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', 'admin_password_hash')
-    .single();
-
-  // 2. If DB connection fails (e.g. not configured), fallback to local check for 'admin'
-  if (error) {
-    console.warn("Database check failed, using fallback authentication. Error:", error.message || error);
-    // Hash for 'admin'
-    const defaultHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-    return hash === defaultHash;
+  // Quick fallback if clearly not configured
+  if (!isConfigured && hash === defaultHash) {
+    return true;
   }
 
-  if (!data) return false;
-  return data.value === hash;
+  try {
+    // 1. Try to check against DB
+    const { data, error } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'admin_password_hash')
+      .single();
+
+    if (error) throw error;
+    if (!data) return false;
+    return data.value === hash;
+
+  } catch (error: any) {
+    console.warn("Database auth check failed, using local fallback. Error:", error.message || "Unknown");
+    // 2. If DB connection fails (e.g. not configured), fallback to local check for 'admin'
+    return hash === defaultHash;
+  }
 };
 
 export const updateAdminPassword = async (newPassword: string) => {
+  if (!isConfigured) throw new Error("Database not configured");
   const hash = await sha256(newPassword);
   const { error } = await supabase
     .from('settings')
@@ -145,6 +179,8 @@ export const updateAdminPassword = async (newPassword: string) => {
 };
 
 export const getTelegramSettings = async () => {
+  if (!isConfigured) return { botToken: '', chatId: '' };
+
   try {
     const { data: tokenData } = await supabase.from('settings').select('value').eq('key', 'telegram_bot_token').single();
     const { data: chatData } = await supabase.from('settings').select('value').eq('key', 'telegram_chat_id').single();
@@ -159,6 +195,7 @@ export const getTelegramSettings = async () => {
 };
 
 export const saveTelegramSettings = async (botToken: string, chatId: string) => {
+  if (!isConfigured) throw new Error("Database not configured");
   await supabase.from('settings').upsert({ key: 'telegram_bot_token', value: botToken });
   await supabase.from('settings').upsert({ key: 'telegram_chat_id', value: chatId });
 };
