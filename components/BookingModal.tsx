@@ -38,6 +38,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     setStep('success');
   };
 
+  // Helper to open calendar on click
+  const openCalendar = (e: React.MouseEvent<HTMLInputElement>) => {
+    try {
+      if ('showPicker' in HTMLInputElement.prototype) {
+        e.currentTarget.showPicker();
+      }
+    } catch (error) {
+      // Fallback for older browsers or if prevented
+      console.log('Native picker not supported or blocked');
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
@@ -98,26 +110,26 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                 <div className="space-y-2">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Начало <span className="opacity-50 text-[10px] lowercase">(необязательно)</span></label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
+                    <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5 pointer-events-none" />
                     <input 
                       type="date" 
-                      // Removed required
                       value={formData.startDate || ''}
                       onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input"
+                      onClick={openCalendar}
+                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Окончание <span className="opacity-50 text-[10px] lowercase">(необязательно)</span></label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
+                    <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5 pointer-events-none" />
                     <input 
                       type="date" 
-                      // Removed required
                       value={formData.endDate || ''}
                       onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input"
+                      onClick={openCalendar}
+                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer"
                     />
                   </div>
                 </div>
