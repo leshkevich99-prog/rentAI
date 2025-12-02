@@ -5,6 +5,11 @@ export enum CarCategory {
   CONVERTIBLE = 'Кабриолеты'
 }
 
+export interface DiscountRule {
+  days: number; // Больше этого количества дней
+  discount: number; // Процент скидки (0-100)
+}
+
 export interface Car {
   id: string;
   name: string;
@@ -17,6 +22,8 @@ export interface Car {
   };
   imageUrl: string;
   available: boolean;
+  description?: string;
+  discountRules?: DiscountRule[];
 }
 
 export interface ChatMessage {
@@ -31,4 +38,7 @@ export interface BookingDetails {
   endDate: string;
   name: string;
   phone: string;
+  totalPrice?: number;
+  days?: number;
+  discountApplied?: number;
 }

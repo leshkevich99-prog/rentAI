@@ -56,7 +56,9 @@ export const fetchCars = async (): Promise<Car[]> => {
     pricePerDay: car.price_per_day,
     specs: car.specs,
     imageUrl: car.image_url,
-    available: car.available
+    available: car.available,
+    description: car.description,
+    discountRules: car.discount_rules || []
   }));
 };
 
@@ -69,7 +71,9 @@ export const saveCar = async (car: Car) => {
     price_per_day: car.pricePerDay,
     specs: car.specs,
     image_url: car.imageUrl,
-    available: car.available
+    available: car.available,
+    description: car.description,
+    discount_rules: car.discountRules
   };
 
   if (car.id && car.id.length > 20) { 

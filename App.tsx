@@ -12,6 +12,7 @@ import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { UserAgreement } from './components/UserAgreement';
 import { Home } from './pages/Home';
 import { Admin } from './pages/Admin';
+import { CarDetails } from './pages/CarDetails';
 import { Car } from './types';
 import { CARS as MOCK_CARS } from './constants';
 import { fetchCars, saveCar, deleteCarById, isConfigured } from './services/supabase';
@@ -131,6 +132,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home cars={cars} onBookCar={handleBookCar} />} />
           <Route path="/fleet" element={<Fleet cars={cars} onBookCar={handleBookCar} />} />
+          <Route path="/fleet/:id" element={<CarDetails cars={cars} onBookCar={handleBookCar} />} />
           <Route path="/services" element={<Services />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />

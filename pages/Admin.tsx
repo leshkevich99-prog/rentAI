@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Car, CarCategory } from '../types';
+import { Car, CarCategory, DiscountRule } from '../types';
 import { 
   LayoutDashboard, 
   Car as CarIcon, 
@@ -21,7 +21,8 @@ import {
   RefreshCw,
   ShieldCheck,
   AlertTriangle,
-  Loader2
+  Loader2,
+  Percent
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isConfigured, uploadCarImage } from '../services/supabase';
@@ -89,7 +90,15 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   // Car Editor Handlers
   const openEditModal = (car?: Car) => {
     if (car) {
-      setCurrentCar({ ...car });
+      // Ensure discountRules exists
+      setCurrentCar({ 
+          ...car,
+          discountRules: car.discountRules || [
+            { days: 3, discount: 10 },
+            { days: 5, discount: 15 },
+            { days: 15, discount: 20 }
+          ]
+      });
     } else {
       setCurrentCar({
         id: '', 
@@ -98,7 +107,13 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
         pricePerDay: 0,
         specs: { hp: 0, zeroToSixty: 0, maxSpeed: 0 },
         imageUrl: '',
-        available: true
+        available: true,
+        description: '',
+        discountRules: [
+            { days: 3, discount: 10 },
+            { days: 5, discount: 15 },
+            { days: 15, discount: 20 }
+        ]
       });
     }
     setIsEditing(true);
@@ -129,6 +144,25 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
     } finally {
       setIsUploadingImage(false);
     }
+  };
+
+  const handleDiscountChange = (index: number, field: keyof DiscountRule, value: number) => {
+      const newRules = [...(currentCar.discountRules || [])];
+      newRules[index] = { ...newRules[index], [field]: value };
+      setCurrentCar({ ...currentCar, discountRules: newRules });
+  };
+
+  const addDiscountRule = () => {
+      setCurrentCar({
+          ...currentCar,
+          discountRules: [...(currentCar.discountRules || []), { days: 0, discount: 0 }]
+      });
+  };
+
+  const removeDiscountRule = (index: number) => {
+      const newRules = [...(currentCar.discountRules || [])];
+      newRules.splice(index, 1);
+      setCurrentCar({ ...currentCar, discountRules: newRules });
   };
 
   const handleSaveCar = (e: React.FormEvent) => {
@@ -625,6 +659,67 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                         />
                     </div>
                  </div>
+              </div>
+
+               {/* Description */}
+               <div>
+                  <label className="block text-xs uppercase text-gray-500 mb-2">Описание</label>
+                  <textarea 
+                    rows={4}
+                    value={currentCar.description || ''}
+                    onChange={e => setCurrentCar({...currentCar, description: e.target.value})}
+                    placeholder="Подробное описание автомобиля..."
+                    className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                  />
+               </div>
+
+              {/* Discount Rules */}
+              <div className="bg-dark-900 border border-white/5 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-4">
+                      <label className="block text-xs uppercase text-gray-500">Правила скидок</label>
+                      <button 
+                        type="button"
+                        onClick={addDiscountRule}
+                        className="text-xs text-gold-400 hover:text-white uppercase font-bold flex items-center gap-1"
+                      >
+                          <Plus size={12} /> Добавить правило
+                      </button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                      {(currentCar.discountRules || []).map((rule, idx) => (
+                          <div key={idx} className="flex gap-4 items-center">
+                              <div className="flex-1">
+                                  <label className="text-[10px] text-gray-500 block mb-1">Больше дней</label>
+                                  <input 
+                                    type="number"
+                                    value={rule.days}
+                                    onChange={(e) => handleDiscountChange(idx, 'days', Number(e.target.value))}
+                                    className="w-full bg-dark-800 border border-white/10 p-2 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
+                                  />
+                              </div>
+                              <div className="flex-1">
+                                  <label className="text-[10px] text-gray-500 block mb-1">Скидка %</label>
+                                  <input 
+                                    type="number"
+                                    value={rule.discount}
+                                    onChange={(e) => handleDiscountChange(idx, 'discount', Number(e.target.value))}
+                                    className="w-full bg-dark-800 border border-white/10 p-2 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
+                                  />
+                              </div>
+                              <button 
+                                type="button" 
+                                onClick={() => removeDiscountRule(idx)}
+                                className="mt-4 p-2 text-red-500 hover:text-white"
+                              >
+                                  <Trash2 size={16} />
+                              </button>
+                          </div>
+                      ))}
+                      {(currentCar.discountRules || []).length === 0 && (
+                          <p className="text-sm text-gray-500 italic">Нет правил скидок. Будут использоваться значения по умолчанию.</p>
+                      )}
+                  </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

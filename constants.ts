@@ -31,6 +31,14 @@ const generateCarPlaceholder = (name: string, category: string) => {
   return `data:image/svg+xml;base64,${btoa(svg)}`;
 };
 
+const DEFAULT_DESCRIPTION = "Испытайте истинное удовольствие от вождения. Этот автомобиль сочетает в себе безупречный стиль, передовые технологии и невероятную мощь. Идеальный выбор для тех, кто не привык к компромиссам. Салон выполнен из премиальных материалов, обеспечивая максимальный комфорт в любой поездке.";
+
+const DEFAULT_DISCOUNTS = [
+  { days: 3, discount: 10 },
+  { days: 5, discount: 15 },
+  { days: 15, discount: 20 }
+];
+
 export const CARS: Car[] = [
   {
     id: '1',
@@ -39,7 +47,9 @@ export const CARS: Car[] = [
     pricePerDay: 3500,
     specs: { hp: 640, zeroToSixty: 2.9, maxSpeed: 325 },
     imageUrl: generateCarPlaceholder('Huracán Evo', 'SPORT'),
-    available: true
+    available: true,
+    description: DEFAULT_DESCRIPTION,
+    discountRules: DEFAULT_DISCOUNTS
   },
   {
     id: '2',
@@ -48,7 +58,9 @@ export const CARS: Car[] = [
     pricePerDay: 4200,
     specs: { hp: 563, zeroToSixty: 5.2, maxSpeed: 250 },
     imageUrl: generateCarPlaceholder('Cullinan', 'SUV'),
-    available: true
+    available: true,
+    description: "Роскошный внедорожник, который переопределяет понятие комфорта. Rolls-Royce Cullinan — это воплощение элегантности и мощи, способное покорить любые дороги с неизменным достоинством.",
+    discountRules: DEFAULT_DISCOUNTS
   },
   {
     id: '3',
@@ -57,7 +69,9 @@ export const CARS: Car[] = [
     pricePerDay: 2100,
     specs: { hp: 496, zeroToSixty: 4.8, maxSpeed: 250 },
     imageUrl: generateCarPlaceholder('Maybach S-Class', 'SEDAN'),
-    available: true
+    available: true,
+    description: DEFAULT_DESCRIPTION,
+    discountRules: DEFAULT_DISCOUNTS
   },
   {
     id: '4',
@@ -66,7 +80,9 @@ export const CARS: Car[] = [
     pricePerDay: 3800,
     specs: { hp: 710, zeroToSixty: 2.9, maxSpeed: 340 },
     imageUrl: generateCarPlaceholder('Ferrari F8', 'SPORT'),
-    available: true
+    available: true,
+    description: DEFAULT_DESCRIPTION,
+    discountRules: DEFAULT_DISCOUNTS
   },
   {
     id: '5',
@@ -75,7 +91,9 @@ export const CARS: Car[] = [
     pricePerDay: 2800,
     specs: { hp: 650, zeroToSixty: 3.6, maxSpeed: 335 },
     imageUrl: generateCarPlaceholder('Continental GT', 'CONVERTIBLE'),
-    available: false
+    available: false,
+    description: DEFAULT_DESCRIPTION,
+    discountRules: DEFAULT_DISCOUNTS
   },
   {
     id: '6',
@@ -84,7 +102,9 @@ export const CARS: Car[] = [
     pricePerDay: 2900,
     specs: { hp: 640, zeroToSixty: 2.7, maxSpeed: 330 },
     imageUrl: generateCarPlaceholder('911 Turbo S', 'SPORT'),
-    available: true
+    available: true,
+    description: DEFAULT_DESCRIPTION,
+    discountRules: DEFAULT_DISCOUNTS
   },
 ];
 
@@ -94,6 +114,7 @@ export const AI_SYSTEM_INSTRUCTION = `
 Наш автопарк включает: Lamborghini Huracán, Rolls-Royce Cullinan, Mercedes Maybach, Ferrari F8, Bentley Continental GT, Porsche 911.
 Будь вежлив, используй деловой, но приветливый тон. Предлагай авто на основе потребностей (скорость, комфорт, статус, для свидания, для встречи).
 Цены указаны в белорусских рублях (BYN) за сутки.
+У нас есть система скидок: более 3 дней - 10%, более 5 дней - 15%, более 15 дней - 20%.
 Отвечай кратко и по делу, на русском языке.
 Если спрашивают адрес - Минск, пр-т Победителей 7а.
 `;

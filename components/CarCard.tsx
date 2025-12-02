@@ -1,6 +1,7 @@
 import React from 'react';
 import { Car } from '../types';
 import { Gauge, Zap, Wind } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface CarCardProps {
   car: Car;
@@ -10,8 +11,8 @@ interface CarCardProps {
 export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
   return (
     <div className="group relative bg-dark-800 border border-white/5 overflow-hidden transition-transform duration-500 hover:-translate-y-2">
-      {/* Image Container */}
-      <div className="relative h-64 overflow-hidden">
+      {/* Image Container - Clickable */}
+      <Link to={`/fleet/${car.id}`} className="block relative h-64 overflow-hidden cursor-pointer">
         <div className="absolute inset-0 bg-dark-900 animate-pulse" />
         <img
           src={car.imageUrl}
@@ -31,13 +32,15 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
             {car.category}
           </span>
         </div>
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-6">
-        <h3 className="font-serif text-2xl text-white mb-2 group-hover:text-gold-400 transition-colors">
-          {car.name}
-        </h3>
+        <Link to={`/fleet/${car.id}`} className="block">
+          <h3 className="font-serif text-2xl text-white mb-2 group-hover:text-gold-400 transition-colors">
+            {car.name}
+          </h3>
+        </Link>
         
         <div className="flex items-center gap-6 my-6 text-gray-400 text-sm">
           <div className="flex flex-col items-center gap-1">
