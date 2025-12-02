@@ -1,47 +1,31 @@
-import { getTelegramSettings } from './supabase';
 import { BookingDetails, Car } from '../types';
 
+/**
+ * Отправляет данные бронирования на серверный эндпоинт /api/send-booking.
+ * Это скрывает токен бота от браузера и повышает безопасность.
+ */
 export const sendTelegramBooking = async (booking: BookingDetails, car: Car): Promise<boolean> => {
   try {
-    const { botToken, chatId } = await getTelegramSettings();
-
-    if (!botToken || !chatId) {
-      console.warn('Telegram settings are missing');
-      return false;
-    }
-
-    const message = `
-🚗 <b>НОВАЯ ЗАЯВКА НА БРОНИРОВАНИЕ</b>
-
-<b>Автомобиль:</b> ${car.name}
-<b>Категория:</b> ${car.category}
-<b>Цена:</b> ${car.pricePerDay} BYN/сутки
-
-👤 <b>Клиент:</b> ${booking.name}
-📱 <b>Телефон:</b> ${booking.phone}
-
-📅 <b>Даты:</b>
-С: ${booking.startDate}
-По: ${booking.endDate}
-    `.trim();
-
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-    
-    const response = await fetch(url, {
+    const response = await fetch('/api/send-booking', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'HTML',
+        booking,
+        car
       }),
     });
 
-    return response.ok;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Backend Booking Error:', errorData);
+      return false;
+    }
+
+    return true;
   } catch (error) {
-    console.error('Failed to send Telegram notification:', error);
+    console.error('Network Error sending booking:', error);
     return false;
   }
 };
