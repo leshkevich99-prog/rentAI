@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Hero } from '../components/Hero';
 import { CarCard } from '../components/CarCard';
 import { Car } from '../types';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Phone } from 'lucide-react';
+import { CallbackModal } from '../components/CallbackModal';
 
 interface HomeProps {
   cars: Car[];
@@ -13,6 +14,8 @@ interface HomeProps {
 const promoBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/maindown.png";
 
 export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
+  const [isCallbackOpen, setIsCallbackOpen] = useState(false);
+
   // Select top 3 cars for display (ensure we have at least some cars if array is empty)
   const featuredCars = cars.slice(0, 3);
 
@@ -54,7 +57,7 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
         </div>
       </section>
 
-      {/* Promo Section */}
+      {/* Promo Section: Personal Chauffeur */}
       <section className="relative py-32 bg-dark-900 overflow-hidden border-t border-white/5">
          <div className="absolute inset-0">
            <img src={promoBg} alt="Road Abstract" className="w-full h-full object-cover opacity-60" />
@@ -62,17 +65,36 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
          </div>
          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
            <div className="max-w-2xl">
-             <h2 className="text-gold-400 font-bold uppercase tracking-[0.2em] mb-4 text-sm">Особые Привилегии</h2>
-             <h3 className="font-serif text-4xl md:text-5xl text-white mb-6">Членство в Клубе</h3>
-             <p className="text-gray-300 mb-8 text-lg font-light">
-               Станьте частью закрытого клуба EliteDrive и получите доступ к эксклюзивным новинкам автопрома до их официального релиза, а также специальные условия аренды.
+             <h2 className="text-gold-400 font-bold uppercase tracking-[0.2em] mb-4 text-sm">Эксклюзивный Сервис</h2>
+             <h3 className="font-serif text-4xl md:text-5xl text-white mb-6">Аренда с Водителем</h3>
+             <p className="text-gray-300 mb-8 text-lg font-light leading-relaxed">
+               Позвольте себе роскошь расслабиться в пути. Наши профессиональные водители обеспечат максимальный комфорт и безопасность, пока вы занимаетесь своими делами или просто наслаждаетесь поездкой на заднем сиденье Rolls-Royce или Maybach.
              </p>
-             <button className="px-8 py-3 bg-white text-black font-bold uppercase tracking-widest hover:bg-gold-400 transition-colors">
-               Подать заявку
+             <button 
+               onClick={() => setIsCallbackOpen(true)}
+               className="px-8 py-3 bg-white text-black font-bold uppercase tracking-widest hover:bg-gold-400 transition-colors"
+             >
+               Обсудить условия
              </button>
            </div>
          </div>
       </section>
+
+      {/* Floating Callback Button (Bottom Left) */}
+      <button
+        onClick={() => setIsCallbackOpen(true)}
+        className="fixed bottom-8 left-8 z-40 bg-white text-black p-4 rounded-full shadow-lg shadow-white/10 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+      >
+        <Phone className="w-6 h-6 animate-pulse" />
+        <span className="absolute left-full ml-4 bg-dark-900 border border-white/10 text-white px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          Заказать звонок
+        </span>
+      </button>
+
+      {/* Callback Modal */}
+      {isCallbackOpen && (
+        <CallbackModal onClose={() => setIsCallbackOpen(false)} />
+      )}
     </div>
   );
 };

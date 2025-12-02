@@ -20,14 +20,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { booking, car } = req.body;
-
-    if (!booking || !car) {
-      return res.status(400).json({ error: 'Missing booking or car data' });
-    }
+    const { booking, car, type } = req.body;
 
     // 1. Инициализация Supabase на сервере
-    // Используем process.env, так как это Node.js среда
     const supabaseUrl = process.env.VITE_SUPABASE_URL;
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
@@ -39,7 +34,6 @@ export default async function handler(req, res) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // 2. Безопасно получаем настройки Telegram из базы данных
-    // Эти данные никогда не покинут сервер
     const { data: settingsData, error: dbError } = await supabase
       .from('settings')
       .select('key, value')
@@ -62,8 +56,28 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Telegram settings not configured in Admin panel' });
     }
 
-    // 3. Формируем сообщение
-    const message = `
+    // 3. Формируем сообщение в зависимости от типа заявки
+    let message = '';
+
+    if (type === 'callback') {
+        // --- ЗАКАЗ ЗВОНКА ---
+        if (!booking || !booking.phone) {
+            return res.status(400).json({ error: 'Missing phone for callback' });
+        }
+        message = `
+📞 <b>ЗАКАЗ ОБРАТНОГО ЗВОНКА</b>
+
+👤 <b>Имя:</b> ${booking.name || 'Не указано'}
+📱 <b>Телефон:</b> ${booking.phone}
+⏰ <b>Время:</b> ${new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Minsk' })}
+        `.trim();
+
+    } else {
+        // --- БРОНИРОВАНИЕ АВТО ---
+        if (!booking || !car) {
+            return res.status(400).json({ error: 'Missing booking or car data' });
+        }
+        message = `
 🚗 <b>НОВАЯ ЗАЯВКА (Через сайт)</b>
 
 <b>Автомобиль:</b> ${car.name}
@@ -79,7 +93,8 @@ export default async function handler(req, res) {
 
 💰 <b>Итого:</b> ${booking.totalPrice ? booking.totalPrice + ' BYN' : 'Не рассчитано'}
 ${booking.discountApplied ? `🏷 <b>Скидка:</b> ${booking.discountApplied}%` : ''}
-    `.trim();
+        `.trim();
+    }
 
     // 4. Отправляем в Telegram
     const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
