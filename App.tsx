@@ -10,7 +10,7 @@ import { BookingModal } from './components/BookingModal';
 import { Terms } from './components/Terms';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { UserAgreement } from './components/UserAgreement';
-import { AiConcierge } from './components/AiConcierge';
+import { CallbackModal } from './components/CallbackModal';
 import { Home } from './pages/Home';
 import { Admin } from './pages/Admin';
 import { CarDetails } from './pages/CarDetails';
@@ -18,11 +18,13 @@ import { NotFound } from './pages/NotFound';
 import { Car } from './types';
 import { CARS as MOCK_CARS } from './constants';
 import { fetchCars, isConfigured } from './services/supabase';
+import { Phone } from 'lucide-react';
 
 function App() {
   const [cars, setCars] = useState<Car[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [isCallbackOpen, setIsCallbackOpen] = useState(false);
   const location = useLocation();
 
   // Scroll to top on route change
@@ -67,9 +69,7 @@ function App() {
     setSelectedCar(null);
   };
 
-  // Admin handlers wrapper
-  // NOTE: The actual DB saving now happens inside Admin.tsx securely via API.
-  // These handlers are just for Optimistic UI updates.
+  // Admin handlers wrapper (Optimistic UI updates)
   const handleAddCar = async (newCar: Car) => {
     const tempCar = { ...newCar, id: newCar.id || Math.random().toString(36).substring(7) };
     setCars(prev => [tempCar, ...prev]);
@@ -83,9 +83,12 @@ function App() {
     setCars(prev => prev.filter(c => c.id !== id));
   };
 
+  // Check if we are on the admin page to hide global Nav/Footer
+  const isAdminPage = location.pathname.startsWith('/admin');
+
   return (
     <div className="bg-black min-h-screen flex flex-col font-sans text-gray-100">
-      <Navbar />
+      {!isAdminPage && <Navbar />}
       
       <div className="flex-grow">
         <Routes>
@@ -114,14 +117,31 @@ function App() {
         </Routes>
       </div>
 
-      <Footer />
+      {!isAdminPage && <Footer />}
 
-      {/* Global Modals/Widgets */}
+      {/* Global Modals */}
       {selectedCar && (
         <BookingModal car={selectedCar} onClose={handleCloseModal} />
       )}
       
-      <AiConcierge />
+      {/* Floating Callback Button (Visible on all pages except Admin) */}
+      {!isAdminPage && (
+        <>
+          <button
+            onClick={() => setIsCallbackOpen(true)}
+            className="fixed bottom-8 right-8 z-40 bg-gold-500 text-black p-4 rounded-full shadow-lg shadow-gold-500/20 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+          >
+            <Phone className="w-6 h-6 animate-pulse" />
+            <span className="absolute right-full mr-4 bg-white text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Заказать звонок
+            </span>
+          </button>
+          
+          {isCallbackOpen && (
+            <CallbackModal onClose={() => setIsCallbackOpen(false)} />
+          )}
+        </>
+      )}
     </div>
   );
 }

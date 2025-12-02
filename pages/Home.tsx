@@ -3,8 +3,7 @@ import { Hero } from '../components/Hero';
 import { CarCard } from '../components/CarCard';
 import { Car } from '../types';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Phone } from 'lucide-react';
-import { CallbackModal } from '../components/CallbackModal';
+import { ChevronRight } from 'lucide-react';
 import { ChauffeurModal } from '../components/ChauffeurModal';
 
 interface HomeProps {
@@ -15,7 +14,6 @@ interface HomeProps {
 const promoBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/maindown.png";
 
 export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
-  const [isCallbackOpen, setIsCallbackOpen] = useState(false);
   const [isChauffeurOpen, setIsChauffeurOpen] = useState(false);
 
   // Select top 3 cars for display (ensure we have at least some cars if array is empty)
@@ -81,22 +79,6 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
            </div>
          </div>
       </section>
-
-      {/* Floating Callback Button (Bottom Left) */}
-      <button
-        onClick={() => setIsCallbackOpen(true)}
-        className="fixed bottom-8 left-8 z-40 bg-white text-black p-4 rounded-full shadow-lg shadow-white/10 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
-      >
-        <Phone className="w-6 h-6 animate-pulse" />
-        <span className="absolute left-full ml-4 bg-dark-900 border border-white/10 text-white px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          Заказать звонок
-        </span>
-      </button>
-
-      {/* Callback Modal */}
-      {isCallbackOpen && (
-        <CallbackModal onClose={() => setIsCallbackOpen(false)} />
-      )}
 
       {/* Chauffeur Modal */}
       {isChauffeurOpen && (

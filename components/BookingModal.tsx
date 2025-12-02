@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, User, Phone, CheckCircle, Loader2, Calculator } from 'lucide-react';
+import { X, Calendar, User, Phone, CheckCircle, Loader2 } from 'lucide-react';
 import { Car } from '../types';
 import { BookingDetails } from '../types';
 import { sendTelegramBooking } from '../services/telegram';
@@ -122,7 +122,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
         e.currentTarget.showPicker();
       }
     } catch (error) {
-      // Fallback for older browsers or if prevented
       console.log('Native picker not supported or blocked');
     }
   };
@@ -144,7 +143,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-5">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
@@ -161,7 +160,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
         </button>
 
         {step === 'form' ? (
-          <div className="p-8">
+          <div className="p-5 md:p-8">
             <div className="mb-6">
               <h3 className="font-serif text-2xl text-white mb-1">Бронирование</h3>
               <p className="text-gold-400 text-sm font-bold uppercase tracking-wider">{car.name}</p>
@@ -171,14 +170,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
               <div className="space-y-2">
                 <label className="text-xs uppercase text-gray-500 tracking-wider">Ваше имя</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                   <input 
                     type="text" 
                     required 
                     placeholder="Александр"
                     value={formData.name || ''}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors"
+                    className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none"
                   />
                 </div>
               </div>
@@ -186,38 +185,39 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
               <div className="space-y-2">
                 <label className="text-xs uppercase text-gray-500 tracking-wider">Телефон</label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                   <input 
                     type="tel" 
                     required 
                     placeholder="+375 (29) 000-00-00"
                     value={formData.phone || ''}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors"
+                    className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none"
                   />
                 </div>
               </div>
 
-              {/* Changed grid-cols-2 to stack on mobile (grid-cols-1) */}
+              {/* Date Inputs - Fixed Grid & Width */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-2 w-full min-w-0">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Начало (необязательно)</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5 pointer-events-none" />
+                  <div className="relative w-full">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
                     <input 
                       type="date" 
                       min={today}
                       value={formData.startDate || ''}
                       onChange={handleStartDateChange}
                       onClick={openCalendar}
-                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer"
+                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-3 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer appearance-none"
+                      style={{ colorScheme: 'dark' }}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 w-full min-w-0">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Окончание (необязательно)</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5 pointer-events-none" />
+                  <div className="relative w-full">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
                     <input 
                       type="date" 
                       min={formData.startDate || today}
@@ -225,7 +225,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                       value={formData.endDate || ''}
                       onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       onClick={openCalendar}
-                      className={`w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer ${!formData.startDate ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full bg-dark-900 border border-white/10 pl-10 pr-3 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer appearance-none ${!formData.startDate ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      style={{ colorScheme: 'dark' }}
                     />
                   </div>
                 </div>
