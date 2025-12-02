@@ -558,7 +558,8 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       {isEditing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
           <div className="relative bg-dark-800 rounded-2xl w-full md:max-w-2xl border border-white/10 my-8">
-            <div className="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-dark-800 rounded-t-2xl z-10">
+            {/* REMOVED: sticky top-0 to fix overlap on mobile */}
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-dark-800 rounded-t-2xl z-10">
               <h3 className="text-xl font-serif text-white pr-8">
                 {currentCar.id ? 'Редактировать' : 'Добавить'} автомобиль
               </h3>
