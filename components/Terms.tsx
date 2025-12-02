@@ -33,10 +33,6 @@ export const Terms: React.FC = () => {
                       <span className="w-1.5 h-1.5 bg-gold-400 rounded-full"></span>
                       Стаж вождения от 3-х лет
                     </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-gold-400 rounded-full"></span>
-                      Отсутствие грубых нарушений ПДД
-                    </li>
                   </ul>
                 </div>
               </div>
@@ -58,10 +54,6 @@ export const Terms: React.FC = () => {
                       <span className="w-1.5 h-1.5 bg-gold-400 rounded-full"></span>
                       Водительское удостоверение категории "B" (международного образца)
                     </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-gold-400 rounded-full"></span>
-                      Талон к водительскому удостоверению (для граждан РБ)
-                    </li>
                   </ul>
                 </div>
               </div>
@@ -78,7 +70,7 @@ export const Terms: React.FC = () => {
                     Автомобили разрешено эксплуатировать на территории Республики Беларусь.
                   </p>
                   <p className="text-gray-400 text-sm leading-relaxed">
-                    Выезд за пределы РБ возможен только по предварительному письменному согласованию с компанией и оформлении «Зеленой карты».
+                    Выезд за пределы РБ возможен только по предварительному письменному согласованию с компанией».
                   </p>
                 </div>
               </div>

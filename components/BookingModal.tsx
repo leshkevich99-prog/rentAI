@@ -27,6 +27,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     finalTotal: number;
   } | null>(null);
 
+  // Get today's date in YYYY-MM-DD format for min attribute
+  const today = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
     if (formData.startDate && formData.endDate && car) {
       calculatePrice(formData.startDate, formData.endDate);
@@ -40,6 +43,13 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     
     const startDate = new Date(start);
     const endDate = new Date(end);
+    
+    // Safety check: ensure end date is not before start date
+    if (endDate < startDate) {
+        setCalc(null);
+        return;
+    }
+
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
     const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include the start day
 
@@ -117,6 +127,22 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     }
   };
 
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newStartDate = e.target.value;
+    
+    // If new start date is after current end date, clear end date
+    let newEndDate = formData.endDate;
+    if (formData.endDate && newStartDate > formData.endDate) {
+        newEndDate = '';
+    }
+
+    setFormData({ 
+        ...formData, 
+        startDate: newStartDate,
+        endDate: newEndDate
+    });
+  };
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
@@ -175,28 +201,31 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
               {/* Changed grid-cols-2 to stack on mobile (grid-cols-1) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs uppercase text-gray-500 tracking-wider">Начало</label>
+                  <label className="text-xs uppercase text-gray-500 tracking-wider">Начало (необязательно)</label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5 pointer-events-none" />
                     <input 
                       type="date" 
+                      min={today}
                       value={formData.startDate || ''}
-                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                      onChange={handleStartDateChange}
                       onClick={openCalendar}
                       className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs uppercase text-gray-500 tracking-wider">Окончание</label>
+                  <label className="text-xs uppercase text-gray-500 tracking-wider">Окончание (необязательно)</label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-3 text-gray-500 w-5 h-5 pointer-events-none" />
                     <input 
                       type="date" 
+                      min={formData.startDate || today}
+                      disabled={!formData.startDate}
                       value={formData.endDate || ''}
                       onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       onClick={openCalendar}
-                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer"
+                      className={`w-full bg-dark-900 border border-white/10 pl-10 pr-4 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer ${!formData.startDate ? 'opacity-50 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 </div>
@@ -234,14 +263,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                 
                 <button 
                   type="submit" 
-                  disabled={!calc}
                   className={`w-full font-bold uppercase tracking-widest py-4 transition-colors ${
-                      calc 
-                      ? 'bg-gold-500 text-black hover:bg-gold-400' 
-                      : 'bg-white/10 text-gray-500 cursor-not-allowed'
+                       'bg-gold-500 text-black hover:bg-gold-400' 
                   }`}
                 >
-                  {calc ? 'Подтвердить бронирование' : 'Выберите даты'}
+                  {calc ? 'Подтвердить бронирование' : 'Отправить заявку'}
                 </button>
               </div>
             </form>

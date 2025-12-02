@@ -23,8 +23,6 @@ export const Footer: React.FC = () => {
             <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Компания</h4>
             <ul className="space-y-3 text-sm text-gray-500">
               <li><Link to="/about" className="hover:text-gold-400 transition-colors">О нас</Link></li>
-              <li><a href="#" className="hover:text-gold-400 transition-colors">Карьера</a></li>
-              <li><a href="#" className="hover:text-gold-400 transition-colors">Блог</a></li>
             </ul>
           </div>
 
@@ -33,7 +31,6 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3 text-sm text-gray-500">
               <li><Link to="/terms" className="hover:text-gold-400 transition-colors">Правила аренды</Link></li>
               <li><Link to="/services" className="hover:text-gold-400 transition-colors">Страхование</Link></li>
-              <li><a href="#" className="hover:text-gold-400 transition-colors">FAQ</a></li>
               <li><Link to="/contact" className="hover:text-gold-400 transition-colors">Контакты</Link></li>
             </ul>
           </div>
