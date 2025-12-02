@@ -10,13 +10,14 @@ import { BookingModal } from './components/BookingModal';
 import { Terms } from './components/Terms';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { UserAgreement } from './components/UserAgreement';
+import { AiConcierge } from './components/AiConcierge';
 import { Home } from './pages/Home';
 import { Admin } from './pages/Admin';
 import { CarDetails } from './pages/CarDetails';
 import { NotFound } from './pages/NotFound';
 import { Car } from './types';
 import { CARS as MOCK_CARS } from './constants';
-import { fetchCars, saveCar, deleteCarById, isConfigured } from './services/supabase';
+import { fetchCars, isConfigured } from './services/supabase';
 
 function App() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -67,100 +68,60 @@ function App() {
   };
 
   // Admin handlers wrapper
+  // NOTE: The actual DB saving now happens inside Admin.tsx securely via API.
+  // These handlers are just for Optimistic UI updates.
   const handleAddCar = async (newCar: Car) => {
-    // Handle demo mode
-    if (!isConfigured) {
-      const demoCar = { ...newCar, id: Math.random().toString(36).substring(2, 9) };
-      setCars(prev => [demoCar, ...prev]);
-      alert("Демо режим: Автомобиль добавлен локально (не сохранено в БД)");
-      return;
-    }
-
-    // Optimistic update
-    setCars(prev => [newCar, ...prev]);
-    try {
-      await saveCar(newCar);
-      // Reload to get real ID
-      const updated = await fetchCars();
-      setCars(updated);
-    } catch (e) {
-      console.error(e);
-      alert('Ошибка при сохранении');
-    }
+    const tempCar = { ...newCar, id: newCar.id || Math.random().toString(36).substring(7) };
+    setCars(prev => [tempCar, ...prev]);
   };
 
   const handleUpdateCar = async (updatedCar: Car) => {
     setCars(prev => prev.map(c => c.id === updatedCar.id ? updatedCar : c));
-    
-    if (!isConfigured) {
-      alert("Демо режим: Автомобиль обновлен локально (не сохранено в БД)");
-      return;
-    }
-
-    try {
-      await saveCar(updatedCar);
-    } catch (e) {
-      console.error(e);
-      alert('Ошибка при обновлении');
-    }
   };
 
   const handleDeleteCar = async (id: string) => {
-    if (window.confirm('Вы уверены, что хотите удалить этот автомобиль?')) {
-      setCars(prev => prev.filter(c => c.id !== id));
-      
-      if (!isConfigured) {
-        alert("Демо режим: Автомобиль удален локально (не сохранено в БД)");
-        return;
-      }
-
-      try {
-        await deleteCarById(id);
-      } catch (e) {
-        console.error(e);
-        alert('Ошибка при удалении');
-      }
-    }
+    setCars(prev => prev.filter(c => c.id !== id));
   };
 
-  const isAdminRoute = location.pathname.startsWith('/admin');
-
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-gold-500 selection:text-black">
-      {!isAdminRoute && <Navbar />}
+    <div className="bg-black min-h-screen flex flex-col font-sans text-gray-100">
+      <Navbar />
       
-      <main>
+      <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Home cars={cars} onBookCar={handleBookCar} />} />
-          <Route path="/fleet" element={<Fleet cars={cars} onBookCar={handleBookCar} />} />
+          <Route path="/fleet" element={<div className="pt-20"><Fleet cars={cars} onBookCar={handleBookCar} /></div>} />
           <Route path="/fleet/:id" element={<CarDetails cars={cars} onBookCar={handleBookCar} />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/terms" element={<Terms />} />
+          
+          <Route path="/services" element={<div className="pt-20"><Services /></div>} />
+          <Route path="/about" element={<div className="pt-20"><About /></div>} />
+          <Route path="/contact" element={<div className="pt-20"><Contact /></div>} />
+          <Route path="/terms" element={<div className="pt-20"><Terms /></div>} />
+          
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/user-agreement" element={<UserAgreement />} />
           
-          <Route 
-            path="/admin" 
-            element={
-              <Admin 
-                cars={cars} 
-                onAddCar={handleAddCar}
-                onUpdateCar={handleUpdateCar}
-                onDeleteCar={handleDeleteCar}
-              />
-            } 
-          />
+          <Route path="/admin" element={
+            <Admin 
+              cars={cars} 
+              onAddCar={handleAddCar} 
+              onUpdateCar={handleUpdateCar} 
+              onDeleteCar={handleDeleteCar} 
+            />
+          } />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </main>
+      </div>
 
-      {!isAdminRoute && <Footer />}
-      
+      <Footer />
+
+      {/* Global Modals/Widgets */}
       {selectedCar && (
         <BookingModal car={selectedCar} onClose={handleCloseModal} />
       )}
+      
+      <AiConcierge />
     </div>
   );
 }

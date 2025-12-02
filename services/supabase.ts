@@ -62,39 +62,64 @@ export const fetchCars = async (): Promise<Car[]> => {
   }));
 };
 
-export const saveCar = async (car: Car) => {
-  if (!isConfigured) throw new Error("Database not configured");
+/**
+ * Безопасное сохранение через серверный API.
+ * Использует переданный пароль для авторизации на сервере.
+ */
+export const saveCarSecure = async (car: Car, password: string) => {
+  if (!isConfigured) {
+      // Demo fallback
+      console.log("Demo mode: save simulated");
+      return;
+  }
 
-  const carData = {
-    name: car.name,
-    category: car.category,
-    price_per_day: car.pricePerDay,
-    specs: car.specs,
-    image_url: car.imageUrl,
-    available: car.available,
-    description: car.description,
-    discount_rules: car.discountRules
-  };
+  const response = await fetch('/api/admin-cars', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'save',
+      password: password,
+      car: car
+    })
+  });
 
-  if (car.id && car.id.length > 20) { 
-    const { error } = await supabase.from('cars').update(carData).eq('id', car.id);
-    if (error) throw error;
-  } else {
-    const { error } = await supabase.from('cars').insert([carData]);
-    if (error) throw error;
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || 'Failed to save car');
   }
 };
 
-export const deleteCarById = async (id: string) => {
-  if (!isConfigured) throw new Error("Database not configured");
-  
-  if (!id || id.length < 20) {
-    console.warn("Skipping DB delete for mock/invalid ID:", id);
-    return;
+/**
+ * Безопасное удаление через серверный API.
+ */
+export const deleteCarSecure = async (id: string, password: string) => {
+  if (!isConfigured) {
+      console.log("Demo mode: delete simulated");
+      return;
   }
 
-  const { error } = await supabase.from('cars').delete().eq('id', id);
-  if (error) throw error;
+  const response = await fetch('/api/admin-cars', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'delete',
+      password: password,
+      id: id
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || 'Failed to delete car');
+  }
+};
+
+// Deprecated direct client calls (kept for backward compat or read-only if needed, but not used for writing anymore)
+export const saveCar = async (car: Car) => {
+   console.warn("Direct client saveCar is deprecated. Use saveCarSecure via Admin panel.");
+};
+export const deleteCarById = async (id: string) => {
+   console.warn("Direct client deleteCarById is deprecated. Use deleteCarSecure via Admin panel.");
 };
 
 // --- STORAGE API ---

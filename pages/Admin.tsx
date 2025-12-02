@@ -25,7 +25,7 @@ import {
   Percent
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isConfigured, uploadCarImage } from '../services/supabase';
+import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isConfigured, uploadCarImage, saveCarSecure, deleteCarSecure } from '../services/supabase';
 
 interface AdminProps {
   cars: Car[];
@@ -52,7 +52,8 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   
   // Image Upload State
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  
+  const [isSaving, setIsSaving] = useState(false);
+
   const navigate = useNavigate();
 
   // Load Settings
@@ -165,15 +166,39 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       setCurrentCar({ ...currentCar, discountRules: newRules });
   };
 
-  const handleSaveCar = (e: React.FormEvent) => {
+  const handleSaveCar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentCar.name) {
+    if (!currentCar.name) return;
+
+    setIsSaving(true);
+    try {
+      // 1. Secure Server-Side Save
+      await saveCarSecure(currentCar as Car, password);
+      
+      // 2. Update Local UI State
       if (currentCar.id) {
         onUpdateCar(currentCar as Car);
       } else {
         onAddCar(currentCar as Car);
       }
       setIsEditing(false);
+    } catch (error: any) {
+      console.error(error);
+      alert('Ошибка сохранения: ' + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSecureDelete = async (id: string) => {
+    if (window.confirm('Вы уверены, что хотите удалить этот автомобиль?')) {
+      try {
+        await deleteCarSecure(id, password);
+        onDeleteCar(id);
+      } catch (error: any) {
+        console.error(error);
+        alert('Ошибка удаления: ' + error.message);
+      }
     }
   };
 
@@ -424,7 +449,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                             <Edit size={18} />
                           </button>
                           <button 
-                            onClick={() => onDeleteCar(car.id)}
+                            onClick={() => handleSecureDelete(car.id)}
                             className="p-2 hover:text-red-500 transition-colors"
                           >
                             <Trash2 size={18} />
@@ -802,14 +827,15 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                   <button 
                     type="submit" 
                     className="flex-1 bg-gold-500 text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded"
-                    disabled={isUploadingImage}
+                    disabled={isUploadingImage || isSaving}
                   >
-                    {isUploadingImage ? 'Ждем загрузку...' : 'Сохранить'}
+                    {isUploadingImage ? 'Ждем загрузку...' : isSaving ? 'Сохранение...' : 'Сохранить'}
                   </button>
                   <button 
                     type="button" 
                     onClick={() => setIsEditing(false)}
                     className="flex-1 bg-white/10 text-white font-bold uppercase py-3 hover:bg-white/20 transition-colors rounded"
+                    disabled={isSaving}
                   >
                     Отмена
                   </button>
