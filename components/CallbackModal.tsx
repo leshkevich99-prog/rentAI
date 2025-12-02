@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Phone, User, Loader2, CheckCircle } from 'lucide-react';
+import { X, Phone, User, Loader2, CheckCircle, PhoneCall } from 'lucide-react';
 
 interface CallbackModalProps {
   onClose: () => void;
@@ -101,6 +101,20 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
               >
                 Жду звонка
               </button>
+
+              <div className="flex items-center gap-4 py-2">
+                <div className="h-px bg-white/10 flex-1" />
+                <span className="text-xs text-gray-500 uppercase font-bold tracking-widest">Или</span>
+                <div className="h-px bg-white/10 flex-1" />
+              </div>
+
+              <a 
+                href="tel:+375291234567"
+                className="w-full flex items-center justify-center gap-2 border border-white/20 text-white font-bold uppercase tracking-widest py-3 hover:bg-white hover:text-black transition-colors rounded"
+              >
+                <PhoneCall size={18} />
+                Позвонить сейчас
+              </a>
             </form>
           </div>
         ) : step === 'sending' ? (

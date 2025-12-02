@@ -72,13 +72,37 @@ export default async function handler(req, res) {
 ⏰ <b>Время:</b> ${new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Minsk' })}
         `.trim();
 
+    } else if (type === 'chauffeur') {
+        // --- АРЕНДА С ВОДИТЕЛЕМ ---
+        const mapDuration = {
+            'transfer': 'Трансфер',
+            '3h': '3 часа',
+            '5h': '5 часов',
+            '8h': '8 часов (Полный день)',
+            'event': 'Свадьба / Мероприятие'
+        };
+
+        message = `
+🎩 <b>ЗАЯВКА: С ВОДИТЕЛЕМ</b>
+
+👤 <b>Клиент:</b> ${booking.name}
+📱 <b>Телефон:</b> ${booking.phone}
+
+📅 <b>Дата:</b> ${booking.date}
+⏰ <b>Время:</b> ${booking.time}
+⏳ <b>Услуга:</b> ${mapDuration[booking.duration] || booking.duration}
+
+📍 <b>Детали / Маршрут:</b>
+${booking.details || 'Не указано'}
+        `.trim();
+
     } else {
-        // --- БРОНИРОВАНИЕ АВТО ---
+        // --- БРОНИРОВАНИЕ АВТО (Drive Yourself) ---
         if (!booking || !car) {
             return res.status(400).json({ error: 'Missing booking or car data' });
         }
         message = `
-🚗 <b>НОВАЯ ЗАЯВКА (Через сайт)</b>
+🚗 <b>НОВАЯ ЗАЯВКА (Аренда)</b>
 
 <b>Автомобиль:</b> ${car.name}
 <b>Категория:</b> ${car.category}

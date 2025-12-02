@@ -5,6 +5,7 @@ import { Car } from '../types';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Phone } from 'lucide-react';
 import { CallbackModal } from '../components/CallbackModal';
+import { ChauffeurModal } from '../components/ChauffeurModal';
 
 interface HomeProps {
   cars: Car[];
@@ -15,6 +16,7 @@ const promoBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/publ
 
 export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
   const [isCallbackOpen, setIsCallbackOpen] = useState(false);
+  const [isChauffeurOpen, setIsChauffeurOpen] = useState(false);
 
   // Select top 3 cars for display (ensure we have at least some cars if array is empty)
   const featuredCars = cars.slice(0, 3);
@@ -71,7 +73,7 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
                Позвольте себе роскошь расслабиться в пути. Наши профессиональные водители обеспечат максимальный комфорт и безопасность, пока вы занимаетесь своими делами или просто наслаждаетесь поездкой на заднем сиденье Rolls-Royce или Maybach.
              </p>
              <button 
-               onClick={() => setIsCallbackOpen(true)}
+               onClick={() => setIsChauffeurOpen(true)}
                className="px-8 py-3 bg-white text-black font-bold uppercase tracking-widest hover:bg-gold-400 transition-colors"
              >
                Обсудить условия
@@ -94,6 +96,11 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
       {/* Callback Modal */}
       {isCallbackOpen && (
         <CallbackModal onClose={() => setIsCallbackOpen(false)} />
+      )}
+
+      {/* Chauffeur Modal */}
+      {isChauffeurOpen && (
+        <ChauffeurModal onClose={() => setIsChauffeurOpen(false)} />
       )}
     </div>
   );
