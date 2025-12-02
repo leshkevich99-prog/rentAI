@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Простая функция очистки HTML тегов для безопасности
+const sanitize = (str) => {
+  if (typeof str !== 'string') return '';
+  return str.replace(/<[^>]*>?/gm, '').trim().slice(0, 2000); // Лимит 2000 символов
+};
+
 export default async function handler(req, res) {
-  // Настройка CORS для разрешения запросов с фронтенда
+  // Настройка CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -22,7 +28,19 @@ export default async function handler(req, res) {
   try {
     const { booking, car, type } = req.body;
 
-    // 1. Инициализация Supabase на сервере
+    // --- SECURITY VALIDATION ---
+    if (!booking) return res.status(400).json({ error: 'No data provided' });
+
+    // Очистка данных
+    const safeName = sanitize(booking.name);
+    const safePhone = sanitize(booking.phone);
+    
+    // Проверка обязательных полей
+    if (!safePhone || safePhone.length < 5) {
+        return res.status(400).json({ error: 'Invalid phone number' });
+    }
+
+    // Инициализация Supabase
     const supabaseUrl = process.env.VITE_SUPABASE_URL;
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
@@ -33,7 +51,7 @@ export default async function handler(req, res) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 2. Безопасно получаем настройки Telegram из базы данных
+    // Получаем настройки Telegram
     const { data: settingsData, error: dbError } = await supabase
       .from('settings')
       .select('key, value')
@@ -53,27 +71,25 @@ export default async function handler(req, res) {
     const chatId = settings['telegram_chat_id'];
 
     if (!botToken || !chatId) {
-      return res.status(500).json({ error: 'Telegram settings not configured in Admin panel' });
+      return res.status(500).json({ error: 'Telegram settings not configured' });
     }
 
-    // 3. Формируем сообщение в зависимости от типа заявки
+    // Формируем сообщение
     let message = '';
 
     if (type === 'callback') {
         // --- ЗАКАЗ ЗВОНКА ---
-        if (!booking || !booking.phone) {
-            return res.status(400).json({ error: 'Missing phone for callback' });
-        }
         message = `
 📞 <b>ЗАКАЗ ОБРАТНОГО ЗВОНКА</b>
 
-👤 <b>Имя:</b> ${booking.name || 'Не указано'}
-📱 <b>Телефон:</b> ${booking.phone}
+👤 <b>Имя:</b> ${safeName || 'Не указано'}
+📱 <b>Телефон:</b> ${safePhone}
 ⏰ <b>Время:</b> ${new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Minsk' })}
         `.trim();
 
     } else if (type === 'chauffeur') {
         // --- АРЕНДА С ВОДИТЕЛЕМ ---
+        const safeDetails = sanitize(booking.details);
         const mapDuration = {
             'transfer': 'Трансфер',
             '3h': '3 часа',
@@ -85,42 +101,39 @@ export default async function handler(req, res) {
         message = `
 🎩 <b>ЗАЯВКА: С ВОДИТЕЛЕМ</b>
 
-👤 <b>Клиент:</b> ${booking.name}
-📱 <b>Телефон:</b> ${booking.phone}
+👤 <b>Клиент:</b> ${safeName}
+📱 <b>Телефон:</b> ${safePhone}
 
-📅 <b>Дата:</b> ${booking.date}
-⏰ <b>Время:</b> ${booking.time}
+📅 <b>Дата:</b> ${sanitize(booking.date)}
+⏰ <b>Время:</b> ${sanitize(booking.time)}
 ⏳ <b>Услуга:</b> ${mapDuration[booking.duration] || booking.duration}
 
-📍 <b>Детали / Маршрут:</b>
-${booking.details || 'Не указано'}
+📍 <b>Детали:</b>
+${safeDetails || 'Не указано'}
         `.trim();
 
     } else {
-        // --- БРОНИРОВАНИЕ АВТО (Drive Yourself) ---
-        if (!booking || !car) {
-            return res.status(400).json({ error: 'Missing booking or car data' });
-        }
+        // --- БРОНИРОВАНИЕ АВТО ---
+        if (!car) return res.status(400).json({ error: 'Missing car data' });
+        
         message = `
 🚗 <b>НОВАЯ ЗАЯВКА (Аренда)</b>
 
-<b>Автомобиль:</b> ${car.name}
-<b>Категория:</b> ${car.category}
+<b>Автомобиль:</b> ${sanitize(car.name)}
 <b>Цена:</b> ${car.pricePerDay} BYN/сутки
 
-👤 <b>Клиент:</b> ${booking.name}
-📱 <b>Телефон:</b> ${booking.phone}
+👤 <b>Клиент:</b> ${safeName}
+📱 <b>Телефон:</b> ${safePhone}
 
 📅 <b>Даты:</b>
-С: ${booking.startDate}
-По: ${booking.endDate}
+С: ${sanitize(booking.startDate)}
+По: ${sanitize(booking.endDate)}
 
 💰 <b>Итого:</b> ${booking.totalPrice ? booking.totalPrice + ' BYN' : 'Не рассчитано'}
-${booking.discountApplied ? `🏷 <b>Скидка:</b> ${booking.discountApplied}%` : ''}
         `.trim();
     }
 
-    // 4. Отправляем в Telegram
+    // Отправка в Telegram
     const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
     const tgResponse = await fetch(tgUrl, {
       method: 'POST',
@@ -133,12 +146,10 @@ ${booking.discountApplied ? `🏷 <b>Скидка:</b> ${booking.discountApplied
     });
 
     if (!tgResponse.ok) {
-      const errText = await tgResponse.text();
-      console.error('Telegram API Error:', errText);
+      console.error('Telegram API Error');
       return res.status(502).json({ error: 'Failed to send to Telegram' });
     }
 
-    // Успех
     return res.status(200).json({ success: true });
 
   } catch (error) {

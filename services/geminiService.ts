@@ -1,52 +1,32 @@
-import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
-import { AI_SYSTEM_INSTRUCTION } from '../constants';
+import { Chat } from "@google/genai";
 
-let chatSession: Chat | null = null;
-
-const getAiClient = () => {
-  // Use process.env strictly as per guidelines
-  const apiKey = process.env.API_KEY;
-  
-  if (!apiKey) {
-    console.warn("API Key not found in environment variables");
-    return null;
-  }
-  return new GoogleGenAI({ apiKey });
-};
+// Интерфейс для совместимости с существующим кодом, хотя мы теперь используем stateless API
+// Мы оставляем базовую структуру, но переписываем логику отправки.
 
 export const initializeChat = (): Chat | null => {
-  const ai = getAiClient();
-  if (!ai) return null;
-
-  try {
-    chatSession = ai.chats.create({
-      model: 'gemini-2.5-flash',
-      config: {
-        systemInstruction: AI_SYSTEM_INSTRUCTION,
-        temperature: 0.7,
-      },
-    });
-    return chatSession;
-  } catch (error) {
-    console.error("Failed to initialize chat:", error);
-    return null;
-  }
+  // Теперь инициализация не требуется на клиенте, так как сессия управляется сервером (или stateless)
+  // Возвращаем заглушку, чтобы не ломать типы в компонентах, если они проверяют наличие chatSession
+  return {} as Chat;
 };
 
 export const sendMessageToGemini = async (message: string): Promise<string> => {
-  if (!chatSession) {
-    initializeChat();
-  }
-
-  if (!chatSession) {
-    return "Извините, сервис консьержа временно недоступен. Проверьте API ключ.";
-  }
-
   try {
-    const response: GenerateContentResponse = await chatSession.sendMessage({ message });
-    return response.text || "Извините, я не смог обработать ваш запрос.";
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server responded with ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.text || "Извините, я не расслышал. Повторите, пожалуйста.";
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Произошла ошибка связи с сервером. Пожалуйста, попробуйте позже.";
+    console.error("Chat Service Error:", error);
+    return "В данный момент связь с консьержем недоступна. Попробуйте позже.";
   }
 };
