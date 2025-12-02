@@ -13,6 +13,7 @@ import { UserAgreement } from './components/UserAgreement';
 import { Home } from './pages/Home';
 import { Admin } from './pages/Admin';
 import { CarDetails } from './pages/CarDetails';
+import { NotFound } from './pages/NotFound';
 import { Car } from './types';
 import { CARS as MOCK_CARS } from './constants';
 import { fetchCars, saveCar, deleteCarById, isConfigured } from './services/supabase';
@@ -151,6 +152,7 @@ function App() {
               />
             } 
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

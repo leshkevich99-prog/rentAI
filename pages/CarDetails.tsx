@@ -14,7 +14,7 @@ export const CarDetails: React.FC<CarDetailsProps> = ({ cars, onBookCar }) => {
   const car = cars.find(c => c.id === id);
 
   if (!car) {
-    return <div className="min-h-screen bg-black flex items-center justify-center text-white">Автомобиль не найден</div>;
+    return <NotFound />;
   }
 
   // Use default rules if none are set on the car
