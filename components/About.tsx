@@ -34,7 +34,7 @@ export const About: React.FC = () => {
             </h3>
             
             <p className="text-gray-400 text-lg mb-6 leading-relaxed">
-              EliteDrive была основана в 2015 году с одной целью: предоставить сервис, который превосходит ожидания самых требовательных клиентов. Мы не просто сдаем автомобили в аренду, мы дарим эмоции и свободу передвижения на высшем уровне.
+              EliteDrive была основана в 2025 году с одной целью: предоставить сервис, который превосходит ожидания самых требовательных клиентов. Мы не просто сдаем автомобили в аренду, мы дарим эмоции и свободу передвижения на высшем уровне.
             </p>
             
             <p className="text-gray-500 mb-8 leading-relaxed">
@@ -45,22 +45,22 @@ export const About: React.FC = () => {
               <div className="flex items-start gap-3">
                 <div className="mt-1 bg-gold-400/20 p-1 rounded-full"><Check size={12} className="text-gold-400" /></div>
                 <div>
-                  <h4 className="text-white font-bold text-2xl">50+</h4>
+                  <h4 className="text-white font-bold text-2xl">15+</h4>
                   <p className="text-gray-500 text-xs uppercase tracking-wider">Автомобилей</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 bg-gold-400/20 p-1 rounded-full"><Check size={12} className="text-gold-400" /></div>
                 <div>
-                  <h4 className="text-white font-bold text-2xl">5000+</h4>
+                  <h4 className="text-white font-bold text-2xl">500+</h4>
                   <p className="text-gray-500 text-xs uppercase tracking-wider">Клиентов</p>
                 </div>
               </div>
             </div>
 
             <div className="border-t border-white/10 pt-8">
-               <div className="font-serif italic text-2xl text-gray-500 opacity-50">Alexander Volkov</div>
-               <p className="text-gray-500 text-xs mt-2 uppercase tracking-widest">Александр Волков, CEO EliteDrive</p>
+               <div className="font-serif italic text-2xl text-gray-500 opacity-50">Roman Romanov</div>
+               <p className="text-gray-500 text-xs mt-2 uppercase tracking-widest">Роман Романов, CEO EliteDrive</p>
             </div>
           </div>
 

@@ -25,7 +25,7 @@ export const Contact: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-white font-bold uppercase tracking-wider text-sm mb-1">Адрес</h4>
-                  <p className="text-gray-500">пр-т Победителей 7а<br/>Минск, Беларусь, 220004</p>
+                  <p className="text-gray-500">ул. П. Мстиславца, 11 <br/>Минск, Беларусь, 220076</p>
                 </div>
               </div>
 
