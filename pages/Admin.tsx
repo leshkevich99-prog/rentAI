@@ -124,6 +124,12 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Check file size (limit to 4.5MB to be safe for Vercel functions)
+    if (file.size > 4.5 * 1024 * 1024) {
+        alert('Файл слишком большой! Максимальный размер: 4.5 MB');
+        return;
+    }
+
     // Demo mode fallback
     if (!isConfigured) {
       const reader = new FileReader();
@@ -141,7 +147,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       setCurrentCar({ ...currentCar, imageUrl: publicUrl });
     } catch (error: any) {
       console.error(error);
-      alert(`Ошибка загрузки: ${error.message || 'Проверьте bucket "car-images" в Supabase'}`);
+      alert(`Ошибка загрузки: ${error.message || 'Попробуйте файл меньшего размера'}`);
     } finally {
       setIsUploadingImage(false);
     }
@@ -336,7 +342,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 bg-black min-h-screen md:ml-64 pt-20 md:pt-8 w-full overflow-hidden">
+      <main className="flex-1 p-4 md:p-8 bg-black min-h-screen md:ml-64 pt-28 md:pt-8 w-full overflow-hidden">
         
         {/* Dashboard View */}
         {activeTab === 'dashboard' && (

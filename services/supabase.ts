@@ -124,29 +124,41 @@ export const deleteCarById = async (id: string) => {
 
 // --- STORAGE API ---
 
+/**
+ * Загрузка изображений через серверный прокси.
+ * Решает проблему CORS и RLS при загрузке напрямую из браузера.
+ */
 export const uploadCarImage = async (file: File): Promise<string> => {
   if (!isConfigured) throw new Error("Database not configured");
 
-  // 1. Создаем уникальное имя файла
+  // 1. Конвертируем File в Base64 для передачи на сервер
+  const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+  });
+
+  const base64Image = await toBase64(file);
   const fileExt = file.name.split('.').pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-  const filePath = `${fileName}`;
 
-  // 2. Загружаем в бакет 'car-images'
-  const { error: uploadError } = await supabase.storage
-    .from('car-images')
-    .upload(filePath, file);
+  // 2. Отправляем на наш API
+  const response = await fetch('/api/upload-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+          image: base64Image,
+          filename: fileName
+      })
+  });
 
-  if (uploadError) {
-    console.error("Upload error:", uploadError);
-    throw new Error(`Ошибка загрузки: ${uploadError.message}`);
+  if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Upload failed');
   }
 
-  // 3. Получаем публичную ссылку
-  const { data } = supabase.storage
-    .from('car-images')
-    .getPublicUrl(filePath);
-
+  const data = await response.json();
   return data.publicUrl;
 };
 
