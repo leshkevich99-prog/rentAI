@@ -588,224 +588,235 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
 
       </main>
 
-      {/* Edit Modal */}
+      {/* Edit Modal (Redesigned for better mobile scrolling) */}
       {isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-          <div className="relative bg-dark-800 rounded-2xl w-full md:max-w-2xl border border-white/10 my-8">
-            {/* REMOVED: sticky top-0 to fix overlap on mobile */}
-            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-dark-800 rounded-t-2xl z-10">
-              <h3 className="text-xl font-serif text-white pr-8">
-                {currentCar.id ? 'Редактировать' : 'Добавить'} автомобиль
-              </h3>
-              <button onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-white">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <form onSubmit={handleSaveCar} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs uppercase text-gray-500 mb-2">Название</label>
-                  <input 
-                    required
-                    type="text" 
-                    value={currentCar.name || ''}
-                    onChange={e => setCurrentCar({...currentCar, name: e.target.value})}
-                    className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs uppercase text-gray-500 mb-2">Категория</label>
-                  <select 
-                    value={currentCar.category || CarCategory.SEDAN}
-                    onChange={e => setCurrentCar({...currentCar, category: e.target.value as CarCategory})}
-                    className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                  >
-                    {Object.values(CarCategory).map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
+            onClick={() => setIsEditing(false)}
+          />
+
+          {/* Modal Positioning Wrapper */}
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="relative w-full max-w-2xl bg-dark-800 rounded-2xl border border-white/10 shadow-2xl z-10 my-8">
+              
+              {/* Header - Static (scrolls with content) */}
+              <div className="flex justify-between items-center p-6 border-b border-white/10 bg-dark-800 rounded-t-2xl">
+                <h3 className="text-xl font-serif text-white pr-8">
+                  {currentCar.id ? 'Редактировать' : 'Добавить'} автомобиль
+                </h3>
+                <button onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
               </div>
-
-              <div>
-                 <label className="block text-xs uppercase text-gray-500 mb-2">Изображение</label>
-                 
-                 <div className="flex flex-col gap-4">
-                    {/* Preview */}
-                    {currentCar.imageUrl && (
-                        <div className="relative h-40 w-full rounded overflow-hidden border border-white/10 bg-black/20">
-                            <img src={currentCar.imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                        </div>
-                    )}
-                    
-                    <div className="flex gap-2">
-                        <label className={`flex-1 cursor-pointer bg-dark-900 border border-white/10 p-3 text-white rounded hover:border-gold-400 transition-colors flex items-center justify-center gap-2 ${isUploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
-                            {isUploadingImage ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
-                            <span>{isUploadingImage ? 'Загрузка...' : 'Загрузить фото (Server)'}</span>
-                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploadingImage} />
-                        </label>
-                    </div>
-                    
-                    <div className="relative">
-                        <span className="absolute -top-2 left-3 bg-dark-800 px-2 text-[10px] text-gray-500">Ссылка (генерируется автоматически)</span>
-                        <input 
-                            type="text" 
-                            value={currentCar.imageUrl || ''}
-                            onChange={e => setCurrentCar({...currentCar, imageUrl: e.target.value})}
-                            className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
-                            placeholder="https://..."
-                            readOnly
-                        />
-                    </div>
-                 </div>
-              </div>
-
-               {/* Description */}
-               <div>
-                  <label className="block text-xs uppercase text-gray-500 mb-2">Описание</label>
-                  <textarea 
-                    rows={4}
-                    value={currentCar.description || ''}
-                    onChange={e => setCurrentCar({...currentCar, description: e.target.value})}
-                    placeholder="Подробное описание автомобиля..."
-                    className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                  />
-               </div>
-
-              {/* Discount Rules */}
-              <div className="bg-dark-900 border border-white/5 p-4 rounded-lg">
-                  <div className="flex justify-between items-center mb-4">
-                      <label className="block text-xs uppercase text-gray-500">Правила скидок</label>
-                      <button 
-                        type="button"
-                        onClick={addDiscountRule}
-                        className="text-xs text-gold-400 hover:text-white uppercase font-bold flex items-center gap-1"
-                      >
-                          <Plus size={12} /> Добавить правило
-                      </button>
-                  </div>
-                  
-                  <div className="space-y-3">
-                      {(currentCar.discountRules || []).map((rule, idx) => (
-                          <div key={idx} className="flex gap-4 items-center">
-                              <div className="flex-1">
-                                  <label className="text-[10px] text-gray-500 block mb-1">Больше дней</label>
-                                  <input 
-                                    type="number"
-                                    value={rule.days}
-                                    onChange={(e) => handleDiscountChange(idx, 'days', Number(e.target.value))}
-                                    className="w-full bg-dark-800 border border-white/10 p-2 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
-                                  />
-                              </div>
-                              <div className="flex-1">
-                                  <label className="text-[10px] text-gray-500 block mb-1">Скидка %</label>
-                                  <input 
-                                    type="number"
-                                    value={rule.discount}
-                                    onChange={(e) => handleDiscountChange(idx, 'discount', Number(e.target.value))}
-                                    className="w-full bg-dark-800 border border-white/10 p-2 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
-                                  />
-                              </div>
-                              <button 
-                                type="button" 
-                                onClick={() => removeDiscountRule(idx)}
-                                className="mt-4 p-2 text-red-500 hover:text-white"
-                              >
-                                  <Trash2 size={16} />
-                              </button>
-                          </div>
-                      ))}
-                      {(currentCar.discountRules || []).length === 0 && (
-                          <p className="text-sm text-gray-500 italic">Нет правил скидок. Будут использоваться значения по умолчанию.</p>
-                      )}
-                  </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                   <label className="block text-xs uppercase text-gray-500 mb-2">Цена / Сутки (BYN)</label>
-                   <input 
+              
+              {/* Form Content */}
+              <form onSubmit={handleSaveCar} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs uppercase text-gray-500 mb-2">Название</label>
+                    <input 
                       required
-                      type="number" 
-                      value={currentCar.pricePerDay || 0}
-                      onChange={e => setCurrentCar({...currentCar, pricePerDay: Number(e.target.value)})}
+                      type="text" 
+                      value={currentCar.name || ''}
+                      onChange={e => setCurrentCar({...currentCar, name: e.target.value})}
                       className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                   />
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase text-gray-500 mb-2">Категория</label>
+                    <select 
+                      value={currentCar.category || CarCategory.SEDAN}
+                      onChange={e => setCurrentCar({...currentCar, category: e.target.value as CarCategory})}
+                      className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                    >
+                      {Object.values(CarCategory).map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                 <div className="flex items-center md:pt-8 gap-3">
-                   <input 
-                      type="checkbox" 
-                      id="available"
-                      checked={currentCar.available || false}
-                      onChange={e => setCurrentCar({...currentCar, available: e.target.checked})}
-                      className="w-5 h-5 accent-gold-500"
-                   />
-                   <label htmlFor="available" className="text-white">Доступен для аренды</label>
-                 </div>
-              </div>
 
-              <div className="border-t border-white/10 pt-6">
-                <h4 className="text-white mb-4 font-medium">Характеристики</h4>
+                <div>
+                   <label className="block text-xs uppercase text-gray-500 mb-2">Изображение</label>
+                   
+                   <div className="flex flex-col gap-4">
+                      {/* Preview */}
+                      {currentCar.imageUrl && (
+                          <div className="relative h-40 w-full rounded overflow-hidden border border-white/10 bg-black/20">
+                              <img src={currentCar.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                          </div>
+                      )}
+                      
+                      <div className="flex gap-2">
+                          <label className={`flex-1 cursor-pointer bg-dark-900 border border-white/10 p-3 text-white rounded hover:border-gold-400 transition-colors flex items-center justify-center gap-2 ${isUploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
+                              {isUploadingImage ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                              <span>{isUploadingImage ? 'Загрузка...' : 'Загрузить фото (Server)'}</span>
+                              <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploadingImage} />
+                          </label>
+                      </div>
+                      
+                      <div className="relative">
+                          <span className="absolute -top-2 left-3 bg-dark-800 px-2 text-[10px] text-gray-500">Ссылка (генерируется автоматически)</span>
+                          <input 
+                              type="text" 
+                              value={currentCar.imageUrl || ''}
+                              onChange={e => setCurrentCar({...currentCar, imageUrl: e.target.value})}
+                              className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
+                              placeholder="https://..."
+                              readOnly
+                          />
+                      </div>
+                   </div>
+                </div>
+
+                 {/* Description */}
+                 <div>
+                    <label className="block text-xs uppercase text-gray-500 mb-2">Описание</label>
+                    <textarea 
+                      rows={4}
+                      value={currentCar.description || ''}
+                      onChange={e => setCurrentCar({...currentCar, description: e.target.value})}
+                      placeholder="Подробное описание автомобиля..."
+                      className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                    />
+                 </div>
+
+                {/* Discount Rules */}
+                <div className="bg-dark-900 border border-white/5 p-4 rounded-lg">
+                    <div className="flex justify-between items-center mb-4">
+                        <label className="block text-xs uppercase text-gray-500">Правила скидок</label>
+                        <button 
+                          type="button"
+                          onClick={addDiscountRule}
+                          className="text-xs text-gold-400 hover:text-white uppercase font-bold flex items-center gap-1"
+                        >
+                            <Plus size={12} /> Добавить правило
+                        </button>
+                    </div>
+                    
+                    <div className="space-y-3">
+                        {(currentCar.discountRules || []).map((rule, idx) => (
+                            <div key={idx} className="flex gap-4 items-center">
+                                <div className="flex-1">
+                                    <label className="text-[10px] text-gray-500 block mb-1">Больше дней</label>
+                                    <input 
+                                      type="number"
+                                      value={rule.days}
+                                      onChange={(e) => handleDiscountChange(idx, 'days', Number(e.target.value))}
+                                      className="w-full bg-dark-800 border border-white/10 p-2 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-[10px] text-gray-500 block mb-1">Скидка %</label>
+                                    <input 
+                                      type="number"
+                                      value={rule.discount}
+                                      onChange={(e) => handleDiscountChange(idx, 'discount', Number(e.target.value))}
+                                      className="w-full bg-dark-800 border border-white/10 p-2 text-white rounded focus:border-gold-400 focus:outline-none text-sm"
+                                    />
+                                </div>
+                                <button 
+                                  type="button" 
+                                  onClick={() => removeDiscountRule(idx)}
+                                  className="mt-4 p-2 text-red-500 hover:text-white"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        ))}
+                        {(currentCar.discountRules || []).length === 0 && (
+                            <p className="text-sm text-gray-500 italic">Нет правил скидок. Будут использоваться значения по умолчанию.</p>
+                        )}
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2">Мощность (л.с.)</label>
-                    <input 
-                      type="number" 
-                      value={currentCar.specs?.hp || 0}
-                      onChange={e => setCurrentCar({
-                        ...currentCar, 
-                        specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), hp: Number(e.target.value) }
-                      })}
-                      className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                    />
+                     <label className="block text-xs uppercase text-gray-500 mb-2">Цена / Сутки (BYN)</label>
+                     <input 
+                        required
+                        type="number" 
+                        value={currentCar.pricePerDay || 0}
+                        onChange={e => setCurrentCar({...currentCar, pricePerDay: Number(e.target.value)})}
+                        className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                     />
                   </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2">Разгон 0-100</label>
-                    <input 
-                      type="number" 
-                      step="0.1"
-                      value={currentCar.specs?.zeroToSixty || 0}
-                      onChange={e => setCurrentCar({
-                        ...currentCar, 
-                        specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), zeroToSixty: Number(e.target.value) }
-                      })}
-                      className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2">Макс. скорость</label>
-                    <input 
-                      type="number" 
-                      value={currentCar.specs?.maxSpeed || 0}
-                      onChange={e => setCurrentCar({
-                        ...currentCar, 
-                        specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), maxSpeed: Number(e.target.value) }
-                      })}
-                      className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                    />
+                   <div className="flex items-center md:pt-8 gap-3">
+                     <input 
+                        type="checkbox" 
+                        id="available"
+                        checked={currentCar.available || false}
+                        onChange={e => setCurrentCar({...currentCar, available: e.target.checked})}
+                        className="w-5 h-5 accent-gold-500"
+                     />
+                     <label htmlFor="available" className="text-white">Доступен для аренды</label>
+                   </div>
+                </div>
+
+                <div className="border-t border-white/10 pt-6">
+                  <h4 className="text-white mb-4 font-medium">Характеристики</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-xs uppercase text-gray-500 mb-2">Мощность (л.с.)</label>
+                      <input 
+                        type="number" 
+                        value={currentCar.specs?.hp || 0}
+                        onChange={e => setCurrentCar({
+                          ...currentCar, 
+                          specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), hp: Number(e.target.value) }
+                        })}
+                        className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase text-gray-500 mb-2">Разгон 0-100</label>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={currentCar.specs?.zeroToSixty || 0}
+                        onChange={e => setCurrentCar({
+                          ...currentCar, 
+                          specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), zeroToSixty: Number(e.target.value) }
+                        })}
+                        className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase text-gray-500 mb-2">Макс. скорость</label>
+                      <input 
+                        type="number" 
+                        value={currentCar.specs?.maxSpeed || 0}
+                        onChange={e => setCurrentCar({
+                          ...currentCar, 
+                          specs: { ...(currentCar.specs || { hp:0, zeroToSixty:0, maxSpeed:0 }), maxSpeed: Number(e.target.value) }
+                        })}
+                        className="w-full bg-dark-900 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="pt-4 flex flex-col md:flex-row gap-4">
-                <button 
-                  type="submit" 
-                  className="flex-1 bg-gold-500 text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded"
-                  disabled={isUploadingImage}
-                >
-                  {isUploadingImage ? 'Ждем загрузку...' : 'Сохранить'}
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => setIsEditing(false)}
-                  className="flex-1 bg-white/10 text-white font-bold uppercase py-3 hover:bg-white/20 transition-colors rounded"
-                >
-                  Отмена
-                </button>
-              </div>
+                <div className="pt-4 flex flex-col md:flex-row gap-4">
+                  <button 
+                    type="submit" 
+                    className="flex-1 bg-gold-500 text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded"
+                    disabled={isUploadingImage}
+                  >
+                    {isUploadingImage ? 'Ждем загрузку...' : 'Сохранить'}
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setIsEditing(false)}
+                    className="flex-1 bg-white/10 text-white font-bold uppercase py-3 hover:bg-white/20 transition-colors rounded"
+                  >
+                    Отмена
+                  </button>
+                </div>
 
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}
