@@ -177,7 +177,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     placeholder="Александр"
                     value={formData.name || ''}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none"
+                    className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-none"
                   />
                 </div>
               </div>
@@ -192,7 +192,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                     placeholder="+375 (29) 000-00-00"
                     value={formData.phone || ''}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="w-full bg-dark-900 border border-white/10 px-10 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none"
+                    className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-none"
                   />
                 </div>
               </div>
@@ -209,7 +209,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                       value={formData.startDate || ''}
                       onChange={handleStartDateChange}
                       onClick={openCalendar}
-                      className="w-full bg-dark-900 border border-white/10 pl-10 pr-3 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer appearance-none"
+                      className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer appearance-none rounded-none"
                       style={{ colorScheme: 'dark' }}
                     />
                   </div>
@@ -225,7 +225,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                       value={formData.endDate || ''}
                       onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       onClick={openCalendar}
-                      className={`w-full bg-dark-900 border border-white/10 pl-10 pr-3 py-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer appearance-none ${!formData.startDate ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-3 text-white focus:outline-none focus:border-gold-400 transition-colors calendar-input cursor-pointer appearance-none rounded-none ${!formData.startDate ? 'opacity-50 cursor-not-allowed' : ''}`}
                       style={{ colorScheme: 'dark' }}
                     />
                   </div>
