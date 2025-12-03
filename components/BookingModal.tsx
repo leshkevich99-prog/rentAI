@@ -267,7 +267,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                       value={formData.startDate || ''}
                       onChange={handleStartDateChange}
                       onClick={openCalendar}
-                      className="w-full h-14 bg-dark-900 border border-white/10 pl-10 pr-3 text-white focus:outline-none focus:border-gold-400 transition-colors cursor-pointer rounded-lg"
+                      className="w-full h-14 bg-dark-900 border border-white/10 pl-10 pr-3 text-white focus:outline-none focus:border-gold-400 transition-colors cursor-pointer rounded-lg appearance-none"
                       style={{ colorScheme: 'dark' }}
                     />
                   </div>
@@ -283,7 +283,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                       value={formData.endDate || ''}
                       onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       onClick={openCalendar}
-                      className={`w-full h-14 bg-dark-900 border border-white/10 pl-10 pr-3 text-white focus:outline-none focus:border-gold-400 transition-colors cursor-pointer rounded-lg ${!formData.startDate ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full h-14 bg-dark-900 border border-white/10 pl-10 pr-3 text-white focus:outline-none focus:border-gold-400 transition-colors cursor-pointer rounded-lg appearance-none ${!formData.startDate ? 'opacity-50 cursor-not-allowed' : ''}`}
                       style={{ colorScheme: 'dark' }}
                     />
                   </div>
