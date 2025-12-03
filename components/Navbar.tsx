@@ -38,7 +38,7 @@ export const Navbar: React.FC = () => {
           <Link to="/" className="flex items-center gap-2">
             <Car className="w-8 h-8 text-gold-400" />
             <span className="text-2xl font-serif font-bold tracking-wider text-white">
-              Elite<span className="text-gold-400">Drive</span>
+              LÉ<span className="text-gold-400">ON</span>
             </span>
           </Link>
 

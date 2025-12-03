@@ -15,77 +15,67 @@ export const Contact: React.FC = () => {
               Контакты
             </h3>
             <p className="text-gray-400 mb-12">
-              Мы всегда рады ответить на ваши вопросы и помочь с выбором автомобиля. Наш офис находится в центре Минска, но мы доставляем авто в любую удобную для вас локацию.
+              Мы всегда рады ответить на ваши вопросы и помочь с выбором автомобиля. Наш офис находится в престижном районе Минска, но мы также доставляем авто в любую удобную для вас локацию.
             </p>
 
             <div className="space-y-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-dark-900 border border-white/10 flex items-center justify-center shrink-0">
-                  <MapPin className="text-gold-400" />
+                <div className="bg-dark-900 p-3 border border-white/10 rounded-lg">
+                  <MapPin className="text-gold-400 w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-white font-bold uppercase tracking-wider text-sm mb-1">Адрес</h4>
-                  <p className="text-gray-500">ул. П. Мстиславца, 11 <br/>Минск, Беларусь, 220076</p>
+                  <h4 className="text-white font-bold mb-1">Наш Офис</h4>
+                  <p className="text-gray-400 text-sm">г. Минск, Dana Center<br />ул. П. Мстиславца, 9</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-dark-900 border border-white/10 flex items-center justify-center shrink-0">
-                  <Phone className="text-gold-400" />
+                <div className="bg-dark-900 p-3 border border-white/10 rounded-lg">
+                  <Phone className="text-gold-400 w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-white font-bold uppercase tracking-wider text-sm mb-1">Телефон</h4>
-                  <p className="text-gray-500">+375 (29) 123-45-67<br/>+375 (44) 765-43-21 (Telegram)</p>
+                  <h4 className="text-white font-bold mb-1">Телефон</h4>
+                  <a href="tel:+375290000000" className="text-gray-400 text-sm hover:text-gold-400 transition-colors">
+                    +375 (29) 000-00-00
+                  </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-dark-900 border border-white/10 flex items-center justify-center shrink-0">
-                  <Mail className="text-gold-400" />
+                <div className="bg-dark-900 p-3 border border-white/10 rounded-lg">
+                  <Mail className="text-gold-400 w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-white font-bold uppercase tracking-wider text-sm mb-1">Email</h4>
-                  <p className="text-gray-500">info@elitedrive.by<br/>booking@elitedrive.by</p>
+                  <h4 className="text-white font-bold mb-1">Email</h4>
+                  <a href="mailto:avtoprokat.minsk@yandex.by" className="text-gray-400 text-sm hover:text-gold-400 transition-colors">
+                    avtoprokat.minsk@yandex.by
+                  </a>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-dark-900 border border-white/10 flex items-center justify-center shrink-0">
-                  <Clock className="text-gold-400" />
+                <div className="bg-dark-900 p-3 border border-white/10 rounded-lg">
+                  <Clock className="text-gold-400 w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-white font-bold uppercase tracking-wider text-sm mb-1">Время работы</h4>
-                  <p className="text-gray-500">Ежедневно: 09:00 - 22:00<br/>Поддержка 24/7</p>
+                  <h4 className="text-white font-bold mb-1">Время работы</h4>
+                  <p className="text-gray-400 text-sm">Ежедневно: 09:00 - 22:00<br />Поддержка: 24/7</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-dark-900 p-8 border border-white/5">
-            <h4 className="text-white font-serif text-2xl mb-6">Оставить заявку</h4>
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs text-gray-500 uppercase tracking-widest">Имя</label>
-                  <input type="text" className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none transition-colors" placeholder="Ваше имя" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs text-gray-500 uppercase tracking-widest">Телефон</label>
-                  <input type="text" className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none transition-colors" placeholder="+375 (__) ___-__-__" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500 uppercase tracking-widest">Email</label>
-                <input type="email" className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none transition-colors" placeholder="example@mail.by" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500 uppercase tracking-widest">Сообщение</label>
-                <textarea rows={4} className="w-full bg-dark-800 border border-white/10 p-3 text-white focus:border-gold-400 focus:outline-none transition-colors" placeholder="Интересует аренда Rolls-Royce..." />
-              </div>
-              <button className="w-full bg-gold-500 text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors">
-                Отправить
-              </button>
-            </form>
+          <div className="h-full min-h-[400px] bg-dark-900 rounded-2xl border border-white/10 overflow-hidden relative group">
+             <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2349.037943560783!2d27.648358177114674!3d53.93121513083654!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46dbcfd35b1e6add%3A0x6767073215234930!2sDana%20Center!5e0!3m2!1sen!2sby!4v1709400000000!5m2!1sen!2sby"
+                width="100%"
+                height="100%"
+                style={{ border: 0, opacity: 0.6, filter: 'grayscale(100%) invert(90%)' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="relative z-10 hover:opacity-100 hover:filter-none transition-all duration-500"
+            ></iframe>
           </div>
 
         </div>

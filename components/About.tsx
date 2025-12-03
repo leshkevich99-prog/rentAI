@@ -34,7 +34,7 @@ export const About: React.FC = () => {
             </h3>
             
             <p className="text-gray-400 text-lg mb-6 leading-relaxed">
-              EliteDrive была основана в 2025 году с одной целью: предоставить сервис, который превосходит ожидания самых требовательных клиентов. Мы не просто сдаем автомобили в аренду, мы дарим эмоции и свободу передвижения на высшем уровне.
+              LÉON была основана в 2025 году с одной целью: предоставить сервис, который превосходит ожидания самых требовательных клиентов. Мы не просто сдаем автомобили в аренду, мы дарим эмоции и свободу передвижения на высшем уровне.
             </p>
             
             <p className="text-gray-500 mb-8 leading-relaxed">
@@ -60,7 +60,7 @@ export const About: React.FC = () => {
 
             <div className="border-t border-white/10 pt-8">
                <div className="font-serif italic text-2xl text-gray-500 opacity-50">Roman Romanov</div>
-               <p className="text-gray-500 text-xs mt-2 uppercase tracking-widest">Роман Романов, CEO EliteDrive</p>
+               <p className="text-gray-500 text-xs mt-2 uppercase tracking-widest">Роман Романов, CEO LÉON</p>
             </div>
           </div>
 

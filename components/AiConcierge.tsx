@@ -6,7 +6,7 @@ import { sendMessageToGemini } from '../services/geminiService';
 export const AiConcierge: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: 'Здравствуйте! Я ваш персональный консьерж EliteDrive. Помочь вам с выбором автомобиля?' }
+    { role: 'model', text: 'Здравствуйте! Я ваш персональный консьерж LÉON. Помочь вам с выбором автомобиля?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ export const AiConcierge: React.FC = () => {
               <Sparkles className="w-5 h-5 text-gold-400" />
             </div>
             <div>
-              <h3 className="text-white font-serif font-bold">Elite Консьерж</h3>
+              <h3 className="text-white font-serif font-bold">LÉON Консьерж</h3>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                 <span className="text-xs text-gray-400">Online</span>

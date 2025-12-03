@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2 mb-6">
               <Car className="w-6 h-6 text-gold-400" />
               <Link to="/" className="text-xl font-serif font-bold tracking-wider text-white">
-                Elite<span className="text-gold-400">Drive</span>
+                LÉ<span className="text-gold-400">ON</span>
               </Link>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed">
@@ -52,7 +52,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600">
-          <p>© 2024 EliteDrive Belarus. Все права защищены.</p>
+          <p>© 2025 LÉON Belarus. Все права защищены.</p>
           <div className="flex gap-6">
             <Link to="/privacy" className="hover:text-gray-400">Политика конфиденциальности</Link>
             <Link to="/user-agreement" className="hover:text-gray-400">Пользовательское соглашение</Link>

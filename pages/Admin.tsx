@@ -240,7 +240,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-dark-900 border border-white/10 p-8 rounded-2xl shadow-2xl relative">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-serif text-white mb-2">EliteDrive <span className="text-gold-400">Admin</span></h2>
+            <h2 className="text-3xl font-serif text-white mb-2">LÉON <span className="text-gold-400">Admin</span></h2>
             <p className="text-gray-400">Безопасный вход</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
@@ -275,7 +275,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-dark-900 border-b border-white/5 p-4 flex items-center justify-between">
         <Link to="/" className="text-xl font-serif font-bold text-white">
-           Elite<span className="text-gold-400">Panel</span>
+           LÉON <span className="text-gold-400">Panel</span>
         </Link>
         <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="text-white p-2">
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -298,7 +298,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       >
         <div className="p-6 border-b border-white/5 hidden md:block">
            <Link to="/" className="text-2xl font-serif font-bold text-white">
-              Elite<span className="text-gold-400">Panel</span>
+              LÉON <span className="text-gold-400">Panel</span>
             </Link>
         </div>
         
