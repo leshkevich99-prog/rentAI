@@ -24,16 +24,6 @@ const supabase = createClient(
   supabaseKey || 'placeholder'
 );
 
-// Helper for Hashing (Auth)
-async function sha256(message: string) {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-const DEFAULT_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // SHA-256 for 'admin'
-
 // --- CARS API ---
 
 export const fetchCars = async (): Promise<Car[]> => {
@@ -114,7 +104,7 @@ export const deleteCarSecure = async (id: string, password: string) => {
   }
 };
 
-// Deprecated direct client calls (kept for backward compat or read-only if needed, but not used for writing anymore)
+// Deprecated direct client calls
 export const saveCar = async (car: Car) => {
    console.warn("Direct client saveCar is deprecated. Use saveCarSecure via Admin panel.");
 };
@@ -124,10 +114,6 @@ export const deleteCarById = async (id: string) => {
 
 // --- STORAGE API ---
 
-/**
- * Загрузка изображений через серверный прокси.
- * Решает проблему CORS и RLS при загрузке напрямую из браузера.
- */
 export const uploadCarImage = async (file: File): Promise<string> => {
   if (!isConfigured) throw new Error("Database not configured");
 
@@ -164,74 +150,42 @@ export const uploadCarImage = async (file: File): Promise<string> => {
 
 // --- AUTH API ---
 
+/**
+ * Проверка пароля теперь происходит через API,
+ * так как пароль хранится в переменных окружения сервера.
+ */
 export const checkAdminPassword = async (password: string): Promise<boolean> => {
-  const hash = await sha256(password);
-  
-  if (!isConfigured) {
-    return hash === DEFAULT_HASH;
-  }
-
   try {
-    const { data, error } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'admin_password_hash')
-      .single();
-    
-    if (error || !data) {
-      return hash === DEFAULT_HASH;
-    }
+    const response = await fetch('/api/admin-cars', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'check_auth',
+        password: password
+      })
+    });
 
-    return data.value === hash;
+    return response.ok;
   } catch (e) {
     console.error("Auth check failed", e);
-    return hash === DEFAULT_HASH;
+    // Fallback for local dev without backend running properly
+    return password === 'admin';
   }
 };
 
 export const updateAdminPassword = async (newPassword: string) => {
-  if (!isConfigured) throw new Error("Database not configured");
-  
-  const hash = await sha256(newPassword);
-  
-  const { error } = await supabase
-    .from('settings')
-    .upsert({ key: 'admin_password_hash', value: hash });
-    
-  if (error) throw error;
+  // Теперь управляется через ENV переменные
+  throw new Error("Пароль меняется через переменные окружения Vercel (ADMIN_PASSWORD).");
 };
 
 // --- TELEGRAM API ---
 
 export const getTelegramSettings = async () => {
-  if (!isConfigured) return { botToken: '', chatId: '' };
-
-  const { data } = await supabase
-    .from('settings')
-    .select('key, value')
-    .in('key', ['telegram_bot_token', 'telegram_chat_id']);
-
-  const settings: any = {};
-  data?.forEach((item: any) => {
-    settings[item.key] = item.value;
-  });
-
-  return {
-    botToken: settings['telegram_bot_token'] || '',
-    chatId: settings['telegram_chat_id'] || ''
-  };
+  // Теперь управляется через ENV переменные
+  return { botToken: '***', chatId: '***' };
 };
 
 export const saveTelegramSettings = async (token: string, chatId: string) => {
-  if (!isConfigured) throw new Error("Database not configured");
-
-  const { error: err1 } = await supabase
-    .from('settings')
-    .upsert({ key: 'telegram_bot_token', value: token });
-    
-  const { error: err2 } = await supabase
-    .from('settings')
-    .upsert({ key: 'telegram_chat_id', value: chatId });
-
-  if (err1 || err2) throw new Error("Failed to save settings");
+  // Теперь управляется через ENV переменные
+  throw new Error("Настройки Telegram меняются через переменные окружения Vercel.");
 };

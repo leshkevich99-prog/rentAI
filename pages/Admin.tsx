@@ -18,14 +18,13 @@ import {
   Lock,
   MessageCircle,
   Database,
-  RefreshCw,
   ShieldCheck,
   AlertTriangle,
   Loader2,
-  Percent
+  Server
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { checkAdminPassword, updateAdminPassword, getTelegramSettings, saveTelegramSettings, isConfigured, uploadCarImage, saveCarSecure, deleteCarSecure } from '../services/supabase';
+import { checkAdminPassword, isConfigured, uploadCarImage, saveCarSecure, deleteCarSecure } from '../services/supabase';
 
 interface AdminProps {
   cars: Car[];
@@ -44,27 +43,11 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
   const [currentCar, setCurrentCar] = useState<Partial<Car>>({});
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   
-  // Settings State
-  const [newPassword, setNewPassword] = useState('');
-  const [telegramToken, setTelegramToken] = useState('');
-  const [telegramChatId, setTelegramChatId] = useState('');
-  const [settingsStatus, setSettingsStatus] = useState('');
-  
   // Image Upload State
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const navigate = useNavigate();
-
-  // Load Settings
-  useEffect(() => {
-    if (activeTab === 'settings' && isAuthenticated) {
-      getTelegramSettings().then(settings => {
-        setTelegramToken(settings.botToken);
-        setTelegramChatId(settings.chatId);
-      });
-    }
-  }, [activeTab, isAuthenticated]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,33 +191,6 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
     }
   };
 
-  // Settings Handlers
-  const handleSaveTelegram = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSettingsStatus('Сохранение Telegram...');
-    try {
-      await saveTelegramSettings(telegramToken, telegramChatId);
-      setSettingsStatus('Telegram настройки сохранены!');
-      setTimeout(() => setSettingsStatus(''), 3000);
-    } catch (error) {
-      setSettingsStatus('Ошибка сохранения. Проверьте подключение к БД.');
-    }
-  };
-  
-  const handleSavePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPassword) return;
-    setSettingsStatus('Обновление пароля...');
-    try {
-      await updateAdminPassword(newPassword);
-      setNewPassword('');
-      setSettingsStatus('Пароль успешно обновлен!');
-      setTimeout(() => setSettingsStatus(''), 3000);
-    } catch (error) {
-      setSettingsStatus('Ошибка обновления пароля.');
-    }
-  };
-
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -260,7 +216,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
             </button>
             <div className="flex flex-col gap-2 items-center">
                <p className="text-xs text-center text-gray-600">
-                  * По умолчанию пароль: <b>admin</b>
+                  * По умолчанию пароль: <b>admin</b> (если не задан в ENV)
                </p>
             </div>
           </form>
@@ -493,7 +449,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                       <div>
                         <h4 className="text-white font-bold mb-2">Supabase Подключен</h4>
                         <p className="text-gray-400 text-sm leading-relaxed">
-                          Приложение успешно использует ключи из переменных окружения (<code>.env</code>).
+                          Приложение успешно использует ключи из переменных окружения.
                         </p>
                       </div>
                     </div>
@@ -509,97 +465,46 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                         <p className="text-gray-400 text-sm leading-relaxed mb-2">
                            Ключи <code>VITE_SUPABASE_URL</code> и <code>VITE_SUPABASE_ANON_KEY</code> не найдены в окружении.
                         </p>
-                        <p className="text-gray-500 text-xs">
-                           Все изменения (добавление/удаление авто) будут работать только локально до перезагрузки страницы.
-                        </p>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Telegram Settings */}
-              <div className="bg-dark-900 p-6 rounded-xl border border-white/5">
+              {/* Vercel Environment Info */}
+              <div className="bg-dark-900 p-6 rounded-xl border border-white/5 lg:col-span-2">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-blue-500/10 rounded-lg text-blue-500"><MessageCircle size={24} /></div>
-                  <h3 className="text-xl font-bold text-white">Уведомления Telegram</h3>
+                  <div className="p-3 bg-blue-500/10 rounded-lg text-blue-500"><Server size={24} /></div>
+                  <h3 className="text-xl font-bold text-white">Переменные Окружения</h3>
                 </div>
                 
-                <form onSubmit={handleSaveTelegram} className="space-y-4">
-                  <div className="text-sm text-gray-400 bg-white/5 p-4 rounded mb-4">
-                    <p className="mb-2"><b>Важно:</b> Telegram бот НЕ может писать вам первым по username. Он может отвечать только по Chat ID.</p>
-                    <ol className="list-decimal list-inside space-y-1 text-xs">
-                      <li>Создайте бота в <b>@BotFather</b> и получите Token.</li>
-                      <li>Напишите своему боту <code>/start</code>.</li>
-                      <li>Узнайте свой Chat ID в боте <b>@getmyid_bot</b>.</li>
-                    </ol>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2">Telegram Bot Token</label>
-                    <input 
-                      type="text" 
-                      value={telegramToken}
-                      onChange={e => setTelegramToken(e.target.value)}
-                      placeholder="123456:ABC-DEF..."
-                      className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2">Ваш Chat ID</label>
-                    <input 
-                      type="text" 
-                      value={telegramChatId}
-                      onChange={e => setTelegramChatId(e.target.value)}
-                      placeholder="12345678"
-                      className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                    />
-                  </div>
+                <div className="bg-white/5 p-6 rounded-lg border border-white/5">
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    Настройки безопасности и интеграций теперь управляются через панель Vercel. 
+                    Для изменения пароля администратора или токенов Telegram, пожалуйста, перейдите в настройки проекта:
+                  </p>
+                  <p className="text-sm font-mono text-gold-400 mb-6 bg-black/50 p-4 rounded block">
+                    Settings &rarr; Environment Variables
+                  </p>
                   
-                  <div className="pt-4 border-t border-white/5">
-                     <button className="bg-gold-500 text-black font-bold uppercase px-6 py-3 rounded hover:bg-gold-400 transition-colors w-full">
-                       Сохранить настройки Telegram
-                     </button>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-white font-bold text-sm mb-1">Telegram Bot Token</h4>
+                      <code className="text-xs text-gray-500">TELEGRAM_BOT_TOKEN</code>
+                    </div>
+                     <div>
+                      <h4 className="text-white font-bold text-sm mb-1">Telegram Chat ID</h4>
+                      <code className="text-xs text-gray-500">TELEGRAM_CHAT_ID</code>
+                    </div>
+                     <div>
+                      <h4 className="text-white font-bold text-sm mb-1">Пароль Администратора</h4>
+                      <code className="text-xs text-gray-500">ADMIN_PASSWORD</code>
+                    </div>
                   </div>
-                </form>
-              </div>
-
-              {/* Password Settings */}
-              <div className="bg-dark-900 p-6 rounded-xl border border-white/5">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-red-500/10 rounded-lg text-red-500"><Lock size={24} /></div>
-                  <h3 className="text-xl font-bold text-white">Смена пароля</h3>
                 </div>
-
-                <form onSubmit={handleSavePassword} className="space-y-4">
-                   <p className="text-sm text-gray-400 mb-4">
-                     Пароль шифруется (SHA-256) и хранится в базе Supabase. Если база не подключена, работает пароль 'admin'.
-                   </p>
-                   <div>
-                    <label className="block text-xs uppercase text-gray-500 mb-2">Новый пароль</label>
-                    <input 
-                      type="password" 
-                      value={newPassword}
-                      onChange={e => setNewPassword(e.target.value)}
-                      placeholder="Введите новый пароль"
-                      className="w-full bg-dark-800 border border-white/10 p-3 text-white rounded focus:border-gold-400 focus:outline-none"
-                    />
-                  </div>
-                   <div className="pt-4 border-t border-white/5">
-                     <button className="bg-white/10 text-white font-bold uppercase px-6 py-3 rounded hover:bg-white/20 transition-colors w-full border border-white/10">
-                       Обновить пароль
-                     </button>
-                  </div>
-                </form>
               </div>
+
             </div>
-
-            {settingsStatus && (
-              <div className="fixed bottom-8 right-8 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl animate-fade-in-up z-50">
-                 {settingsStatus}
-              </div>
-            )}
           </div>
         )}
 
@@ -611,7 +516,6 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                 <div className="p-8 text-center text-gray-500">
                     <CalendarDays size={48} className="mx-auto mb-4 opacity-50" />
                     <p>Заявки отправляются напрямую в ваш Telegram.</p>
-                    <button onClick={() => setActiveTab('settings')} className="mt-4 text-gold-400 hover:text-white underline text-sm">Настроить Telegram</button>
                 </div>
              </div>
            </div>

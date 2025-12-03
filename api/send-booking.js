@@ -40,38 +40,13 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid phone number' });
     }
 
-    // Инициализация Supabase
-    const supabaseUrl = process.env.VITE_SUPABASE_URL;
-    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.error('Missing Supabase Env Vars on Server');
-      return res.status(500).json({ error: 'Server misconfiguration' });
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Получаем настройки Telegram
-    const { data: settingsData, error: dbError } = await supabase
-      .from('settings')
-      .select('key, value')
-      .in('key', ['telegram_bot_token', 'telegram_chat_id']);
-
-    if (dbError) {
-      console.error('DB Error:', dbError);
-      throw new Error('Failed to fetch settings');
-    }
-
-    const settings = {};
-    settingsData.forEach(item => {
-      settings[item.key] = item.value;
-    });
-
-    const botToken = settings['telegram_bot_token'];
-    const chatId = settings['telegram_chat_id'];
+    // Получаем настройки Telegram из переменных окружения Vercel
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (!botToken || !chatId) {
-      return res.status(500).json({ error: 'Telegram settings not configured' });
+      console.error('Telegram Env Vars missing');
+      return res.status(500).json({ error: 'Server misconfiguration: Telegram settings not found' });
     }
 
     // Формируем сообщение
@@ -146,7 +121,7 @@ ${safeDetails || 'Не указано'}
     });
 
     if (!tgResponse.ok) {
-      console.error('Telegram API Error');
+      console.error('Telegram API Error', await tgResponse.text());
       return res.status(502).json({ error: 'Failed to send to Telegram' });
     }
 

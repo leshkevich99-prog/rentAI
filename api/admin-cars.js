@@ -1,13 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
-
-// Хеширование для сверки пароля (SHA-256)
-// Using standard Node.js crypto for better serverless compatibility
-function sha256(message) {
-  return crypto.createHash('sha256').update(message).digest('hex');
-}
-
-const DEFAULT_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // SHA-256 для 'admin'
 
 export default async function handler(req, res) {
   // CORS
@@ -34,7 +25,22 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Password required' });
   }
 
-  // 1. Инициализация Supabase
+  // 1. Проверка пароля через переменные окружения Vercel
+  const envPassword = process.env.ADMIN_PASSWORD;
+  
+  // Пароль по умолчанию, если переменная не задана (для локальной разработки)
+  const isAuthValid = envPassword ? (password === envPassword) : (password === 'admin');
+
+  if (!isAuthValid) {
+    return res.status(403).json({ error: 'Invalid password' });
+  }
+
+  // Если это просто проверка авторизации (при логине на фронтенде)
+  if (action === 'check_auth') {
+    return res.status(200).json({ success: true });
+  }
+
+  // 2. Инициализация Supabase для работы с данными
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
@@ -44,31 +50,7 @@ export default async function handler(req, res) {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  // 2. Проверка пароля (Auth)
-  let isAuthenticated = false;
-  const inputHash = sha256(password);
-
-  // Сначала проверяем дефолтный хэш (чтобы работало без БД настроек)
-  if (inputHash === DEFAULT_HASH) {
-    isAuthenticated = true;
-  } else {
-    // Если не дефолтный, проверяем в БД (таблица settings)
-    const { data: settingsData } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'admin_password_hash')
-      .single();
-    
-    if (settingsData && settingsData.value === inputHash) {
-      isAuthenticated = true;
-    }
-  }
-
-  if (!isAuthenticated) {
-    return res.status(403).json({ error: 'Invalid password' });
-  }
-
-  // 3. Выполнение действий
+  // 3. Выполнение действий с данными
   try {
     if (action === 'save') {
       if (!car) return res.status(400).json({ error: 'Car data missing' });
