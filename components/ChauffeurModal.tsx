@@ -91,7 +91,7 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
                       placeholder="Иван"
                       value={formData.name}
                       onChange={(e) => handleChange('name', e.target.value)}
-                      className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded"
+                      className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-none"
                     />
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
                       placeholder="+375 (29) ..."
                       value={formData.phone}
                       onChange={(e) => handleChange('phone', e.target.value)}
-                      className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded"
+                      className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-none"
                     />
                   </div>
                 </div>
@@ -114,9 +114,9 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
 
               {/* Date & Time */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-2 w-full min-w-0">
                     <label className="text-xs uppercase text-gray-500 tracking-wider">Дата подачи</label>
-                    <div className="relative">
+                    <div className="relative w-full">
                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
                         <input 
                             type="date" 
@@ -125,14 +125,14 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
                             value={formData.date}
                             onChange={(e) => handleChange('date', e.target.value)}
                             onClick={(e) => {try{e.currentTarget.showPicker()}catch(err){}}}
-                            className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded cursor-pointer"
+                            className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-none cursor-pointer"
                             style={{ colorScheme: 'dark' }}
                         />
                     </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 w-full min-w-0">
                     <label className="text-xs uppercase text-gray-500 tracking-wider">Время</label>
-                    <div className="relative">
+                    <div className="relative w-full">
                         <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
                         <input 
                             type="time" 
@@ -140,7 +140,7 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
                             value={formData.time}
                             onChange={(e) => handleChange('time', e.target.value)}
                             onClick={(e) => {try{e.currentTarget.showPicker()}catch(err){}}}
-                            className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded cursor-pointer"
+                            className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-none cursor-pointer"
                             style={{ colorScheme: 'dark' }}
                         />
                     </div>
@@ -153,7 +153,7 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
                   <select 
                     value={formData.duration}
                     onChange={(e) => handleChange('duration', e.target.value)}
-                    className="w-full h-12 bg-dark-900 border border-white/10 px-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded appearance-none"
+                    className="w-full h-12 bg-dark-900 border border-white/10 px-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-none"
                   >
                       <option value="transfer">Трансфер (Аэропорт/Точка-Точка)</option>
                       <option value="3h">Почасовая (3 часа)</option>

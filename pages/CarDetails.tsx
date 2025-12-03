@@ -119,7 +119,7 @@ export const CarDetails: React.FC<CarDetailsProps> = ({ cars, onBookCar }) => {
                          </button>
                          <p className="text-center text-xs text-gray-500">
                              <CheckCircle size={12} className="inline mr-1 text-green-500" />
-                             Без скрытых платежей. Страховка включена.
+                             Без залога. Лимит пробега 300 км/сут.
                          </p>
                     </div>
                 </div>
