@@ -31,6 +31,7 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
         result.sort((a, b) => b.specs.hp - a.specs.hp);
         break;
       case 'acceleration_asc':
+        // Sort by 0-100 time (ascending = faster)
         result.sort((a, b) => a.specs.zeroToSixty - b.specs.zeroToSixty);
         break;
       default:
@@ -85,8 +86,9 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
               </button>
 
               {isFilterOpen && (
-                <div className="absolute top-full right-0 mt-2 w-60 bg-dark-800 border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden backdrop-blur-xl">
-                  {/* Backdrop for click outside could be implemented globally, but for now simple toggle works */}
+                <>
+                <div className="fixed inset-0 z-10" onClick={() => setIsFilterOpen(false)} />
+                <div className="absolute top-full right-0 mt-2 w-64 bg-dark-800 border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden backdrop-blur-xl">
                   <div className="py-1">
                     <button 
                       onClick={() => { setSortBy('default'); setIsFilterOpen(false); }}
@@ -124,6 +126,7 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
                     </button>
                   </div>
                 </div>
+                </>
               )}
             </div>
           </div>

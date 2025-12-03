@@ -29,7 +29,7 @@ export const Navbar: React.FC = () => {
     <nav
       className={`fixed w-full z-50 transition-all duration-500 border-b ${
         isScrolled || location.pathname !== '/'
-          ? 'bg-black/60 backdrop-blur-xl border-white/5 py-4 shadow-lg shadow-black/50'
+          ? 'bg-dark-900/80 backdrop-blur-xl border-white/5 py-4 shadow-lg shadow-black/50'
           : 'bg-transparent border-transparent py-6'
       }`}
     >

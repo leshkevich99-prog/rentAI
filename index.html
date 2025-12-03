@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#0a0a0a" />
     <meta name="description" content="Аренда элитных автомобилей в Минске. LÉON - это премиум автопарк, высокий уровень сервиса и индивидуальный подход. Lamborghini, Rolls-Royce, Ferrari." />
     <meta name="keywords" content="аренда авто минск, прокат спорткаров, аренда ламборгини, прокат роллс ройс, luxury car rental minsk, автопрокат премиум" />
@@ -13,6 +13,7 @@
     <meta property="og:image" content="https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/mainback.png" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="LÉON" />
+    <meta property="og:locale" content="ru_RU" />
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -46,6 +47,7 @@
             animation: {
               'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
               'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'bounce-slow': 'bounce 2s infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -65,14 +67,15 @@
       }
       /* Custom Scrollbar */
       ::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
       }
       ::-webkit-scrollbar-track {
         background: #0a0a0a; 
       }
       ::-webkit-scrollbar-thumb {
         background: #333; 
-        border-radius: 3px;
+        border-radius: 4px;
+        border: 2px solid #0a0a0a;
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #D4AF37; 
@@ -95,6 +98,11 @@
       }
       ::-webkit-calendar-picker-indicator:hover {
         opacity: 1;
+      }
+      
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
       }
     </style>
   <script type="importmap">

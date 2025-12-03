@@ -9,31 +9,52 @@ interface BookingModalProps {
   onClose: () => void;
 }
 
-// Phone formatter helper
+// Improved Phone formatter helper
 const formatPhoneNumber = (value: string) => {
   if (!value) return value;
   
-  // Remove all non-digits
-  const phoneNumber = value.replace(/[^\d]/g, '');
+  // 1. Оставляем только цифры
+  let digits = value.replace(/\D/g, '');
   
-  // Handle Belarus Prefix +375
-  // If user starts typing 29... add 375
+  // 2. Если пользователь вставил номер с кодом +375 или 80... обрезаем лишнее
+  // Мы ожидаем ввод 29... 44... 33... (9 цифр)
   
-  const phoneNumberLength = phoneNumber.length;
-  
-  if (phoneNumberLength < 4) return phoneNumber;
-
-  if (phoneNumberLength < 7) {
-    return `(${phoneNumber.slice(0, 2)}) ${phoneNumber.slice(2)}`;
+  if (digits.startsWith('375')) {
+    digits = digits.slice(3);
+  } else if (digits.startsWith('80')) {
+    digits = digits.slice(2);
   }
   
-  if (phoneNumberLength < 10) {
-    return `(${phoneNumber.slice(0, 2)}) ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5, 7)}`;
+  // 3. Обрезаем до 9 цифр (стандарт РБ без кода страны)
+  digits = digits.slice(0, 9);
+  
+  // 4. Формируем маску (XX) XXX-XX-XX
+  if (digits.length === 0) return '';
+  
+  let formatted = '';
+  
+  // Код оператора (2 цифры)
+  if (digits.length > 0) {
+    formatted += `(${digits.slice(0, 2)}`;
   }
   
-  return `(${phoneNumber.slice(0, 2)}) ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5, 7)}-${phoneNumber.slice(7, 9)}`;
+  // Первая тройка цифр
+  if (digits.length >= 3) {
+    formatted += `) ${digits.slice(2, 5)}`;
+  }
+  
+  // Следующие две
+  if (digits.length >= 6) {
+    formatted += `-${digits.slice(5, 7)}`;
+  }
+  
+  // Последние две
+  if (digits.length >= 8) {
+    formatted += `-${digits.slice(7, 9)}`;
+  }
+  
+  return formatted;
 };
-
 
 export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
   const [step, setStep] = useState<'form' | 'sending' | 'success'>('form');
@@ -169,7 +190,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const formatted = formatPhoneNumber(e.target.value);
+      // Allow user to delete (backspace) without mask fighting them too much
+      // But re-format immediately on input
+      const val = e.target.value;
+      const formatted = formatPhoneNumber(val);
       setFormData({...formData, phone: formatted});
   };
 
@@ -216,17 +240,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
               <div className="space-y-2">
                 <label className="text-xs uppercase text-gray-500 tracking-wider">Телефон</label>
                 <div className="relative group">
-                   <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                   <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
                        <Phone className="text-gray-500 w-5 h-5 group-focus-within:text-gold-400 transition-colors" />
                        <span className="text-gray-400 font-medium border-r border-white/10 pr-2">+375</span>
                    </div>
                   <input 
                     type="tel" 
                     required 
-                    placeholder="(29) 000-00-00"
+                    placeholder="(29) 123-45-67"
                     value={formData.phone || ''}
                     onChange={handlePhoneChange}
-                    maxLength={14}
                     className="w-full h-14 bg-dark-900 border border-white/10 pl-28 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded-lg font-medium tracking-wide"
                   />
                 </div>
