@@ -29,7 +29,7 @@ export const Navbar: React.FC = () => {
     <nav
       className={`fixed w-full z-50 transition-all duration-500 border-b ${
         isScrolled || location.pathname !== '/'
-          ? 'bg-dark-900/90 backdrop-blur-lg border-white/10 py-4 shadow-lg shadow-black/50'
+          ? 'bg-black/60 backdrop-blur-xl border-white/5 py-4 shadow-lg shadow-black/50'
           : 'bg-transparent border-transparent py-6'
       }`}
     >
@@ -72,7 +72,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Menu */}
       <div 
-        className={`md:hidden absolute top-full left-0 w-full bg-dark-900/95 backdrop-blur-xl border-b border-white/10 overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`md:hidden absolute top-full left-0 w-full bg-dark-900/95 backdrop-blur-2xl border-b border-white/10 overflow-hidden transition-all duration-500 ease-in-out ${
             isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >

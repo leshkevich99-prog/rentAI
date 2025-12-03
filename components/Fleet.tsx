@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { CarCategory, Car } from '../types';
 import { CarCard } from './CarCard';
-import { SlidersHorizontal, ArrowDownWideNarrow, ArrowUpNarrowWide, Zap } from 'lucide-react';
+import { SlidersHorizontal, ArrowDownWideNarrow, ArrowUpNarrowWide, Zap, Gauge } from 'lucide-react';
 
 interface FleetProps {
   cars: Car[];
   onBookCar: (car: Car) => void;
 }
 
-type SortType = 'default' | 'price_asc' | 'price_desc' | 'power_desc';
+type SortType = 'default' | 'price_asc' | 'price_desc' | 'power_desc' | 'acceleration_asc';
 
 export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
   const [activeCategory, setActiveCategory] = useState<string>('ALL');
@@ -29,6 +29,9 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
         break;
       case 'power_desc':
         result.sort((a, b) => b.specs.hp - a.specs.hp);
+        break;
+      case 'acceleration_asc':
+        result.sort((a, b) => a.specs.zeroToSixty - b.specs.zeroToSixty);
         break;
       default:
         // Default Supabase order or ID based
@@ -82,34 +85,44 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
               </button>
 
               {isFilterOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-dark-800 border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden">
-                  <button 
-                    onClick={() => { setSortBy('default'); setIsFilterOpen(false); }}
-                    className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'default' ? 'text-gold-400' : 'text-gray-300'}`}
-                  >
-                    <span>По умолчанию</span>
-                  </button>
-                  <button 
-                    onClick={() => { setSortBy('price_asc'); setIsFilterOpen(false); }}
-                    className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'price_asc' ? 'text-gold-400' : 'text-gray-300'}`}
-                  >
-                    <span>Сначала дешевле</span>
-                    <ArrowDownWideNarrow size={14} />
-                  </button>
-                  <button 
-                    onClick={() => { setSortBy('price_desc'); setIsFilterOpen(false); }}
-                    className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'price_desc' ? 'text-gold-400' : 'text-gray-300'}`}
-                  >
-                    <span>Сначала дороже</span>
-                    <ArrowUpNarrowWide size={14} />
-                  </button>
-                   <button 
-                    onClick={() => { setSortBy('power_desc'); setIsFilterOpen(false); }}
-                    className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'power_desc' ? 'text-gold-400' : 'text-gray-300'}`}
-                  >
-                    <span>Самые мощные</span>
-                    <Zap size={14} />
-                  </button>
+                <div className="absolute top-full right-0 mt-2 w-60 bg-dark-800 border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden backdrop-blur-xl">
+                  {/* Backdrop for click outside could be implemented globally, but for now simple toggle works */}
+                  <div className="py-1">
+                    <button 
+                      onClick={() => { setSortBy('default'); setIsFilterOpen(false); }}
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'default' ? 'text-gold-400' : 'text-gray-300'}`}
+                    >
+                      <span>По умолчанию</span>
+                    </button>
+                    <button 
+                      onClick={() => { setSortBy('price_asc'); setIsFilterOpen(false); }}
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'price_asc' ? 'text-gold-400' : 'text-gray-300'}`}
+                    >
+                      <span>Сначала дешевле</span>
+                      <ArrowDownWideNarrow size={14} />
+                    </button>
+                    <button 
+                      onClick={() => { setSortBy('price_desc'); setIsFilterOpen(false); }}
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'price_desc' ? 'text-gold-400' : 'text-gray-300'}`}
+                    >
+                      <span>Сначала дороже</span>
+                      <ArrowUpNarrowWide size={14} />
+                    </button>
+                    <button 
+                      onClick={() => { setSortBy('power_desc'); setIsFilterOpen(false); }}
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'power_desc' ? 'text-gold-400' : 'text-gray-300'}`}
+                    >
+                      <span>Самые мощные</span>
+                      <Zap size={14} />
+                    </button>
+                     <button 
+                      onClick={() => { setSortBy('acceleration_asc'); setIsFilterOpen(false); }}
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 flex items-center justify-between ${sortBy === 'acceleration_asc' ? 'text-gold-400' : 'text-gray-300'}`}
+                    >
+                      <span>Самые быстрые (0-100)</span>
+                      <Gauge size={14} />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
