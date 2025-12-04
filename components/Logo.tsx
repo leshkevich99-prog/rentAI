@@ -78,7 +78,7 @@ export const Logo: React.FC<LogoProps> = ({ className = '', variant = 'full' }) 
       {variant === 'full' && (
         <div className="flex flex-col justify-center">
           <span className="text-2xl font-serif font-bold tracking-widest text-white leading-none flex items-center">
-            LÉ<span className="text-transparent bg-clip-text bg-gradient-to-b from-gold-300 to-gold-600">ON</span>
+            LÉ<span className="text-transparent bg-clip-text bg-gradient-to-b from-gold-400 to-gold-600">ON</span>
           </span>
           <span className="text-[8px] uppercase tracking-[0.35em] text-gray-500 font-bold ml-0.5 mt-1 border-t border-gray-800 pt-0.5 inline-block">
             Premium
