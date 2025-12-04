@@ -1,6 +1,16 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Helper to find env var by checking multiple common naming conventions
+const findEnv = (possibleKeys) => {
+  for (const key of possibleKeys) {
+    if (process.env[key]) return process.env[key];
+    if (process.env[key.toLowerCase()]) return process.env[key.toLowerCase()];
+    if (process.env[key.toUpperCase()]) return process.env[key.toUpperCase()];
+  }
+  return null;
+};
+
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -27,8 +37,12 @@ export default async function handler(req, res) {
   }
 
   // 1. Authorization Check (Environment Variable)
-  // Проверяем оба регистра
-  const envPassword = process.env.ADMIN_PASSWORD || process.env.admin_password || process.env.VITE_ADMIN_PASSWORD;
+  const envPassword = findEnv([
+    'ADMIN_PASSWORD',
+    'admin_password',
+    'VITE_ADMIN_PASSWORD',
+    'PASSWORD'
+  ]);
   
   // Strict comparison, trimming to avoid whitespace issues
   const cleanInputPass = String(password).trim();
@@ -36,7 +50,7 @@ export default async function handler(req, res) {
 
   if (!cleanEnvPass) {
       console.error('ADMIN_PASSWORD env var is missing');
-      return res.status(500).json({ error: 'Server auth misconfiguration' });
+      return res.status(500).json({ error: 'Server auth misconfiguration: ADMIN_PASSWORD missing' });
   }
 
   if (cleanInputPass !== cleanEnvPass) {
@@ -48,13 +62,18 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   }
 
-  // 2. Database Connection (Only needed for data modification)
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  // 2. Database Connection
+  const supabaseUrl = findEnv(['SUPABASE_URL', 'VITE_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL']);
+  const supabaseServiceKey = findEnv([
+      'SUPABASE_SERVICE_ROLE_KEY', 
+      'SUPABASE_KEY', 
+      'SUPABASE_ANON_KEY', 
+      'VITE_SUPABASE_ANON_KEY'
+  ]);
 
   if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Database configuration missing');
-    return res.status(500).json({ error: 'Server DB misconfiguration' });
+    return res.status(500).json({ error: 'Server DB misconfiguration: Keys missing' });
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);

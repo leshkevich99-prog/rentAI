@@ -4,6 +4,18 @@ const sanitize = (str) => {
   return str.replace(/<[^>]*>?/gm, '').trim().slice(0, 2000);
 };
 
+// Helper to find env var by checking multiple common naming conventions
+const findEnv = (possibleKeys) => {
+  for (const key of possibleKeys) {
+    if (process.env[key]) return process.env[key];
+    // Check lowercase version if the key provided was uppercase
+    if (process.env[key.toLowerCase()]) return process.env[key.toLowerCase()];
+    // Check uppercase version
+    if (process.env[key.toUpperCase()]) return process.env[key.toUpperCase()];
+  }
+  return null;
+};
+
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -27,19 +39,41 @@ export default async function handler(req, res) {
     const { booking, car, type } = req.body;
 
     // --- CONFIGURATION ---
-    // Проверяем все возможные варианты написания переменных (Vercel обычно использует UPPERCASE)
-    const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.telegram_bot_token || process.env.VITE_TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID || process.env.telegram_chat_id || process.env.VITE_TELEGRAM_CHAT_ID;
+    // Try to find keys using various common names
+    const botToken = findEnv([
+      'TELEGRAM_BOT_TOKEN', 
+      'telegram_bot_token', 
+      'VITE_TELEGRAM_BOT_TOKEN', 
+      'BOT_TOKEN', 
+      'TG_BOT_TOKEN'
+    ]);
+    
+    const chatId = findEnv([
+      'TELEGRAM_CHAT_ID', 
+      'telegram_chat_id', 
+      'VITE_TELEGRAM_CHAT_ID', 
+      'CHAT_ID', 
+      'TG_CHAT_ID'
+    ]);
 
     if (!botToken || !chatId) {
-      console.error('Telegram settings missing. BotToken present:', !!botToken, 'ChatID present:', !!chatId);
-      // Возвращаем детализированную ошибку, чтобы вы видели в консоли браузера, чего именно не хватает
+      // Log available keys (security: do not log values) to help debug in Vercel logs
+      const availableKeys = Object.keys(process.env).filter(k => 
+        k.toLowerCase().includes('telegram') || 
+        k.toLowerCase().includes('chat') || 
+        k.toLowerCase().includes('token')
+      );
+      console.error('Telegram settings missing.');
+      console.error('Found potentially relevant keys:', availableKeys);
+      console.error('BotToken Found:', !!botToken, 'ChatID Found:', !!chatId);
+
       return res.status(500).json({ 
         error: 'Server misconfiguration: Telegram keys missing',
         details: {
           botTokenSet: !!botToken,
           chatIdSet: !!chatId,
-          instruction: 'Please verify Env Vars in Vercel Project Settings and REDEPLOY.'
+          visibleRelevantKeys: availableKeys, // Sending this to client for debugging
+          instruction: 'Please check your Vercel Environment Variables. Ensure TELEGRAM_CHAT_ID is set.'
         }
       });
     }
