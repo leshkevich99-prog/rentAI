@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 
 const getEnvVar = (key) => {
@@ -39,33 +40,33 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Password required' });
   }
 
-  // 1. Проверка пароля
+  // 1. Authorization Check (Environment Variable)
   const envPassword = getEnvVar('ADMIN_PASSWORD');
   
-  // Пароль по умолчанию "admin" работает ТОЛЬКО если переменная окружения НЕ задана вообще.
-  const isAuthValid = envPassword ? (password === envPassword) : (password === 'admin');
+  // Strict comparison, trimming to avoid whitespace issues
+  const cleanInputPass = String(password).trim();
+  const cleanEnvPass = envPassword ? String(envPassword).trim() : 'admin';
 
-  if (!isAuthValid) {
+  if (cleanInputPass !== cleanEnvPass) {
     return res.status(403).json({ error: 'Invalid password' });
   }
 
-  // Если это просто проверка авторизации (при логине на фронтенде)
+  // If this is just an auth check from the frontend
   if (action === 'check_auth') {
     return res.status(200).json({ success: true });
   }
 
-  // 2. Инициализация Supabase
+  // 2. Database Connection (Only needed for data modification)
   const supabaseUrl = getEnvVar('SUPABASE_URL');
   const supabaseServiceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY') || getEnvVar('SUPABASE_KEY') || getEnvVar('SUPABASE_ANON_KEY');
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('Database keys missing on server');
-    return res.status(500).json({ error: 'Server configuration error (Missing DB Keys)' });
+    console.error('Database configuration missing');
+    return res.status(500).json({ error: 'Server DB misconfiguration' });
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  // 3. Выполнение действий с данными
   try {
     if (action === 'save') {
       if (!car) return res.status(400).json({ error: 'Car data missing' });
@@ -82,7 +83,7 @@ export default async function handler(req, res) {
       };
 
       if (car.id && car.id.length > 10) {
-        // Update (assuming UUID length > 10, mocks are usually '1', '2')
+        // Update
         const { error } = await supabase.from('cars').update(carData).eq('id', car.id);
         if (error) throw error;
       } else {

@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Car } from '../types';
 
@@ -158,20 +159,24 @@ export const checkAdminPassword = async (password: string): Promise<boolean> => 
     return response.ok;
   } catch (e) {
     console.error("Auth check failed", e);
+    // Fallback только для локальной разработки, если API не отвечает
     return password === 'admin';
   }
 };
 
 export const updateAdminPassword = async (newPassword: string) => {
-  throw new Error("Пароль меняется через переменные окружения Vercel (ADMIN_PASSWORD).");
+  throw new Error("Пароль управляется через переменные окружения Vercel (ADMIN_PASSWORD).");
 };
 
 // --- TELEGRAM API ---
 
 export const getTelegramSettings = async () => {
-  return { botToken: '***', chatId: '***' };
+  // Настройки больше не хранятся в БД и недоступны клиенту.
+  // Возвращаем заглушку, чтобы интерфейс не ломался при инициализации,
+  // но реальные данные используются только на бэкенде.
+  return { botToken: '', chatId: '' };
 };
 
 export const saveTelegramSettings = async (token: string, chatId: string) => {
-  throw new Error("Настройки Telegram меняются через переменные окружения Vercel.");
+  throw new Error("Настройки Telegram управляются через переменные окружения Vercel.");
 };

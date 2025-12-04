@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Car, CarCategory, DiscountRule } from '../types';
 import { 
@@ -61,7 +62,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       }
     } catch (err) {
       console.error(err);
-      setLoginError('Ошибка входа. Попробуйте пароль "admin".');
+      setLoginError('Ошибка соединения с сервером');
     }
   };
 
@@ -214,11 +215,6 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
             <button className="w-full bg-gold-500 text-black font-bold uppercase py-3 hover:bg-gold-400 transition-colors rounded">
               Войти
             </button>
-            <div className="flex flex-col gap-2 items-center">
-               <p className="text-xs text-center text-gray-600">
-                  * По умолчанию пароль: <b>admin</b> (если не задан в ENV)
-               </p>
-            </div>
           </form>
         </div>
       </div>
@@ -331,26 +327,6 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
                 </div>
                 <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-1">Новые клиенты</h3>
                 <p className="text-2xl md:text-3xl font-bold text-white">145</p>
-              </div>
-            </div>
-
-            <div className="bg-dark-900 rounded-xl border border-white/5 p-6">
-              <h3 className="text-xl font-serif text-white mb-6">Последние действия</h3>
-              <div className="space-y-4">
-                {[1, 2, 3].map((_, i) => (
-                  <div key={i} className="flex flex-col md:flex-row md:items-center justify-between py-3 border-b border-white/5 last:border-0 gap-2 md:gap-0">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                        <Check size={16} className="text-green-500" />
-                      </div>
-                      <div>
-                        <p className="text-white font-medium text-sm md:text-base">Новая бронь: Rolls-Royce Cullinan</p>
-                        <p className="text-xs text-gray-500">2 минуты назад • Иван Петров</p>
-                      </div>
-                    </div>
-                    <span className="text-gold-400 font-bold ml-14 md:ml-0">4 200 BYN</span>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
@@ -523,7 +499,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
 
       </main>
 
-      {/* Edit Modal (Redesigned for better mobile scrolling) */}
+      {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           {/* Backdrop */}
@@ -536,7 +512,7 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
           <div className="flex min-h-full items-center justify-center p-4">
             <div className="relative w-full max-w-2xl bg-dark-800 rounded-2xl border border-white/10 shadow-2xl z-10 my-8">
               
-              {/* Header - Static (scrolls with content) */}
+              {/* Header */}
               <div className="flex justify-between items-center p-6 border-b border-white/10 bg-dark-800 rounded-t-2xl">
                 <h3 className="text-xl font-serif text-white pr-8">
                   {currentCar.id ? 'Редактировать' : 'Добавить'} автомобиль

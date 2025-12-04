@@ -1,12 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
 
-// Простая функция очистки HTML тегов для безопасности
-const sanitize = (str) => {
-  if (typeof str !== 'string') return '';
-  return str.replace(/<[^>]*>?/gm, '').trim().slice(0, 2000); // Лимит 2000 символов
-};
+// api/send-booking.js
 
-// Хелпер для поиска переменных окружения в разных регистрах и с префиксами
+// Хелпер для поиска переменных окружения
 const getEnvVar = (key) => {
   const variations = [
     key, 
@@ -23,8 +18,13 @@ const getEnvVar = (key) => {
   return null;
 };
 
+const sanitize = (str) => {
+  if (typeof str !== 'string') return '';
+  return str.replace(/<[^>]*>?/gm, '').trim().slice(0, 2000);
+};
+
 export default async function handler(req, res) {
-  // Настройка CORS
+  // CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -45,33 +45,27 @@ export default async function handler(req, res) {
   try {
     const { booking, car, type } = req.body;
 
-    // --- SECURITY VALIDATION ---
-    // Для обратного звонка нам нужен только booking
-    if (!booking) return res.status(400).json({ error: 'No data provided' });
-
-    // Очистка данных
-    const safeName = sanitize(booking.name);
-    const safePhone = sanitize(booking.phone);
-    
-    // Проверка обязательных полей
-    if (!safePhone || safePhone.length < 5) {
-        return res.status(400).json({ error: 'Invalid phone number' });
-    }
-
-    // Получаем настройки Telegram
+    // --- CONFIGURATION ---
     const botToken = getEnvVar('TELEGRAM_BOT_TOKEN');
     const chatId = getEnvVar('TELEGRAM_CHAT_ID');
 
     if (!botToken || !chatId) {
-      console.error('Telegram Env Vars missing. Keys present in process.env:', Object.keys(process.env));
-      return res.status(500).json({ error: 'Server misconfiguration: Telegram settings not found' });
+      console.error('Telegram settings missing in Environment Variables');
+      return res.status(500).json({ error: 'Server misconfiguration: Telegram keys missing' });
     }
 
-    // Формируем сообщение
+    // --- VALIDATION & PREPARATION ---
+    const safeName = sanitize(booking?.name);
+    const safePhone = sanitize(booking?.phone);
+    
+    if (!booking || !safePhone || safePhone.length < 5) {
+        return res.status(400).json({ error: 'Invalid data provided' });
+    }
+
     let message = '';
 
     if (type === 'callback') {
-        // --- ЗАКАЗ ЗВОНКА ---
+        // --- CALLBACK ---
         message = `
 📞 <b>ЗАКАЗ ОБРАТНОГО ЗВОНКА</b>
 
@@ -81,7 +75,7 @@ export default async function handler(req, res) {
         `.trim();
 
     } else if (type === 'chauffeur') {
-        // --- АРЕНДА С ВОДИТЕЛЕМ ---
+        // --- CHAUFFEUR ---
         const safeDetails = sanitize(booking.details);
         const mapDuration = {
             'transfer': 'Трансфер',
@@ -106,7 +100,7 @@ ${safeDetails || 'Не указано'}
         `.trim();
 
     } else {
-        // --- БРОНИРОВАНИЕ АВТО ---
+        // --- RENTAL ---
         if (!car) return res.status(400).json({ error: 'Missing car data' });
         
         message = `
@@ -126,7 +120,7 @@ ${safeDetails || 'Не указано'}
         `.trim();
     }
 
-    // Отправка в Telegram
+    // --- SEND TO TELEGRAM ---
     const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
     const tgResponse = await fetch(tgUrl, {
       method: 'POST',
@@ -147,7 +141,7 @@ ${safeDetails || 'Не указано'}
     return res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error('Server Function Error:', error);
-    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    console.error('Send-Booking Error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
