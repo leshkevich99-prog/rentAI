@@ -109,6 +109,18 @@
         -webkit-appearance: none;
         appearance: none;
         display: block;
+        min-height: 3rem; /* 48px/h-12 equivalent */
+      }
+
+      /* CRITICAL FIX: Vertically align text in iOS date inputs */
+      input[type="date"]::-webkit-date-and-time-value {
+        display: flex;
+        align-items: center;
+        min-height: 3rem; 
+        padding-top: 0;
+        padding-bottom: 0;
+        margin: 0;
+        text-align: left;
       }
       
       /* Smooth scrolling */
