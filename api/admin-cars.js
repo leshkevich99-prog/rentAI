@@ -1,20 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const getEnvVar = (key) => {
-  const variations = [
-    key, 
-    key.toUpperCase(), 
-    key.toLowerCase(),
-    `VITE_${key}`,
-    `VITE_${key.toUpperCase()}`
-  ];
-  for (const v of variations) {
-    if (process.env[v]) return process.env[v];
-  }
-  return null;
-};
-
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -41,11 +27,17 @@ export default async function handler(req, res) {
   }
 
   // 1. Authorization Check (Environment Variable)
-  const envPassword = getEnvVar('ADMIN_PASSWORD');
+  // Проверяем оба регистра
+  const envPassword = process.env.ADMIN_PASSWORD || process.env.admin_password || process.env.VITE_ADMIN_PASSWORD;
   
   // Strict comparison, trimming to avoid whitespace issues
   const cleanInputPass = String(password).trim();
-  const cleanEnvPass = envPassword ? String(envPassword).trim() : 'admin';
+  const cleanEnvPass = envPassword ? String(envPassword).trim() : null;
+
+  if (!cleanEnvPass) {
+      console.error('ADMIN_PASSWORD env var is missing');
+      return res.status(500).json({ error: 'Server auth misconfiguration' });
+  }
 
   if (cleanInputPass !== cleanEnvPass) {
     return res.status(403).json({ error: 'Invalid password' });
@@ -57,8 +49,8 @@ export default async function handler(req, res) {
   }
 
   // 2. Database Connection (Only needed for data modification)
-  const supabaseUrl = getEnvVar('SUPABASE_URL');
-  const supabaseServiceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY') || getEnvVar('SUPABASE_KEY') || getEnvVar('SUPABASE_ANON_KEY');
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Database configuration missing');

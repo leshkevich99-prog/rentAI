@@ -1,23 +1,4 @@
 
-// api/send-booking.js
-
-// Хелпер для поиска переменных окружения
-const getEnvVar = (key) => {
-  const variations = [
-    key, 
-    key.toUpperCase(), 
-    key.toLowerCase(),
-    `VITE_${key}`,
-    `VITE_${key.toUpperCase()}`,
-    `NEXT_PUBLIC_${key}`
-  ];
-  
-  for (const v of variations) {
-    if (process.env[v]) return process.env[v];
-  }
-  return null;
-};
-
 const sanitize = (str) => {
   if (typeof str !== 'string') return '';
   return str.replace(/<[^>]*>?/gm, '').trim().slice(0, 2000);
@@ -46,12 +27,21 @@ export default async function handler(req, res) {
     const { booking, car, type } = req.body;
 
     // --- CONFIGURATION ---
-    const botToken = getEnvVar('TELEGRAM_BOT_TOKEN');
-    const chatId = getEnvVar('TELEGRAM_CHAT_ID');
+    // Проверяем все возможные варианты написания переменных (Vercel обычно использует UPPERCASE)
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.telegram_bot_token || process.env.VITE_TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID || process.env.telegram_chat_id || process.env.VITE_TELEGRAM_CHAT_ID;
 
     if (!botToken || !chatId) {
-      console.error('Telegram settings missing in Environment Variables');
-      return res.status(500).json({ error: 'Server misconfiguration: Telegram keys missing' });
+      console.error('Telegram settings missing. BotToken present:', !!botToken, 'ChatID present:', !!chatId);
+      // Возвращаем детализированную ошибку, чтобы вы видели в консоли браузера, чего именно не хватает
+      return res.status(500).json({ 
+        error: 'Server misconfiguration: Telegram keys missing',
+        details: {
+          botTokenSet: !!botToken,
+          chatIdSet: !!chatId,
+          instruction: 'Please verify Env Vars in Vercel Project Settings and REDEPLOY.'
+        }
+      });
     }
 
     // --- VALIDATION & PREPARATION ---
@@ -142,6 +132,6 @@ ${safeDetails || 'Не указано'}
 
   } catch (error) {
     console.error('Send-Booking Error:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 }
