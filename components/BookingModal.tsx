@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, User, Phone, CheckCircle, Loader2 } from 'lucide-react';
 import { Car } from '../types';
@@ -17,8 +18,6 @@ const formatPhoneNumber = (value: string) => {
   let digits = value.replace(/\D/g, '');
   
   // 2. Если пользователь вставил номер с кодом +375 или 80... обрезаем лишнее
-  // Мы ожидаем ввод 29... 44... 33... (9 цифр)
-  
   if (digits.startsWith('375')) {
     digits = digits.slice(3);
   } else if (digits.startsWith('80')) {
@@ -33,22 +32,19 @@ const formatPhoneNumber = (value: string) => {
   
   let formatted = '';
   
-  // Код оператора (2 цифры)
+  // Код оператора
   if (digits.length > 0) {
     formatted += `(${digits.slice(0, 2)}`;
   }
   
-  // Первая тройка цифр
   if (digits.length >= 3) {
     formatted += `) ${digits.slice(2, 5)}`;
   }
   
-  // Следующие две
   if (digits.length >= 6) {
     formatted += `-${digits.slice(5, 7)}`;
   }
   
-  // Последние две
   if (digits.length >= 8) {
     formatted += `-${digits.slice(7, 9)}`;
   }
@@ -91,14 +87,13 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     const startDate = new Date(start);
     const endDate = new Date(end);
     
-    // Safety check: ensure end date is not before start date
     if (endDate < startDate) {
         setCalc(null);
         return;
     }
 
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include the start day
+    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include start day
 
     if (days <= 0 || isNaN(days)) {
         setCalc(null);
@@ -108,7 +103,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     const originalTotal = days * car.pricePerDay;
     let discountPercent = 0;
 
-    // Default rules if none provided
     const rules = car.discountRules && car.discountRules.length > 0 
         ? car.discountRules 
         : [
@@ -117,8 +111,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
             { days: 15, discount: 20 }
         ];
 
-    // Find highest applicable discount
-    // "Больше 3 дней" means days > 3
     const applicableRule = rules
         .filter(r => days > r.days)
         .sort((a, b) => b.discount - a.discount)[0];
@@ -148,7 +140,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     const booking: BookingDetails = {
       carId: car.id,
       name: formData.name || '',
-      phone: '+375 ' + formData.phone, // Ensure prefix for backend
+      phone: '+375 ' + formData.phone,
       startDate: formData.startDate || '',
       endDate: formData.endDate || '',
       totalPrice: calc?.finalTotal,
@@ -157,12 +149,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     };
 
     // Send to Telegram
-    await sendTelegramBooking(booking, car);
+    const success = await sendTelegramBooking(booking, car);
     
-    setStep('success');
+    if (success) {
+        setStep('success');
+    } else {
+        alert('Не удалось отправить заявку. Пожалуйста, проверьте соединение или свяжитесь с нами по телефону.');
+        setStep('form');
+    }
   };
 
-  // Helper to open calendar on click
   const openCalendar = (e: React.MouseEvent<HTMLInputElement>) => {
     try {
       if ('showPicker' in HTMLInputElement.prototype) {
@@ -175,13 +171,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newStartDate = e.target.value;
-    
-    // If new start date is after current end date, clear end date
     let newEndDate = formData.endDate;
     if (formData.endDate && newStartDate > formData.endDate) {
         newEndDate = '';
     }
-
     setFormData({ 
         ...formData, 
         startDate: newStartDate,
@@ -190,8 +183,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Allow user to delete (backspace) without mask fighting them too much
-      // But re-format immediately on input
       const val = e.target.value;
       const formatted = formatPhoneNumber(val);
       setFormData({...formData, phone: formatted});
@@ -199,13 +190,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-5">
-      {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative bg-dark-800 border border-white/10 w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up max-h-[90vh] overflow-y-auto rounded-xl">
         <button
           onClick={onClose}
@@ -255,7 +244,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                 </div>
               </div>
 
-              {/* Date Inputs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2 w-full min-w-0">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Начало</label>
@@ -290,7 +278,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                 </div>
               </div>
 
-              {/* Расчет стоимости */}
               {calc && (
                   <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-5 rounded-xl space-y-3">
                       <div className="flex justify-between text-sm text-gray-400">

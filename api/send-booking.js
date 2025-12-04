@@ -4,14 +4,11 @@ const sanitize = (str) => {
   return str.replace(/<[^>]*>?/gm, '').trim().slice(0, 2000);
 };
 
-// Helper to find env var by checking multiple common naming conventions
+// Robust environment variable finder
 const findEnv = (possibleKeys) => {
   for (const key of possibleKeys) {
-    if (process.env[key]) return process.env[key];
-    // Check lowercase version if the key provided was uppercase
-    if (process.env[key.toLowerCase()]) return process.env[key.toLowerCase()];
-    // Check uppercase version
-    if (process.env[key.toUpperCase()]) return process.env[key.toUpperCase()];
+    const value = process.env[key] || process.env[key.toUpperCase()] || process.env[key.toLowerCase()];
+    if (value) return value.trim(); // Trim whitespace which often causes issues
   }
   return null;
 };
@@ -39,41 +36,44 @@ export default async function handler(req, res) {
     const { booking, car, type } = req.body;
 
     // --- CONFIGURATION ---
-    // Try to find keys using various common names
+    // Expanded list of possible keys
     const botToken = findEnv([
       'TELEGRAM_BOT_TOKEN', 
-      'telegram_bot_token', 
-      'VITE_TELEGRAM_BOT_TOKEN', 
       'BOT_TOKEN', 
-      'TG_BOT_TOKEN'
+      'TG_BOT_TOKEN',
+      'TELEGRAM_TOKEN',
+      'VITE_TELEGRAM_BOT_TOKEN'
     ]);
     
     const chatId = findEnv([
       'TELEGRAM_CHAT_ID', 
-      'telegram_chat_id', 
-      'VITE_TELEGRAM_CHAT_ID', 
       'CHAT_ID', 
-      'TG_CHAT_ID'
+      'TG_CHAT_ID',
+      'TELEGRAM_CHATID',
+      'TG_CHATID',
+      'CHATID',
+      'VITE_TELEGRAM_CHAT_ID'
     ]);
 
     if (!botToken || !chatId) {
-      // Log available keys (security: do not log values) to help debug in Vercel logs
-      const availableKeys = Object.keys(process.env).filter(k => 
-        k.toLowerCase().includes('telegram') || 
-        k.toLowerCase().includes('chat') || 
-        k.toLowerCase().includes('token')
-      );
-      console.error('Telegram settings missing.');
-      console.error('Found potentially relevant keys:', availableKeys);
-      console.error('BotToken Found:', !!botToken, 'ChatID Found:', !!chatId);
+      // Security: List keys found in process.env that might be relevant (masking values)
+      const relevantEnvKeys = Object.keys(process.env).filter(k => {
+        const lower = k.toLowerCase();
+        return lower.includes('telegram') || lower.includes('chat') || lower.includes('token') || lower.includes('id');
+      });
+
+      console.error('Server Configuration Error: Telegram credentials missing.');
+      console.error('BotToken Found:', !!botToken);
+      console.error('ChatID Found:', !!chatId);
+      console.error('Available Relevant Env Keys:', relevantEnvKeys);
 
       return res.status(500).json({ 
         error: 'Server misconfiguration: Telegram keys missing',
         details: {
-          botTokenSet: !!botToken,
-          chatIdSet: !!chatId,
-          visibleRelevantKeys: availableKeys, // Sending this to client for debugging
-          instruction: 'Please check your Vercel Environment Variables. Ensure TELEGRAM_CHAT_ID is set.'
+          botTokenFound: !!botToken,
+          chatIdFound: !!chatId,
+          relevantKeysInEnv: relevantEnvKeys,
+          instruction: 'Check Vercel Settings -> Environment Variables. Ensure TELEGRAM_CHAT_ID is set.'
         }
       });
     }
@@ -158,14 +158,14 @@ ${safeDetails || 'Не указано'}
 
     if (!tgResponse.ok) {
       const errText = await tgResponse.text();
-      console.error('Telegram API Error', errText);
+      console.error('Telegram API Error:', errText);
       return res.status(502).json({ error: 'Failed to send to Telegram', details: errText });
     }
 
     return res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error('Send-Booking Error:', error);
+    console.error('Send-Booking Handler Error:', error);
     return res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 }

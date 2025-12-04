@@ -5,6 +5,23 @@ interface ChauffeurModalProps {
   onClose: () => void;
 }
 
+// Phone formatter helper (Same as BookingModal)
+const formatPhoneNumber = (value: string) => {
+  if (!value) return value;
+  let digits = value.replace(/\D/g, '');
+  if (digits.startsWith('375')) digits = digits.slice(3);
+  else if (digits.startsWith('80')) digits = digits.slice(2);
+  digits = digits.slice(0, 9);
+  
+  if (digits.length === 0) return '';
+  let formatted = '';
+  if (digits.length > 0) formatted += `(${digits.slice(0, 2)}`;
+  if (digits.length >= 3) formatted += `) ${digits.slice(2, 5)}`;
+  if (digits.length >= 6) formatted += `-${digits.slice(5, 7)}`;
+  if (digits.length >= 8) formatted += `-${digits.slice(7, 9)}`;
+  return formatted;
+};
+
 export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
   const [step, setStep] = useState<'form' | 'sending' | 'success'>('form');
   const [formData, setFormData] = useState({
@@ -29,7 +46,10 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'chauffeur',
-          booking: formData
+          booking: {
+            ...formData,
+            phone: '+375 ' + formData.phone // Append prefix before sending
+          }
         }),
       });
 
@@ -48,6 +68,11 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setFormData(prev => ({ ...prev, phone: formatted }));
   };
 
   return (
@@ -83,8 +108,8 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Ваше имя</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                  <div className="relative group">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 group-focus-within:text-gold-400 transition-colors" />
                     <input 
                       type="text" 
                       required 
@@ -98,15 +123,18 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
 
                 <div className="space-y-2">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Телефон</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                  <div className="relative group">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                       <Phone className="text-gray-500 w-5 h-5 group-focus-within:text-gold-400 transition-colors" />
+                       <span className="text-gray-400 font-medium border-r border-white/10 pr-2">+375</span>
+                   </div>
                     <input 
                       type="tel" 
                       required 
-                      placeholder="+375 (29) ..."
+                      placeholder="(29) ..."
                       value={formData.phone}
-                      onChange={(e) => handleChange('phone', e.target.value)}
-                      className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-lg"
+                      onChange={handlePhoneChange}
+                      className="w-full h-12 bg-dark-900 border border-white/10 pl-28 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-lg font-medium"
                     />
                   </div>
                 </div>
@@ -116,8 +144,8 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 w-full min-w-0">
                     <label className="text-xs uppercase text-gray-500 tracking-wider">Дата подачи</label>
-                    <div className="relative w-full">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
+                    <div className="relative w-full group">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none group-focus-within:text-gold-400" />
                         <input 
                             type="date" 
                             min={today}
@@ -132,8 +160,8 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
                 </div>
                 <div className="space-y-2 w-full min-w-0">
                     <label className="text-xs uppercase text-gray-500 tracking-wider">Время</label>
-                    <div className="relative w-full">
-                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
+                    <div className="relative w-full group">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none group-focus-within:text-gold-400" />
                         <input 
                             type="time" 
                             required
@@ -166,8 +194,8 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
               {/* Details */}
               <div className="space-y-2">
                   <label className="text-xs uppercase text-gray-500 tracking-wider">Маршрут / Пожелания</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
+                  <div className="relative group">
+                    <MapPin className="absolute left-3 top-3 text-gray-500 w-5 h-5 group-focus-within:text-gold-400" />
                     <textarea 
                         rows={3}
                         placeholder="Откуда забрать, куда ехать, предпочтения по авто..."
@@ -180,7 +208,7 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
 
               <button 
                 type="submit" 
-                className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors rounded-lg mt-4"
+                className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors rounded-lg mt-4 shadow-lg"
               >
                 Отправить заявку
               </button>
@@ -189,11 +217,11 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
         ) : step === 'sending' ? (
           <div className="p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
              <Loader2 className="w-10 h-10 text-gold-400 animate-spin mb-4" />
-             <p className="text-white">Согласовываем детали...</p>
+             <p className="text-white font-serif">Согласовываем детали...</p>
           </div>
         ) : (
           <div className="p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6 animate-fade-in-up">
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <h3 className="font-serif text-2xl text-white mb-2">Заявка принята</h3>
