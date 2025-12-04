@@ -1,6 +1,8 @@
+
 import React from 'react';
-import { Car, Instagram, Send, Video } from 'lucide-react';
+import { Instagram, Send, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Logo } from './Logo';
 
 export const Footer: React.FC = () => {
   return (
@@ -8,12 +10,9 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center gap-2 mb-6">
-              <Car className="w-6 h-6 text-gold-400" />
-              <Link to="/" className="text-xl font-serif font-bold tracking-wider text-white">
-                LÉ<span className="text-gold-400">ON</span>
-              </Link>
-            </div>
+            <Link to="/" className="inline-block mb-6 hover:opacity-80 transition-opacity">
+              <Logo />
+            </Link>
             <p className="text-gray-500 text-sm leading-relaxed">
               Предоставляем исключительный сервис аренды премиальных автомобилей в Минске. Каждый момент за рулем — это искусство.
             </p>

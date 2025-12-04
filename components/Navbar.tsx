@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Car } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { Logo } from './Logo';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -29,17 +31,14 @@ export const Navbar: React.FC = () => {
     <nav
       className={`fixed w-full z-50 transition-all duration-500 border-b ${
         isScrolled || location.pathname !== '/'
-          ? 'bg-dark-900/80 backdrop-blur-xl border-white/5 py-4 shadow-lg shadow-black/50'
+          ? 'bg-dark-900/80 backdrop-blur-xl border-white/5 py-3 shadow-lg shadow-black/50'
           : 'bg-transparent border-transparent py-6'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
-            <Car className="w-8 h-8 text-gold-400 transition-transform group-hover:scale-110" />
-            <span className="text-2xl font-serif font-bold tracking-wider text-white">
-              LÉ<span className="text-gold-400 group-hover:text-white transition-colors">ON</span>
-            </span>
+          <Link to="/" className="group hover:opacity-90 transition-opacity">
+            <Logo />
           </Link>
 
           <div className="hidden md:block">
