@@ -7,38 +7,17 @@ const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL;
 const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
 
 // 2. Проверяем статус конфигурации
-// Мы не выбрасываем фатальную ошибку (throw), чтобы приложение могло запуститься
-// в демо-режиме (Mock Data) если ключи еще не добавлены.
+// Если ключи не найдены, клиент переходит в режим работы через API прокси
 export const isConfigured = !!(supabaseUrl && supabaseKey);
 export const isUsingEnv = true;
 
-if (!isConfigured) {
-  console.warn('⚠️ Supabase ключи не найдены в .env. Приложение работает в режиме Mock-данных.');
-}
+// 3. Создаем клиент (только если ключи есть)
+const supabase = isConfigured 
+  ? createClient(supabaseUrl, supabaseKey)
+  : null;
 
-// 3. Создаем клиент
-// Передаем пустые строки если ключей нет, чтобы инициализация не упала.
-// Флаг isConfigured не даст функциям ниже делать реальные запросы.
-const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseKey || 'placeholder'
-);
-
-// --- CARS API ---
-
-export const fetchCars = async (): Promise<Car[]> => {
-  if (!isConfigured) throw new Error("Database not configured");
-  
-  const { data, error } = await supabase
-    .from('cars')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error("Supabase fetch error:", error);
-    throw error;
-  }
-
+// Helper to map DB response to App types
+const mapCarsData = (data: any[]): Car[] => {
   return data.map((car: any) => ({
     id: car.id,
     name: car.name,
@@ -52,17 +31,41 @@ export const fetchCars = async (): Promise<Car[]> => {
   }));
 };
 
+// --- CARS API ---
+
+export const fetchCars = async (): Promise<Car[]> => {
+  // 1. Попытка загрузить напрямую через Supabase Client (быстрее, если настроен)
+  if (isConfigured && supabase) {
+    const { data, error } = await supabase
+      .from('cars')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      return mapCarsData(data);
+    }
+    console.warn("Direct DB fetch failed, falling back to API proxy...", error);
+  }
+  
+  // 2. Фолбэк: загрузка через серверный API (если ключи на клиенте отсутствуют, но есть на сервере)
+  try {
+    const response = await fetch('/api/get-cars');
+    if (response.ok) {
+      const data = await response.json();
+      return mapCarsData(data);
+    }
+  } catch (e) {
+    console.error("API fetch failed", e);
+  }
+  
+  // 3. Если ничего не помогло, выбрасываем ошибку (App.tsx подставит Mock)
+  throw new Error("Could not fetch cars from DB or API");
+};
+
 /**
  * Безопасное сохранение через серверный API.
- * Использует переданный пароль для авторизации на сервере.
  */
 export const saveCarSecure = async (car: Car, password: string) => {
-  if (!isConfigured) {
-      // Demo fallback
-      console.log("Demo mode: save simulated");
-      return;
-  }
-
   const response = await fetch('/api/admin-cars', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -74,8 +77,8 @@ export const saveCarSecure = async (car: Car, password: string) => {
   });
 
   if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error || 'Failed to save car');
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || `Failed to save car (Status ${response.status})`);
   }
 };
 
@@ -83,11 +86,6 @@ export const saveCarSecure = async (car: Car, password: string) => {
  * Безопасное удаление через серверный API.
  */
 export const deleteCarSecure = async (id: string, password: string) => {
-  if (!isConfigured) {
-      console.log("Demo mode: delete simulated");
-      return;
-  }
-
   const response = await fetch('/api/admin-cars', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -99,8 +97,8 @@ export const deleteCarSecure = async (id: string, password: string) => {
   });
 
   if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error || 'Failed to delete car');
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || `Failed to delete car (Status ${response.status})`);
   }
 };
 
@@ -115,9 +113,6 @@ export const deleteCarById = async (id: string) => {
 // --- STORAGE API ---
 
 export const uploadCarImage = async (file: File): Promise<string> => {
-  if (!isConfigured) throw new Error("Database not configured");
-
-  // 1. Конвертируем File в Base64 для передачи на сервер
   const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -129,7 +124,6 @@ export const uploadCarImage = async (file: File): Promise<string> => {
   const fileExt = file.name.split('.').pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-  // 2. Отправляем на наш API
   const response = await fetch('/api/upload-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -150,10 +144,6 @@ export const uploadCarImage = async (file: File): Promise<string> => {
 
 // --- AUTH API ---
 
-/**
- * Проверка пароля теперь происходит через API,
- * так как пароль хранится в переменных окружения сервера.
- */
 export const checkAdminPassword = async (password: string): Promise<boolean> => {
   try {
     const response = await fetch('/api/admin-cars', {
@@ -168,24 +158,20 @@ export const checkAdminPassword = async (password: string): Promise<boolean> => 
     return response.ok;
   } catch (e) {
     console.error("Auth check failed", e);
-    // Fallback for local dev without backend running properly
     return password === 'admin';
   }
 };
 
 export const updateAdminPassword = async (newPassword: string) => {
-  // Теперь управляется через ENV переменные
   throw new Error("Пароль меняется через переменные окружения Vercel (ADMIN_PASSWORD).");
 };
 
 // --- TELEGRAM API ---
 
 export const getTelegramSettings = async () => {
-  // Теперь управляется через ENV переменные
   return { botToken: '***', chatId: '***' };
 };
 
 export const saveTelegramSettings = async (token: string, chatId: string) => {
-  // Теперь управляется через ENV переменные
   throw new Error("Настройки Telegram меняются через переменные окружения Vercel.");
 };

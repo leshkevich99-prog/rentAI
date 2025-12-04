@@ -1,5 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
+const getEnvVar = (key) => {
+  const variations = [
+    key, 
+    key.toUpperCase(), 
+    key.toLowerCase(),
+    `VITE_${key}`,
+    `VITE_${key.toUpperCase()}`
+  ];
+  for (const v of variations) {
+    if (process.env[v]) return process.env[v];
+  }
+  return null;
+};
+
 export default async function handler(req, res) {
   // Настройка CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -26,26 +40,23 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing image data or filename' });
     }
 
-    // Инициализация Supabase с сервисным ключом для обхода RLS
-    const supabaseUrl = process.env.VITE_SUPABASE_URL;
-    // Используем Service Key если есть, иначе Anon Key (но Anon может не сработать если RLS включен)
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    // Используем хелпер для поиска ключей
+    const supabaseUrl = getEnvVar('SUPABASE_URL');
+    const supabaseKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY') || getEnvVar('SUPABASE_ANON_KEY') || getEnvVar('SUPABASE_KEY');
 
     if (!supabaseUrl || !supabaseKey) {
-      return res.status(500).json({ error: 'Server configuration error' });
+      return res.status(500).json({ error: 'Server configuration error: DB keys missing' });
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Декодируем Base64 (формат: "data:image/png;base64,.....")
+    // Декодируем Base64
     const base64Data = image.split(',')[1];
     if (!base64Data) {
         return res.status(400).json({ error: 'Invalid image format' });
     }
     
     const buffer = Buffer.from(base64Data, 'base64');
-
-    // Определяем Content-Type
     const contentType = image.substring(image.indexOf(':') + 1, image.indexOf(';')) || 'image/jpeg';
 
     // Загружаем в Storage
@@ -61,7 +72,6 @@ export default async function handler(req, res) {
       throw error;
     }
 
-    // Получаем публичную ссылку
     const { data: publicData } = supabase.storage
       .from('car-images')
       .getPublicUrl(filename);

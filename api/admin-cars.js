@@ -1,5 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
+const getEnvVar = (key) => {
+  const variations = [
+    key, 
+    key.toUpperCase(), 
+    key.toLowerCase(),
+    `VITE_${key}`,
+    `VITE_${key.toUpperCase()}`
+  ];
+  for (const v of variations) {
+    if (process.env[v]) return process.env[v];
+  }
+  return null;
+};
+
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -25,10 +39,10 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Password required' });
   }
 
-  // 1. Проверка пароля через переменные окружения Vercel
-  const envPassword = process.env.ADMIN_PASSWORD;
+  // 1. Проверка пароля
+  const envPassword = getEnvVar('ADMIN_PASSWORD');
   
-  // Пароль по умолчанию, если переменная не задана (для локальной разработки)
+  // Пароль по умолчанию "admin" работает ТОЛЬКО если переменная окружения НЕ задана вообще.
   const isAuthValid = envPassword ? (password === envPassword) : (password === 'admin');
 
   if (!isAuthValid) {
@@ -40,11 +54,12 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   }
 
-  // 2. Инициализация Supabase для работы с данными
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  // 2. Инициализация Supabase
+  const supabaseUrl = getEnvVar('SUPABASE_URL');
+  const supabaseServiceKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY') || getEnvVar('SUPABASE_KEY') || getEnvVar('SUPABASE_ANON_KEY');
 
   if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('Database keys missing on server');
     return res.status(500).json({ error: 'Server configuration error (Missing DB Keys)' });
   }
 
@@ -67,7 +82,7 @@ export default async function handler(req, res) {
       };
 
       if (car.id && car.id.length > 10) {
-        // Update
+        // Update (assuming UUID length > 10, mocks are usually '1', '2')
         const { error } = await supabase.from('cars').update(carData).eq('id', car.id);
         if (error) throw error;
       } else {

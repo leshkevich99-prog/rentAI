@@ -6,6 +6,23 @@ const sanitize = (str) => {
   return str.replace(/<[^>]*>?/gm, '').trim().slice(0, 2000); // Лимит 2000 символов
 };
 
+// Хелпер для поиска переменных окружения в разных регистрах и с префиксами
+const getEnvVar = (key) => {
+  const variations = [
+    key, 
+    key.toUpperCase(), 
+    key.toLowerCase(),
+    `VITE_${key}`,
+    `VITE_${key.toUpperCase()}`,
+    `NEXT_PUBLIC_${key}`
+  ];
+  
+  for (const v of variations) {
+    if (process.env[v]) return process.env[v];
+  }
+  return null;
+};
+
 export default async function handler(req, res) {
   // Настройка CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -29,6 +46,7 @@ export default async function handler(req, res) {
     const { booking, car, type } = req.body;
 
     // --- SECURITY VALIDATION ---
+    // Для обратного звонка нам нужен только booking
     if (!booking) return res.status(400).json({ error: 'No data provided' });
 
     // Очистка данных
@@ -40,12 +58,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid phone number' });
     }
 
-    // Получаем настройки Telegram из переменных окружения Vercel
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    // Получаем настройки Telegram
+    const botToken = getEnvVar('TELEGRAM_BOT_TOKEN');
+    const chatId = getEnvVar('TELEGRAM_CHAT_ID');
 
     if (!botToken || !chatId) {
-      console.error('Telegram Env Vars missing');
+      console.error('Telegram Env Vars missing. Keys present in process.env:', Object.keys(process.env));
       return res.status(500).json({ error: 'Server misconfiguration: Telegram settings not found' });
     }
 
@@ -121,14 +139,15 @@ ${safeDetails || 'Не указано'}
     });
 
     if (!tgResponse.ok) {
-      console.error('Telegram API Error', await tgResponse.text());
-      return res.status(502).json({ error: 'Failed to send to Telegram' });
+      const errText = await tgResponse.text();
+      console.error('Telegram API Error', errText);
+      return res.status(502).json({ error: 'Failed to send to Telegram', details: errText });
     }
 
     return res.status(200).json({ success: true });
 
   } catch (error) {
     console.error('Server Function Error:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 }
