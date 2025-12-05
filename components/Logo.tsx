@@ -23,9 +23,9 @@ export const Logo: React.FC<LogoProps> = ({ className = '', variant = 'full' }) 
         >
           <defs>
             <linearGradient id="gold-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#FCD34D" />
-              <stop offset="50%" stopColor="#D4AF37" />
-              <stop offset="100%" stopColor="#926F18" />
+              <stop offset="0%" stopColor="#E3C588" />
+              <stop offset="50%" stopColor="#C5A059" />
+              <stop offset="100%" stopColor="#8F6F30" />
             </linearGradient>
             <linearGradient id="shield-fill" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor="#1a1a1a" stopOpacity="0.4" />

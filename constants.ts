@@ -1,3 +1,4 @@
+
 import { Car, CarCategory } from './types';
 
 // Функция для создания стильной заглушки автомобиля в формате SVG
@@ -18,14 +19,14 @@ const generateCarPlaceholder = (name: string, category: string) => {
     
     <!-- Abstract Car Shape Hint -->
     <path d="M100 400 L200 300 H600 L700 400" stroke="#333" stroke-width="2" fill="none" opacity="0.5"/>
-    <line x1="100" y1="400" x2="700" y2="400" stroke="#D4AF37" stroke-width="2" opacity="0.8" />
+    <line x1="100" y1="400" x2="700" y2="400" stroke="#C5A059" stroke-width="2" opacity="0.8" />
     
     <!-- Text -->
     <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="#222" font-family="sans-serif" font-size="80" font-weight="bold" opacity="0.5" transform="rotate(-5, 400, 300)">${category}</text>
-    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#D4AF37" font-family="serif" font-size="36" font-weight="bold" letter-spacing="2">${name}</text>
+    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#C5A059" font-family="serif" font-size="36" font-weight="bold" letter-spacing="2">${name}</text>
     
     <!-- Frame -->
-    <rect x="40" y="40" width="720" height="520" fill="none" stroke="#D4AF37" stroke-width="1" opacity="0.2"/>
+    <rect x="40" y="40" width="720" height="520" fill="none" stroke="#C5A059" stroke-width="1" opacity="0.2"/>
   </svg>
   `.trim();
   return `data:image/svg+xml;base64,${btoa(svg)}`;
