@@ -11,7 +11,7 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -28,62 +28,66 @@ export const Navbar: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav
-      className={`fixed w-full z-50 transition-all duration-500 border-b ${
-        isScrolled || location.pathname !== '/'
-          ? 'bg-dark-900/80 backdrop-blur-xl border-white/5 py-3 shadow-lg shadow-black/50'
-          : 'bg-transparent border-transparent py-6'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="group hover:opacity-90 transition-opacity">
-            <Logo />
-          </Link>
-
-          <div className="hidden md:block">
-            <div className="flex items-center space-x-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={`relative text-xs font-bold uppercase tracking-[0.15em] transition-colors py-2 group ${
-                    isActive(link.path) ? 'text-gold-400' : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  {link.name}
-                  <span className={`absolute bottom-0 left-0 h-[1px] bg-gold-400 transition-all duration-300 ${isActive(link.path) ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-300 hover:text-white p-2 transition-transform active:scale-90"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <div 
-        className={`md:hidden absolute top-full left-0 w-full bg-dark-900/95 backdrop-blur-2xl border-b border-white/10 overflow-hidden transition-all duration-500 ease-in-out ${
-            isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+    <>
+      <nav
+        className={`fixed w-full z-50 transition-all duration-700 border-b ${
+          isScrolled
+            ? 'bg-dark-950/80 backdrop-blur-md border-white/5 py-4'
+            : 'bg-transparent border-transparent py-8'
         }`}
       >
-        <div className="px-4 pt-2 pb-6 space-y-2">
+        <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="group hover:opacity-80 transition-opacity">
+              <Logo />
+            </Link>
+
+            <div className="hidden lg:block">
+              <div className="flex items-center gap-12">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    className={`relative text-[11px] font-medium uppercase tracking-luxury transition-all duration-300 ${
+                      isActive(link.path) ? 'text-gold-400' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {link.name}
+                    <span 
+                        className={`absolute -bottom-2 left-1/2 -translate-x-1/2 h-px bg-gold-400 transition-all duration-500 ${
+                            isActive(link.path) ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full'
+                        }`} 
+                    />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-white hover:text-gold-400 transition-colors p-2"
+              >
+                {isMobileMenuOpen ? <X size={24} strokeWidth={1} /> : <Menu size={24} strokeWidth={1} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`fixed inset-0 z-40 bg-dark-950 flex flex-col justify-center items-center transition-all duration-500 ${
+            isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+        }`}
+      >
+        <div className="flex flex-col items-center gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               to={link.path}
-              className={`block px-4 py-4 text-sm font-bold uppercase tracking-widest border-l-2 transition-all ${
-                 isActive(link.path) 
-                 ? 'border-gold-400 text-gold-400 bg-white/5' 
-                 : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/20'
+              className={`text-2xl font-serif uppercase tracking-widest ${
+                 isActive(link.path) ? 'text-gold-400' : 'text-white/60 hover:text-white'
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -92,6 +96,6 @@ export const Navbar: React.FC = () => {
           ))}
         </div>
       </div>
-    </nav>
+    </>
   );
 };

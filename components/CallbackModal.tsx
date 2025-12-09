@@ -44,61 +44,61 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" 
         onClick={onClose}
       />
 
-      <div className="relative bg-dark-800 border border-white/10 w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up rounded-xl">
+      <div className="relative bg-dark-900 border border-white/10 w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
         >
-          <X size={24} />
+          <X size={24} strokeWidth={1} />
         </button>
 
         {step === 'form' ? (
           <div className="p-8">
-            <div className="mb-6 text-center">
+            <div className="mb-8 text-center">
               <h3 className="font-serif text-2xl text-white mb-2">Обратный звонок</h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-sm font-light">
                 Оставьте номер любой страны, и мы свяжемся с вами.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-xs uppercase text-gray-500 tracking-wider">Ваше имя</label>
+                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">Ваше имя</label>
                 <div className="relative group">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 group-focus-within:text-gold-400 transition-colors" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                   <input 
                     type="text" 
                     required 
                     placeholder="Иван / John"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded-lg"
+                    className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors text-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs uppercase text-gray-500 tracking-wider">Телефон (с кодом страны)</label>
+                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">Телефон (с кодом страны)</label>
                 <div className="relative group">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 group-focus-within:text-gold-400 transition-colors" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                   <input 
                     type="text" 
                     required 
                     placeholder="+375... / +7... / +1..."
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded-lg font-medium tracking-wide"
+                    className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors font-medium tracking-wide text-sm"
                   />
                 </div>
               </div>
 
               <button 
                 type="submit" 
-                className="w-full bg-gold-500 text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors rounded-lg mt-4 shadow-lg shadow-gold-500/10"
+                className="w-full bg-gold-500 text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors text-xs"
               >
                 Жду звонка
               </button>
@@ -111,10 +111,10 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
 
               <div className="grid grid-cols-2 gap-3">
                 <a 
-                    href="https://wa.me/375290000000"
+                    href="https://wa.me/375257422222"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#25D366]/20 transition-colors rounded-lg"
+                    className="flex items-center justify-center gap-2 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#25D366]/20 transition-colors"
                 >
                     WhatsApp
                 </a>
@@ -122,7 +122,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                     href="https://t.me/username"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2 bg-[#0088cc]/10 border border-[#0088cc]/20 text-[#0088cc] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#0088cc]/20 transition-colors rounded-lg"
+                    className="flex items-center justify-center gap-2 bg-[#0088cc]/10 border border-[#0088cc]/20 text-[#0088cc] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#0088cc]/20 transition-colors"
                 >
                     <Send size={14} /> Telegram
                 </a>
@@ -145,7 +145,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
             </p>
             <button 
               onClick={onClose}
-              className="px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all uppercase tracking-widest text-xs font-bold rounded-lg"
+              className="px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all uppercase tracking-widest text-xs font-bold"
             >
               Закрыть
             </button>
