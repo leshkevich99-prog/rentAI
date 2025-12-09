@@ -1,66 +1,77 @@
+
 import React from 'react';
-import { Shield, Clock, Award, Briefcase, Gem, Plane } from 'lucide-react';
+import { ShieldCheck, Clock, CheckCircle, Briefcase, Gem, Plane } from 'lucide-react';
 
 const services = [
   {
-    icon: <Shield className="w-8 h-8 text-gold-400" />,
+    icon: <ShieldCheck strokeWidth={1} className="w-6 h-6" />,
     title: "Полная Страховка",
-    description: "Все автомобили застрахованы по КАСКО без франшизы. Ваше спокойствие — наш приоритет."
+    description: "КАСКО без франшизы. Ваше спокойствие — наш приоритет."
   },
   {
-    icon: <Clock className="w-8 h-8 text-gold-400" />,
+    icon: <Clock strokeWidth={1} className="w-6 h-6" />,
     title: "24/7 Поддержка",
-    description: "Персональный менеджер на связи круглосуточно для решения любых вопросов в дороге."
+    description: "Персональный менеджер на связи круглосуточно."
   },
   {
-    icon: <Award className="w-8 h-8 text-gold-400" />,
-    title: "Безупречное Состояние",
-    description: "Каждое авто проходит детейлинг и технический осмотр перед выдачей клиенту."
+    icon: <CheckCircle strokeWidth={1} className="w-6 h-6" />,
+    title: "Идеальное Состояние",
+    description: "Детейлинг и технический осмотр перед каждой выдачей."
   },
   {
-    icon: <Briefcase className="w-8 h-8 text-gold-400" />,
-    title: "Корпоративным Клиентам",
-    description: "Специальные условия для юридических лиц, полный пакет закрывающих документов."
+    icon: <Briefcase strokeWidth={1} className="w-6 h-6" />,
+    title: "Для Бизнеса",
+    description: "Полный пакет документов для юридических лиц."
   },
   {
-    icon: <Gem className="w-8 h-8 text-gold-400" />,
-    title: "Свадьбы и Мероприятия",
-    description: "Роскошные кортежи для особых случаев. Услуги профессиональных водителей."
+    icon: <Gem strokeWidth={1} className="w-6 h-6" />,
+    title: "Мероприятия",
+    description: "Эскорт и кортежи для свадеб и особых событий."
   },
   {
-    icon: <Plane className="w-8 h-8 text-gold-400" />,
+    icon: <Plane strokeWidth={1} className="w-6 h-6" />,
     title: "VIP Трансфер",
-    description: "Встреча в аэропорту на автомобиле премиум-класса. Ожидание рейса бесплатно."
+    description: "Встреча в аэропорту с комфортом."
   }
 ];
 
 export const Services: React.FC = () => {
   return (
-    <section id="services" className="py-24 bg-dark-800 relative border-t border-white/5">
-       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-gold-400 font-bold uppercase tracking-[0.2em] mb-3 text-sm">
-            Сервис Высшего Класса
-          </h2>
-          <h3 className="font-serif text-4xl md:text-5xl text-white">
-            Наши Преимущества
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <div key={index} className="p-8 bg-dark-900 border border-white/5 hover:border-gold-400/30 transition-all duration-300 group">
-              <div className="mb-6 bg-dark-800 w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                {service.icon}
-              </div>
-              <h4 className="text-xl font-serif text-white mb-4 group-hover:text-gold-400 transition-colors">
-                {service.title}
-              </h4>
-              <p className="text-gray-400 leading-relaxed text-sm">
-                {service.description}
-              </p>
+    <section id="services" className="py-32 bg-dark-950 relative">
+       <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            
+            {/* Heading */}
+            <div className="lg:col-span-4">
+                <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-xs mb-6">
+                    Сервис
+                </h2>
+                <h3 className="font-serif text-5xl text-white mb-8 leading-tight">
+                    Стандарты <br/> Качества
+                </h3>
+                <p className="text-gray-400 font-light leading-relaxed max-w-sm">
+                    Мы уделяем внимание каждой детали, чтобы ваш опыт аренды был безупречным. От чистоты салона до прозрачности договора.
+                </p>
             </div>
-          ))}
+
+            {/* Grid */}
+            <div className="lg:col-span-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                {services.map((service, index) => (
+                    <div key={index} className="group">
+                        <div className="mb-6 text-gold-400 group-hover:text-white transition-colors duration-500">
+                            {service.icon}
+                        </div>
+                        <h4 className="text-lg font-serif text-white mb-3">
+                            {service.title}
+                        </h4>
+                        <p className="text-gray-500 text-sm font-light leading-relaxed group-hover:text-gray-400 transition-colors">
+                            {service.description}
+                        </p>
+                    </div>
+                ))}
+                </div>
+            </div>
         </div>
       </div>
     </section>
