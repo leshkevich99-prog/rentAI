@@ -1,62 +1,15 @@
+
 import React, { useState } from 'react';
-import { X, Phone, User, Loader2, CheckCircle, PhoneCall } from 'lucide-react';
+import { X, Phone, User, Loader2, CheckCircle, PhoneCall, Send } from 'lucide-react';
 
 interface CallbackModalProps {
   onClose: () => void;
 }
 
-// Phone formatter helper
-const formatPhoneNumber = (value: string) => {
-  if (!value) return value;
-  
-  // 1. Оставляем только цифры
-  let digits = value.replace(/\D/g, '');
-  
-  // 2. Если пользователь вставил номер с кодом +375 или 80... обрезаем лишнее
-  if (digits.startsWith('375')) {
-    digits = digits.slice(3);
-  } else if (digits.startsWith('80')) {
-    digits = digits.slice(2);
-  }
-  
-  // 3. Обрезаем до 9 цифр (стандарт РБ без кода страны)
-  digits = digits.slice(0, 9);
-  
-  // 4. Формируем маску (XX) XXX-XX-XX
-  if (digits.length === 0) return '';
-  
-  let formatted = '';
-  
-  // Код оператора
-  if (digits.length > 0) {
-    formatted += `(${digits.slice(0, 2)}`;
-  }
-  
-  if (digits.length >= 3) {
-    formatted += `) ${digits.slice(2, 5)}`;
-  }
-  
-  if (digits.length >= 6) {
-    formatted += `-${digits.slice(5, 7)}`;
-  }
-  
-  if (digits.length >= 8) {
-    formatted += `-${digits.slice(7, 9)}`;
-  }
-  
-  return formatted;
-};
-
 export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
   const [step, setStep] = useState<'form' | 'sending' | 'success'>('form');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      const formatted = formatPhoneNumber(val);
-      setPhone(formatted);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +23,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
           type: 'callback',
           booking: { 
             name, 
-            phone: '+375 ' + phone // Ensure full number is sent
+            phone // Send raw phone string
           }
         }),
       });
@@ -106,12 +59,9 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
         {step === 'form' ? (
           <div className="p-8">
             <div className="mb-6 text-center">
-              <div className="w-12 h-12 bg-gold-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-6 h-6 text-gold-400" />
-              </div>
               <h3 className="font-serif text-2xl text-white mb-2">Обратный звонок</h3>
               <p className="text-gray-400 text-sm">
-                Оставьте номер, и мы перезвоним вам в течение 15 минут.
+                Оставьте номер любой страны, и мы свяжемся с вами.
               </p>
             </div>
 
@@ -123,7 +73,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                   <input 
                     type="text" 
                     required 
-                    placeholder="Иван"
+                    placeholder="Иван / John"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded-lg"
@@ -132,19 +82,16 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs uppercase text-gray-500 tracking-wider">Телефон</label>
+                <label className="text-xs uppercase text-gray-500 tracking-wider">Телефон (с кодом страны)</label>
                 <div className="relative group">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                       <Phone className="text-gray-500 w-5 h-5 group-focus-within:text-gold-400 transition-colors" />
-                       <span className="text-gray-400 font-medium border-r border-white/10 pr-2">+375</span>
-                   </div>
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 group-focus-within:text-gold-400 transition-colors" />
                   <input 
-                    type="tel" 
+                    type="text" 
                     required 
-                    placeholder="(29) 000-00-00"
+                    placeholder="+375... / +7... / +1..."
                     value={phone}
-                    onChange={handlePhoneChange}
-                    className="w-full h-12 bg-dark-900 border border-white/10 pl-28 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded-lg font-medium tracking-wide"
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded-lg font-medium tracking-wide"
                   />
                 </div>
               </div>
@@ -158,17 +105,28 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
 
               <div className="flex items-center gap-4 py-2">
                 <div className="h-px bg-white/10 flex-1" />
-                <span className="text-xs text-gray-500 uppercase font-bold tracking-widest">Или</span>
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Или напишите нам</span>
                 <div className="h-px bg-white/10 flex-1" />
               </div>
 
-              <a 
-                href="tel:+375291234567"
-                className="w-full flex items-center justify-center gap-2 border border-white/20 text-white font-bold uppercase tracking-widest py-3 hover:bg-white/5 transition-colors rounded-lg"
-              >
-                <PhoneCall size={18} />
-                Позвонить сейчас
-              </a>
+              <div className="grid grid-cols-2 gap-3">
+                <a 
+                    href="https://wa.me/375290000000"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#25D366]/20 transition-colors rounded-lg"
+                >
+                    WhatsApp
+                </a>
+                <a 
+                    href="https://t.me/username"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 bg-[#0088cc]/10 border border-[#0088cc]/20 text-[#0088cc] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#0088cc]/20 transition-colors rounded-lg"
+                >
+                    <Send size={14} /> Telegram
+                </a>
+              </div>
             </form>
           </div>
         ) : step === 'sending' ? (

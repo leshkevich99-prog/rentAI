@@ -6,22 +6,6 @@ interface ChauffeurModalProps {
   onClose: () => void;
 }
 
-const formatPhoneNumber = (value: string) => {
-  if (!value) return value;
-  let digits = value.replace(/\D/g, '');
-  if (digits.startsWith('375')) digits = digits.slice(3);
-  else if (digits.startsWith('80')) digits = digits.slice(2);
-  digits = digits.slice(0, 9);
-  
-  if (digits.length === 0) return '';
-  let formatted = '';
-  if (digits.length > 0) formatted += `(${digits.slice(0, 2)}`;
-  if (digits.length >= 3) formatted += `) ${digits.slice(2, 5)}`;
-  if (digits.length >= 6) formatted += `-${digits.slice(5, 7)}`;
-  if (digits.length >= 8) formatted += `-${digits.slice(7, 9)}`;
-  return formatted;
-};
-
 export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
   const [step, setStep] = useState<'form' | 'sending' | 'success'>('form');
   const [formData, setFormData] = useState({
@@ -43,9 +27,7 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
           type: 'chauffeur',
           booking: {
             ...formData,
-            phone: '+375 ' + formData.phone,
-            // Fields removed from UI, but backend might expect them or we just omit them.
-            // Sending default values just in case.
+            // phone already raw
             date: 'По согласованию', 
             time: 'По согласованию'
           }
@@ -67,11 +49,6 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    setFormData(prev => ({ ...prev, phone: formatted }));
   };
 
   return (
@@ -126,19 +103,16 @@ export const ChauffeurModal: React.FC<ChauffeurModalProps> = ({ onClose }) => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">Телефон</label>
+                  <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">Телефон (любая страна)</label>
                   <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                       <Phone className="text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
-                       <span className="text-gray-400 font-medium border-r border-white/10 pr-2 text-sm">+375</span>
-                   </div>
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                     <input 
-                      type="tel" 
+                      type="text" 
                       required 
-                      placeholder="(29) ..."
+                      placeholder="+375... / +7..."
                       value={formData.phone}
-                      onChange={handlePhoneChange}
-                      className="w-full h-12 bg-dark-900 border border-white/10 pl-24 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-lg font-medium text-sm"
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                      className="w-full h-12 bg-dark-900 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors appearance-none rounded-lg font-medium text-sm"
                     />
                   </div>
                 </div>
