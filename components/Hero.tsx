@@ -1,67 +1,59 @@
-
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const heroBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/mainback.png";
 
 export const Hero: React.FC = () => {
   return (
-    <div className="relative h-screen w-full overflow-hidden flex items-center">
-      {/* Background */}
-      <div className="absolute inset-0 bg-dark-950 select-none">
-        <div className="absolute inset-0 bg-black/40 z-10" />
+    <div className="relative h-screen min-h-[600px] w-full overflow-hidden flex items-center justify-center">
+      {/* Background with overlay */}
+      <div className="absolute inset-0 bg-dark-900">
         <img 
             src={heroBg}
             alt="Hero Background" 
-            className="w-full h-full object-cover scale-105 animate-[pulse_10s_ease-in-out_infinite] opacity-60 grayscale-[0.2]"
+            className="w-full h-full object-cover opacity-60"
         />
-        {/* Cinematic Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-transparent to-dark-950/40 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-950/90 via-dark-950/20 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-transparent to-dark-900/80" />
       </div>
 
-      <div className="relative z-20 w-full max-w-[1920px] mx-auto px-6 lg:px-12 pt-20">
-        <div className="max-w-4xl">
-          <div className="overflow-hidden mb-6">
-            <h2 className="text-gold-400 uppercase tracking-super-wide text-xs font-semibold animate-fade-in-up">
-              Premium Car Rental
-            </h2>
-          </div>
-          
-          <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-white mb-8 leading-[0.9] tracking-tight animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Drive <br />
-            <span className="italic font-light text-gray-400">The Exceptional</span>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 text-center sm:text-left w-full">
+        <div className="max-w-3xl">
+          <h2 className="text-gold-400 uppercase tracking-[0.2em] mb-4 text-sm font-bold animate-fade-in-up">
+            Искусство Движения
+          </h2>
+          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight">
+            Ощутите <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+              Совершенство
+            </span>
           </h1>
-          
-          <p className="text-gray-300 text-sm md:text-base mb-12 max-w-lg font-light leading-relaxed tracking-wide animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            Исключительная коллекция автомобилей для тех, кто ценит эстетику движения. LÉON предлагает не просто аренду, а новый уровень свободы.
+          <p className="text-gray-300 text-lg md:text-xl mb-10 max-w-xl font-light leading-relaxed">
+            Эксклюзивная коллекция автомобилей премиум-класса для тех, кто не привык к компромиссам.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+          <div className="flex flex-col sm:flex-row gap-4">
             <Link 
               to="/fleet"
-              className="group relative px-10 py-4 bg-white text-black font-semibold text-xs uppercase tracking-widest overflow-hidden transition-all hover:bg-gold-400"
+              className="group relative px-8 py-4 bg-gold-500 text-black font-bold text-sm uppercase tracking-widest overflow-hidden hover:bg-gold-400 transition-colors flex items-center justify-center gap-2"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Выбрать Авто <ArrowRight className="w-4 h-4" />
-              </span>
+              <span className="relative z-10">Выбрать Авто</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            
             <Link 
-              to="/services"
-              className="px-10 py-4 border border-white/20 text-white font-semibold text-xs uppercase tracking-widest hover:border-white hover:bg-white/5 transition-all"
+              to="/terms"
+              className="flex items-center justify-center px-8 py-4 border border-white/20 text-white font-bold text-sm uppercase tracking-widest hover:bg-white/10 transition-colors backdrop-blur-sm"
             >
-              Услуги
+              Условия Аренды
             </Link>
           </div>
         </div>
       </div>
       
       {/* Scroll indicator */}
-      <div className="absolute bottom-12 right-12 z-20 hidden md:flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-        <span className="text-[10px] uppercase tracking-widest text-gray-500">Scroll</span>
-        <div className="w-12 h-px bg-gray-700"></div>
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce hidden md:block">
+        <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-gold-400 to-transparent"></div>
       </div>
     </div>
   );

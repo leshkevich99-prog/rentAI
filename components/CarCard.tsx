@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Car } from '../types';
+import { Gauge, Zap, Wind } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface CarCardProps {
@@ -10,66 +10,73 @@ interface CarCardProps {
 
 export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
   return (
-    <div className="group flex flex-col w-full">
-      {/* Image Area */}
-      <Link to={`/fleet/${car.id}`} className="block relative aspect-[4/3] overflow-hidden bg-dark-800 cursor-pointer">
+    <div className="group relative bg-dark-800 border border-white/5 overflow-hidden transition-transform duration-500 hover:-translate-y-2">
+      {/* Image Container - Clickable */}
+      <Link to={`/fleet/${car.id}`} className="block relative h-64 overflow-hidden cursor-pointer">
+        <div className="absolute inset-0 bg-dark-900 animate-pulse" />
         <img
           src={car.imageUrl}
           alt={car.name}
-          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
           loading="lazy"
         />
-        
         {!car.available && (
-          <div className="absolute top-4 left-4 z-10">
-            <span className="bg-dark-950/80 backdrop-blur text-white px-3 py-1 text-[10px] uppercase tracking-widest">
-              Занято
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-10">
+            <span className="border border-white/30 px-4 py-2 text-white/70 uppercase text-xs tracking-widest font-bold">
+              Недоступно
             </span>
           </div>
         )}
-
-        {/* Hover Overlay with Specs */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
-            <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                <div className="flex justify-between text-white text-xs tracking-wider border-t border-white/20 pt-4">
-                    <span>{car.specs.hp} HP</span>
-                    <span>{car.specs.zeroToSixty}s (0-100)</span>
-                    <span>{car.specs.maxSpeed} km/h</span>
-                </div>
-            </div>
+        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 border border-white/10">
+          <span className="text-gold-400 text-xs font-bold tracking-widest uppercase">
+            {car.category}
+          </span>
         </div>
       </Link>
 
-      {/* Content Area */}
-      <div className="pt-6 pb-2 border-b border-white/10 group-hover:border-gold-400/50 transition-colors duration-500">
-        <div className="flex justify-between items-end mb-2">
-            <Link to={`/fleet/${car.id}`}>
-                <h3 className="font-serif text-2xl text-white group-hover:text-gold-300 transition-colors">
-                    {car.name}
-                </h3>
-            </Link>
-            <span className="text-xs text-gray-500 uppercase tracking-widest mb-1">{car.category}</span>
-        </div>
+      {/* Content */}
+      <div className="p-6">
+        <Link to={`/fleet/${car.id}`} className="block">
+          <h3 className="font-serif text-2xl text-white mb-2 group-hover:text-gold-400 transition-colors">
+            {car.name}
+          </h3>
+        </Link>
         
-        <div className="flex justify-between items-center mt-4">
-            <div className="flex flex-col">
-                <span className="text-gold-400 font-medium text-lg">
-                    {car.pricePerDay.toLocaleString('ru-RU')} BYN
-                </span>
-                <span className="text-[10px] text-gray-600 uppercase tracking-widest">За сутки</span>
-            </div>
+        <div className="flex items-center gap-6 my-6 text-gray-400 text-sm">
+          <div className="flex flex-col items-center gap-1">
+            <Zap className="w-4 h-4 text-gold-500" />
+            <span>{car.specs.hp} л.с.</span>
+          </div>
+          <div className="w-[1px] h-8 bg-white/10" />
+          <div className="flex flex-col items-center gap-1">
+            <Wind className="w-4 h-4 text-gold-500" />
+            <span>{car.specs.zeroToSixty}с</span>
+          </div>
+          <div className="w-[1px] h-8 bg-white/10" />
+          <div className="flex flex-col items-center gap-1">
+            <Gauge className="w-4 h-4 text-gold-500" />
+            <span>{car.specs.maxSpeed} км/ч</span>
+          </div>
+        </div>
 
-            <button
-                onClick={() => onBook(car)}
-                disabled={!car.available}
-                className={`px-6 py-2 text-[10px] uppercase tracking-widest border transition-all ${
-                    car.available 
-                    ? 'border-white/20 text-white hover:bg-white hover:text-black' 
-                    : 'border-white/5 text-gray-600 cursor-not-allowed'
-                }`}
-            >
-                Бронь
-            </button>
+        <div className="flex items-end justify-between border-t border-white/5 pt-6">
+          <div>
+            <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Стоимость</p>
+            <p className="text-xl font-bold text-white">
+              {car.pricePerDay.toLocaleString('ru-RU')} BYN <span className="text-sm font-normal text-gray-500">/ сутки</span>
+            </p>
+          </div>
+          <button
+            onClick={() => onBook(car)}
+            disabled={!car.available}
+            className={`px-6 py-3 text-sm font-bold uppercase tracking-widest transition-all duration-300 ${
+              car.available
+                ? 'bg-white text-black hover:bg-gold-400 hover:text-black'
+                : 'bg-white/10 text-white/30 cursor-not-allowed'
+            }`}
+          >
+            Забронировать
+          </button>
         </div>
       </div>
     </div>
