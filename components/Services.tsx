@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Shield, Clock, Award, Briefcase, Gem, Plane } from 'lucide-react';
 
@@ -36,10 +37,10 @@ const services = [
 
 export const Services: React.FC = () => {
   return (
-    <section id="services" className="py-24 bg-dark-800 relative border-t border-white/5">
-       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="services" className="py-24 bg-dark-900 relative border-t border-white/5">
+       <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
         <div className="text-center mb-16">
-          <h2 className="text-gold-400 font-bold uppercase tracking-[0.2em] mb-3 text-sm">
+          <h2 className="text-gold-400 font-semibold uppercase tracking-luxury mb-3 text-xs">
             Сервис Высшего Класса
           </h2>
           <h3 className="font-serif text-4xl md:text-5xl text-white">
@@ -49,14 +50,14 @@ export const Services: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <div key={index} className="p-8 bg-dark-900 border border-white/5 hover:border-gold-400/30 transition-all duration-300 group">
-              <div className="mb-6 bg-dark-800 w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div key={index} className="p-8 bg-dark-950 border border-white/5 hover:border-gold-400/30 transition-all duration-300 group">
+              <div className="mb-6 bg-dark-900 w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-white/5">
                 {service.icon}
               </div>
               <h4 className="text-xl font-serif text-white mb-4 group-hover:text-gold-400 transition-colors">
                 {service.title}
               </h4>
-              <p className="text-gray-400 leading-relaxed text-sm">
+              <p className="text-gray-400 leading-relaxed text-sm font-light">
                 {service.description}
               </p>
             </div>

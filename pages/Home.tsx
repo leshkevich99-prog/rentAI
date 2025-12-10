@@ -4,7 +4,7 @@ import { Hero } from '../components/Hero';
 import { CarCard } from '../components/CarCard';
 import { Car } from '../types';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Building2, ShieldCheck, FileText, Send, Phone, User, CheckCircle, Smartphone } from 'lucide-react';
+import { ChevronRight, Building2, ShieldCheck, FileText, Send, CheckCircle } from 'lucide-react';
 import { ChauffeurModal } from '../components/ChauffeurModal';
 
 interface HomeProps {
@@ -14,7 +14,7 @@ interface HomeProps {
 
 const promoBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/maindown.png";
 
-// Inline Contact Form Component for Homepage
+// Inline Contact Form Component
 const HomeContactForm = () => {
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [formData, setFormData] = useState({ name: '', phone: '' });
@@ -34,11 +34,11 @@ const HomeContactForm = () => {
   };
 
   return (
-    <div className="bg-dark-800 border border-white/10 p-8 md:p-12 relative overflow-hidden">
+    <div className="bg-dark-950 border border-white/10 p-8 md:p-12 relative overflow-hidden">
        {/* Background accent */}
        <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2" />
 
-       <h3 className="font-serif text-3xl text-white mb-2">Остались вопросы?</h3>
+       <h3 className="font-serif text-3xl text-white mb-3">Остались вопросы?</h3>
        <p className="text-gray-400 mb-8 max-w-md font-light text-sm leading-relaxed">Оставьте заявку, и мы перезвоним в течение 15 минут. Или напишите нам в мессенджеры.</p>
 
        {step === 'form' ? (
@@ -48,7 +48,7 @@ const HomeContactForm = () => {
                 type="text" 
                 placeholder="Ваше Имя"
                 required
-                className="w-full bg-dark-900 border border-white/10 p-4 text-white placeholder-gray-600 focus:border-gold-400 focus:outline-none text-sm"
+                className="w-full bg-transparent border border-white/10 p-4 text-white placeholder-gray-600 focus:border-gold-400 focus:outline-none text-sm font-light transition-colors"
                 value={formData.name}
                 onChange={e => setFormData({...formData, name: e.target.value})}
               />
@@ -56,9 +56,9 @@ const HomeContactForm = () => {
             <div>
               <input 
                 type="text" 
-                placeholder="Номер телефона (любая страна)"
+                placeholder="Номер телефона"
                 required
-                className="w-full bg-dark-900 border border-white/10 p-4 text-white placeholder-gray-600 focus:border-gold-400 focus:outline-none text-sm"
+                className="w-full bg-transparent border border-white/10 p-4 text-white placeholder-gray-600 focus:border-gold-400 focus:outline-none text-sm font-light transition-colors"
                 value={formData.phone}
                 onChange={e => setFormData({...formData, phone: e.target.value})}
               />
@@ -70,18 +70,18 @@ const HomeContactForm = () => {
        ) : (
          <div className="bg-green-500/10 border border-green-500/20 p-8 text-center">
             <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-            <h4 className="text-white font-bold text-xl">Заявка отправлена</h4>
-            <p className="text-gray-400">Мы скоро свяжемся с вами.</p>
+            <h4 className="text-white font-bold text-xl font-serif">Заявка принята</h4>
+            <p className="text-gray-400 text-sm mt-2">Мы скоро свяжемся с вами.</p>
          </div>
        )}
 
-       <div className="mt-8 pt-8 border-t border-white/5">
+       <div className="mt-10 pt-8 border-t border-white/5">
           <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mb-4">Для быстрой связи (24/7)</p>
           <div className="grid grid-cols-2 gap-4">
-             <a href="https://wa.me/375257422222" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/20 py-3 hover:bg-[#25D366]/20 transition-colors font-bold text-xs uppercase tracking-wider">
+             <a href="https://wa.me/375257422222" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-[#25D366]/5 text-[#25D366] border border-[#25D366]/20 py-3 hover:bg-[#25D366]/10 transition-colors font-bold text-[10px] uppercase tracking-widest">
                 WhatsApp
              </a>
-             <a href="https://t.me/username" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-[#0088cc]/10 text-[#0088cc] border border-[#0088cc]/20 py-3 hover:bg-[#0088cc]/20 transition-colors font-bold text-xs uppercase tracking-wider">
+             <a href="https://t.me/username" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 bg-[#0088cc]/5 text-[#0088cc] border border-[#0088cc]/20 py-3 hover:bg-[#0088cc]/10 transition-colors font-bold text-[10px] uppercase tracking-widest">
                 <Send size={14} /> Telegram
              </a>
           </div>
@@ -107,19 +107,19 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
          
          <div className="flex gap-16 animate-[scroll_30s_linear_infinite] whitespace-nowrap px-4">
             {[...brands, ...brands, ...brands].map((brand, i) => (
-                <span key={i} className="text-xl font-serif text-gray-600 uppercase tracking-widest opacity-50 select-none">
+                <span key={i} className="text-xl font-serif text-gray-700 uppercase tracking-widest opacity-50 select-none">
                     {brand}
                 </span>
             ))}
          </div>
       </div>
       
-      {/* Featured Fleet Preview */}
+      {/* Featured Fleet */}
       <section className="py-24 bg-dark-950 relative">
         <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                 <div>
-                    <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-xs mb-4">
+                    <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-xs mb-3">
                         Автопарк
                     </h2>
                     <h3 className="font-serif text-4xl md:text-5xl text-white max-w-xl">
@@ -145,12 +145,12 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
         </div>
       </section>
 
-      {/* B2B & Benefits Section */}
+      {/* B2B & Benefits */}
       <section className="py-24 bg-dark-900 border-t border-white/5">
         <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                 <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-xs mb-4">Для Бизнеса</h2>
+              <div className="pr-0 lg:pr-12">
+                 <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-xs mb-3">Для Бизнеса</h2>
                  <h3 className="font-serif text-4xl text-white mb-6">
                     Прозрачные условия
                  </h3>
@@ -158,7 +158,7 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
                     Мы ценим ваше время. Оформление документов занимает 15 минут. Возможна оплата по безналичному расчету с НДС.
                  </p>
                  
-                 <div className="space-y-8">
+                 <div className="space-y-10">
                     <div className="flex gap-6 group">
                        <div className="text-gold-400 group-hover:text-white transition-colors">
                           <Building2 size={32} strokeWidth={1} />
@@ -197,7 +197,7 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
         </div>
       </section>
 
-      {/* Promo Section: Personal Chauffeur */}
+      {/* Promo Section */}
       <section className="relative py-32 bg-dark-950 overflow-hidden border-t border-white/5">
          <div className="absolute inset-0">
            <img src={promoBg} alt="Chauffeur Service" className="w-full h-full object-cover opacity-40 grayscale" />
@@ -219,8 +219,6 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
            </div>
          </div>
       </section>
-
-      {/* "Trust / Clients" Section REMOVED as requested */}
 
       {/* Chauffeur Modal */}
       {isChauffeurOpen && (

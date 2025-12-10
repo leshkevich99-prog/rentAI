@@ -25,13 +25,14 @@ export const Logo: React.FC<LogoProps> = ({ className = '', variant = 'full' }) 
             </linearGradient>
           </defs>
 
-          {/* Minimalist Shield/Lion Abstraction */}
+          {/* Minimalist Shield */}
           <path 
             d="M12 2L4 5V11C4 16.5 7.5 21.5 12 23C16.5 21.5 20 16.5 20 11V5L12 2Z" 
             stroke="url(#gold-gradient-logo)" 
             strokeWidth="1.5"
             fill="none"
           />
+          {/* Internal Detail */}
           <path 
             d="M12 6V18M7 11H17" 
             stroke="url(#gold-gradient-logo)" 

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Check } from 'lucide-react';
 
@@ -5,11 +6,11 @@ const aboutImg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/pub
 
 export const About: React.FC = () => {
   return (
-    <section id="about" className="py-24 bg-dark-900 relative overflow-hidden">
+    <section id="about" className="py-24 bg-dark-950 relative overflow-hidden">
       {/* Decorative Background Elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-dark-800 to-transparent opacity-30 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-dark-900 to-transparent opacity-30 pointer-events-none" />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-[1920px] mx-auto px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           <div className="relative">
@@ -25,7 +26,7 @@ export const About: React.FC = () => {
           </div>
 
           <div>
-            <h2 className="text-gold-400 font-bold uppercase tracking-[0.2em] mb-3 text-sm">
+            <h2 className="text-gold-400 font-semibold uppercase tracking-luxury mb-3 text-xs">
               О Компании
             </h2>
             <h3 className="font-serif text-4xl md:text-5xl text-white mb-8 leading-tight">
@@ -33,11 +34,11 @@ export const About: React.FC = () => {
               <span className="italic text-gold-400">премиальной аренды</span>
             </h3>
             
-            <p className="text-gray-400 text-lg mb-6 leading-relaxed">
+            <p className="text-gray-400 text-lg mb-6 leading-relaxed font-light">
               LÉON была основана в 2025 году с одной целью: предоставить сервис, который превосходит ожидания самых требовательных клиентов. Мы не просто сдаем автомобили в аренду, мы дарим эмоции и свободу передвижения на высшем уровне.
             </p>
             
-            <p className="text-gray-500 mb-8 leading-relaxed">
+            <p className="text-gray-500 mb-8 leading-relaxed font-light text-sm">
               В нашем автопарке собраны лучшие образцы мирового автопрома. Каждый автомобиль — это шедевр инженерной мысли, готовый стать вашим надежным спутником, будь то деловая встреча, свадьба или путешествие.
             </p>
 
@@ -45,14 +46,14 @@ export const About: React.FC = () => {
               <div className="flex items-start gap-3">
                 <div className="mt-1 bg-gold-400/20 p-1 rounded-full"><Check size={12} className="text-gold-400" /></div>
                 <div>
-                  <h4 className="text-white font-bold text-2xl">15+</h4>
+                  <h4 className="text-white font-bold text-2xl font-serif">15+</h4>
                   <p className="text-gray-500 text-xs uppercase tracking-wider">Автомобилей</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 bg-gold-400/20 p-1 rounded-full"><Check size={12} className="text-gold-400" /></div>
                 <div>
-                  <h4 className="text-white font-bold text-2xl">500+</h4>
+                  <h4 className="text-white font-bold text-2xl font-serif">500+</h4>
                   <p className="text-gray-500 text-xs uppercase tracking-wider">Клиентов</p>
                 </div>
               </div>
@@ -60,7 +61,7 @@ export const About: React.FC = () => {
 
             <div className="border-t border-white/10 pt-8">
                <div className="font-serif italic text-2xl text-gray-500 opacity-50">Roman Romanov</div>
-               <p className="text-gray-500 text-xs mt-2 uppercase tracking-widest">Роман Романов, CEO LÉON</p>
+               <p className="text-gray-500 text-[10px] mt-2 uppercase tracking-widest">Роман Романов, CEO LÉON</p>
             </div>
           </div>
 

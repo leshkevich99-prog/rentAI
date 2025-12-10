@@ -14,12 +14,6 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="LÉON" />
     <meta property="og:locale" content="ru_RU" />
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="LÉON | Премиум Автопрокат" />
-    <meta name="twitter:description" content="Аренда элитных автомобилей в Минске. Эксклюзивный сервис и лучшие автомобили." />
-    <meta name="twitter:image" content="https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/mainback.png" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='2' y1='2' x2='22' y2='22' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='%23D4AF37'/%3E%3Cstop offset='100%25' stop-color='%238F6F30'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 2L4 5.5V11.5C4 16.8 7.6 21.6 12 23C16.4 21.6 20 16.8 20 11.5V5.5L12 2Z' stroke='url(%23g)' stroke-width='1.5' fill='%23000'/%3E%3Cpath d='M8 10.5C8 10.5 9.5 12 12 12C14.5 12 16 10.5 16 10.5' stroke='url(%23g)' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M12 12V15.5' stroke='url(%23g)' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M10.5 17L12 15.5L13.5 17' stroke='url(%23g)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 6.5L13.5 8.5H10.5L12 6.5Z' fill='url(%23g)'/%3E%3C/svg%3E" />
@@ -27,7 +21,9 @@
     <title>LÉON | Премиум Автопрокат</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Updated Fonts: Cinzel (Serif) for headers, Montserrat (Sans) for body -->
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <script>
@@ -40,21 +36,20 @@
             },
             colors: {
               gold: {
-                300: '#E5C575', // Champagne
-                400: '#D4AF37', // Classic Gold
-                500: '#B2912F', // Deep Gold
-                600: '#8F721E', // Dark Gold
+                300: '#E5C575', 
+                400: '#D4AF37', 
+                500: '#B2912F', 
+                600: '#8F721E', 
               },
               dark: {
-                950: '#050505', // Deep Black
-                900: '#0A0A0A', // Soft Black
-                800: '#121212', // Dark Grey
-                700: '#1A1A1A', // Graphite
+                950: '#050505', 
+                900: '#0A0A0A', 
+                800: '#121212', 
+                700: '#1A1A1A', 
               }
             },
             letterSpacing: {
               'luxury': '0.25em',
-              'super-wide': '0.35em',
             },
             animation: {
               'fade-in-up': 'fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
@@ -79,13 +74,11 @@
         -moz-osx-font-smoothing: grayscale;
       }
       
-      /* Selection Color */
       ::selection {
         background: rgba(212, 175, 55, 0.3);
         color: white;
       }
 
-      /* Custom Scrollbar */
       ::-webkit-scrollbar {
         width: 6px;
       }
@@ -108,7 +101,6 @@
           scrollbar-width: none;
       }
       
-      /* Form autofill fix */
       input:-webkit-autofill,
       input:-webkit-autofill:hover, 
       input:-webkit-autofill:focus, 

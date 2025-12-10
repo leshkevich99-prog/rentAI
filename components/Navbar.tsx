@@ -32,8 +32,8 @@ export const Navbar: React.FC = () => {
       <nav
         className={`fixed w-full z-50 transition-all duration-700 border-b ${
           isScrolled
-            ? 'bg-dark-950/80 backdrop-blur-md border-white/5 py-4'
-            : 'bg-transparent border-transparent py-8'
+            ? 'bg-dark-950/90 backdrop-blur-md border-white/5 py-4'
+            : 'bg-transparent border-transparent py-6 lg:py-8'
         }`}
       >
         <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
@@ -42,8 +42,9 @@ export const Navbar: React.FC = () => {
               <Logo />
             </Link>
 
+            {/* Desktop Menu */}
             <div className="hidden lg:block">
-              <div className="flex items-center gap-12">
+              <div className="flex items-center gap-10">
                 {navLinks.map((link) => (
                   <Link
                     key={link.name}
@@ -63,6 +64,7 @@ export const Navbar: React.FC = () => {
               </div>
             </div>
 
+            {/* Mobile Toggle */}
             <div className="lg:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

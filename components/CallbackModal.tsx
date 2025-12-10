@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Phone, User, Loader2, CheckCircle, PhoneCall, Send } from 'lucide-react';
+import { X, Phone, User, Loader2, CheckCircle, Send } from 'lucide-react';
 
 interface CallbackModalProps {
   onClose: () => void;
@@ -23,7 +23,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
           type: 'callback',
           booking: { 
             name, 
-            phone // Send raw phone string
+            phone
           }
         }),
       });
@@ -61,7 +61,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
             <div className="mb-8 text-center">
               <h3 className="font-serif text-2xl text-white mb-2">Обратный звонок</h3>
               <p className="text-gray-400 text-sm font-light">
-                Оставьте номер любой страны, и мы свяжемся с вами.
+                Оставьте номер, и мы перезвоним в ближайшее время.
               </p>
             </div>
 
@@ -73,7 +73,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                   <input 
                     type="text" 
                     required 
-                    placeholder="Иван / John"
+                    placeholder="Иван"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors text-sm"
@@ -82,13 +82,13 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">Телефон (с кодом страны)</label>
+                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">Телефон</label>
                 <div className="relative group">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                   <input 
                     type="text" 
                     required 
-                    placeholder="+375... / +7... / +1..."
+                    placeholder="+375..."
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors font-medium tracking-wide text-sm"
@@ -105,7 +105,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
 
               <div className="flex items-center gap-4 py-2">
                 <div className="h-px bg-white/10 flex-1" />
-                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Или напишите нам</span>
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Или</span>
                 <div className="h-px bg-white/10 flex-1" />
               </div>
 

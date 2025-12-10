@@ -10,9 +10,9 @@ interface CarCardProps {
 
 export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
   return (
-    <div className="group flex flex-col w-full">
+    <div className="group flex flex-col w-full h-full">
       {/* Image Area */}
-      <Link to={`/fleet/${car.id}`} className="block relative aspect-[4/3] overflow-hidden bg-dark-800 cursor-pointer">
+      <Link to={`/fleet/${car.id}`} className="block relative aspect-[16/10] overflow-hidden bg-dark-800 cursor-pointer">
         <img
           src={car.imageUrl}
           alt={car.name}
@@ -29,9 +29,9 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
         )}
 
         {/* Hover Overlay with Specs */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8">
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
             <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                <div className="flex justify-between text-white text-xs tracking-wider border-t border-white/20 pt-4">
+                <div className="flex justify-between text-white text-[10px] tracking-wider border-t border-white/20 pt-4 font-medium uppercase">
                     <span>{car.specs.hp} HP</span>
                     <span>{car.specs.zeroToSixty}s (0-100)</span>
                     <span>{car.specs.maxSpeed} km/h</span>
@@ -41,17 +41,19 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
       </Link>
 
       {/* Content Area */}
-      <div className="pt-6 pb-2 border-b border-white/10 group-hover:border-gold-400/50 transition-colors duration-500">
-        <div className="flex justify-between items-end mb-2">
+      <div className="pt-6 pb-2 border-b border-white/10 group-hover:border-gold-400/50 transition-colors duration-500 flex-1 flex flex-col justify-between">
+        <div className="mb-4">
+            <div className="flex justify-between items-baseline mb-1">
+                 <span className="text-[10px] text-gray-500 uppercase tracking-widest">{car.category}</span>
+            </div>
             <Link to={`/fleet/${car.id}`}>
-                <h3 className="font-serif text-2xl text-white group-hover:text-gold-300 transition-colors">
+                <h3 className="font-serif text-xl md:text-2xl text-white group-hover:text-gold-300 transition-colors leading-tight">
                     {car.name}
                 </h3>
             </Link>
-            <span className="text-xs text-gray-500 uppercase tracking-widest mb-1">{car.category}</span>
         </div>
         
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-between items-center mt-auto">
             <div className="flex flex-col">
                 <span className="text-gold-400 font-medium text-lg">
                     {car.pricePerDay.toLocaleString('ru-RU')} BYN

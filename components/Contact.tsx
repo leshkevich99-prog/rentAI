@@ -9,7 +9,7 @@ export const Contact: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           
           <div>
-            <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-xs mb-4">
+            <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-xs mb-3">
               Свяжитесь с Нами
             </h2>
             <h3 className="font-serif text-5xl text-white mb-8">
