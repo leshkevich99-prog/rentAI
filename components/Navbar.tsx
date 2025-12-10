@@ -11,7 +11,7 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -30,10 +30,10 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <nav
-        className={`fixed w-full z-50 transition-all duration-700 border-b ${
+        className={`fixed w-full z-50 transition-all duration-700 ${
           isScrolled
-            ? 'bg-dark-950/90 backdrop-blur-md border-white/5 py-4'
-            : 'bg-transparent border-transparent py-6 lg:py-8'
+            ? 'bg-dark-950/80 backdrop-blur-xl border-b border-white/5 py-4'
+            : 'bg-transparent border-transparent py-8'
         }`}
       >
         <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
@@ -44,13 +44,13 @@ export const Navbar: React.FC = () => {
 
             {/* Desktop Menu */}
             <div className="hidden lg:block">
-              <div className="flex items-center gap-10">
+              <div className="flex items-center gap-12">
                 {navLinks.map((link) => (
                   <Link
                     key={link.name}
                     to={link.path}
-                    className={`relative text-[11px] font-medium uppercase tracking-luxury transition-all duration-300 ${
-                      isActive(link.path) ? 'text-gold-400' : 'text-gray-400 hover:text-white'
+                    className={`relative text-[10px] font-bold uppercase tracking-luxury transition-all duration-300 ${
+                      isActive(link.path) ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
                     {link.name}
@@ -79,11 +79,11 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Menu Overlay */}
       <div 
-        className={`fixed inset-0 z-40 bg-dark-950 flex flex-col justify-center items-center transition-all duration-500 ${
+        className={`fixed inset-0 z-40 bg-dark-950/95 backdrop-blur-xl flex flex-col justify-center items-center transition-all duration-500 ${
             isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
       >
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-10">
           {navLinks.map((link) => (
             <Link
               key={link.name}

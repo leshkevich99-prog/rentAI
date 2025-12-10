@@ -24,7 +24,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     
     <script>
       tailwind.config = {
@@ -68,10 +68,13 @@
     <style>
       body {
         background-color: #050505;
+        /* Subtle deep gradient instead of flat black */
+        background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #050505 70%);
         color: #f5f5f5;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        min-height: 100vh;
       }
       
       ::selection {

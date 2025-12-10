@@ -1,37 +1,6 @@
 
 import { Car, CarCategory } from './types';
 
-// Функция для создания стильной заглушки автомобиля в формате SVG
-const generateCarPlaceholder = (name: string, category: string) => {
-  const svg = `
-  <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="grad_${name.replace(/\s/g, '')}" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:#0f0f0f;stop-opacity:1" />
-        <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:1" />
-      </linearGradient>
-      <pattern id="pattern_${name.replace(/\s/g, '')}" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M0 40 L40 0 H20 L0 20 M40 40 V20 L20 40" stroke="#1f1f1f" stroke-width="1" fill="none"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grad_${name.replace(/\s/g, '')})" />
-    <rect width="100%" height="100%" fill="url(#pattern_${name.replace(/\s/g, '')})" opacity="0.3" />
-    
-    <!-- Abstract Car Shape Hint -->
-    <path d="M100 400 L200 300 H600 L700 400" stroke="#333" stroke-width="2" fill="none" opacity="0.5"/>
-    <line x1="100" y1="400" x2="700" y2="400" stroke="#C5A059" stroke-width="2" opacity="0.8" />
-    
-    <!-- Text -->
-    <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="#222" font-family="sans-serif" font-size="80" font-weight="bold" opacity="0.5" transform="rotate(-5, 400, 300)">${category}</text>
-    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#C5A059" font-family="serif" font-size="36" font-weight="bold" letter-spacing="2">${name}</text>
-    
-    <!-- Frame -->
-    <rect x="40" y="40" width="720" height="520" fill="none" stroke="#C5A059" stroke-width="1" opacity="0.2"/>
-  </svg>
-  `.trim();
-  return `data:image/svg+xml;base64,${btoa(svg)}`;
-};
-
 const DEFAULT_DESCRIPTION = "Испытайте истинное удовольствие от вождения. Этот автомобиль сочетает в себе безупречный стиль, передовые технологии и невероятную мощь. Идеальный выбор для тех, кто не привык к компромиссам. Салон выполнен из премиальных материалов, обеспечивая максимальный комфорт в любой поездке.";
 
 const DEFAULT_DISCOUNTS = [
@@ -40,6 +9,7 @@ const DEFAULT_DISCOUNTS = [
   { days: 15, discount: 20 }
 ];
 
+// Используем реальные фото с Unsplash для демо
 export const CARS: Car[] = [
   {
     id: '1',
@@ -47,7 +17,7 @@ export const CARS: Car[] = [
     category: CarCategory.SPORT,
     pricePerDay: 3500,
     specs: { hp: 640, zeroToSixty: 2.9, maxSpeed: 325 },
-    imageUrl: generateCarPlaceholder('Huracán Evo', 'SPORT'),
+    imageUrl: 'https://images.unsplash.com/photo-1544602356-ac9c5220c57c?q=80&w=2940&auto=format&fit=crop', // Green/Black aggressive
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -58,18 +28,18 @@ export const CARS: Car[] = [
     category: CarCategory.SUV,
     pricePerDay: 4200,
     specs: { hp: 563, zeroToSixty: 5.2, maxSpeed: 250 },
-    imageUrl: generateCarPlaceholder('Cullinan', 'SUV'),
+    imageUrl: 'https://images.unsplash.com/photo-1631295868223-63265b40d9e4?q=80&w=2787&auto=format&fit=crop', // Black classy
     available: true,
     description: "Роскошный внедорожник, который переопределяет понятие комфорта. Rolls-Royce Cullinan — это воплощение элегантности и мощи, способное покорить любые дороги с неизменным достоинством.",
     discountRules: DEFAULT_DISCOUNTS
   },
   {
     id: '3',
-    name: 'Mercedes-Benz Maybach',
+    name: 'Mercedes-Benz S-Class Maybach',
     category: CarCategory.SEDAN,
     pricePerDay: 2100,
     specs: { hp: 496, zeroToSixty: 4.8, maxSpeed: 250 },
-    imageUrl: generateCarPlaceholder('Maybach S-Class', 'SEDAN'),
+    imageUrl: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2940&auto=format&fit=crop', // Dark luxury interior/exterior vibe
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -80,7 +50,7 @@ export const CARS: Car[] = [
     category: CarCategory.SPORT,
     pricePerDay: 3800,
     specs: { hp: 710, zeroToSixty: 2.9, maxSpeed: 340 },
-    imageUrl: generateCarPlaceholder('Ferrari F8', 'SPORT'),
+    imageUrl: 'https://images.unsplash.com/photo-1592198084033-aade902d1aae?q=80&w=2940&auto=format&fit=crop', // Red Ferrari
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -91,7 +61,7 @@ export const CARS: Car[] = [
     category: CarCategory.CONVERTIBLE,
     pricePerDay: 2800,
     specs: { hp: 650, zeroToSixty: 3.6, maxSpeed: 335 },
-    imageUrl: generateCarPlaceholder('Continental GT', 'CONVERTIBLE'),
+    imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2940&auto=format&fit=crop', // Blue/Black vibe
     available: false,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -102,7 +72,7 @@ export const CARS: Car[] = [
     category: CarCategory.SPORT,
     pricePerDay: 2900,
     specs: { hp: 640, zeroToSixty: 2.7, maxSpeed: 330 },
-    imageUrl: generateCarPlaceholder('911 Turbo S', 'SPORT'),
+    imageUrl: 'https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2940&auto=format&fit=crop', // Classic dark Porsche
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
