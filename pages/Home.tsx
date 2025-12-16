@@ -13,7 +13,8 @@ interface HomeProps {
   onBookCar: (car: Car) => void;
 }
 
-const promoBg = "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=2941&auto=format&fit=crop";
+// Night city view from luxury car backseat - perfect for chauffeur service context
+const promoBg = "https://images.unsplash.com/photo-1562426509-5044a121aa49?q=80&w=2940&auto=format&fit=crop";
 
 // Inline Contact Form Component - Compact
 const HomeContactForm = () => {
@@ -196,7 +197,7 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
       {/* Promo Section - Compact Parallax */}
       <section className="relative py-24 bg-dark-950 overflow-hidden">
          <div className="absolute inset-0">
-           <img src={promoBg} alt="Chauffeur Service" className="w-full h-full object-cover opacity-50 grayscale" />
+           <img src={promoBg} alt="Chauffeur Service" className="w-full h-full object-cover opacity-60" />
            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
          </div>
          <div className="relative max-w-[1920px] mx-auto px-6 lg:px-12 flex items-center">
