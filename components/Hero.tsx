@@ -5,7 +5,11 @@ import { Link } from 'react-router-dom';
 
 const heroBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/premium_luxury_car_hero_v3_1765910239466.png";
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  onRequestCallback?: () => void;
+}
+
+export const Hero: React.FC<HeroProps> = ({ onRequestCallback }) => {
   return (
     <div className="relative h-screen min-h-[600px] max-h-[1080px] w-full overflow-hidden flex items-center">
       {/* Background with cinematic overlay */}
@@ -25,16 +29,16 @@ export const Hero: React.FC = () => {
           
           <div className="flex items-center gap-4 mb-6 animate-fade-in-up">
             <div className="h-px w-8 bg-gold-400"></div>
-            <span className="text-gold-400 text-[10px] font-bold uppercase tracking-[0.3em]">Minsk Premium Rental</span>
+            <span className="text-gold-400 text-[10px] font-bold uppercase tracking-[0.3em]">Minsk, Belarus</span>
           </div>
 
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-6 leading-[0.9] tracking-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Beyond <br />
-            <span className="text-gray-500 font-light italic">Luxury.</span>
+            Premium <br />
+            <span className="text-white font-light italic">Car Rental.</span>
           </h1>
           
           <p className="text-gray-300 text-sm md:text-base mb-10 max-w-md font-light leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-             Исключительная коллекция автомобилей для тех, кто ценит комфорт, статус и безупречный стиль.
+             Аренда автомобилей премиум-класса в Минске. Lamborghini, Rolls-Royce, Bentley для тех, кто ценит статус и комфорт.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-5 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
@@ -47,15 +51,13 @@ export const Hero: React.FC = () => {
               </span>
             </Link>
             
-            <a 
-              href="https://wa.me/375257422222"
-              target="_blank"
-              rel="noreferrer"
+            <button 
+              onClick={onRequestCallback}
               className="group px-8 py-4 border border-white/20 text-white font-bold text-xs uppercase tracking-widest hover:border-white hover:bg-white/5 transition-all text-center flex items-center justify-center gap-2"
             >
               <span>Связаться</span>
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-            </a>
+            </button>
           </div>
         </div>
       </div>

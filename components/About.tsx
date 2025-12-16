@@ -13,7 +13,7 @@ export const About: React.FC = () => {
       <div className="max-w-[1920px] mx-auto px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
-          <div className="relative">
+          <div className="relative max-w-lg mx-auto lg:mx-0 w-full lg:w-4/5">
             <div className="relative z-10 border border-white/10 p-2">
                <img 
                  src={aboutImg}

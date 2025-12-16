@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { CarCategory, Car } from '../types';
 import { CarCard } from './CarCard';
@@ -55,8 +56,8 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
             Наш Автопарк
           </h3>
           
-          {/* Controls Container */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 border-b border-white/10 pb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          {/* Controls Container - Added z-30 to stay above grid */}
+          <div className="relative z-30 flex flex-col md:flex-row justify-between items-center gap-6 mb-8 border-b border-white/10 pb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             
             {/* Categories */}
             <div className="flex flex-wrap justify-center gap-2">
@@ -87,8 +88,8 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
 
               {isFilterOpen && (
                 <>
-                <div className="fixed inset-0 z-10" onClick={() => setIsFilterOpen(false)} />
-                <div className="absolute top-full right-0 mt-2 w-64 bg-dark-800 border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden backdrop-blur-xl">
+                <div className="fixed inset-0 z-40" onClick={() => setIsFilterOpen(false)} />
+                <div className="absolute top-full right-0 mt-2 w-64 bg-dark-800 border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden backdrop-blur-xl">
                   <div className="py-1">
                     <button 
                       onClick={() => { setSortBy('default'); setIsFilterOpen(false); }}
@@ -132,7 +133,8 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Grid - relative z-0 implied, so controls z-30 sits on top */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-0">
           {filteredCars.map((car) => (
             <div key={car.id} className="animate-fade-in-up">
                <CarCard car={car} onBook={onBookCar} />

@@ -6,6 +6,7 @@ import { Car } from '../types';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Building2, ShieldCheck, FileText, CheckCircle, ArrowRight } from 'lucide-react';
 import { ChauffeurModal } from '../components/ChauffeurModal';
+import { CallbackModal } from '../components/CallbackModal';
 
 interface HomeProps {
   cars: Car[];
@@ -92,13 +93,14 @@ const HomeContactForm = () => {
 
 export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
   const [isChauffeurOpen, setIsChauffeurOpen] = useState(false);
+  const [isCallbackOpen, setIsCallbackOpen] = useState(false);
   const featuredCars = cars.slice(0, 3);
 
   const brands = ["Lamborghini", "Rolls-Royce", "Ferrari", "Bentley", "Porsche", "Mercedes-Benz", "BMW", "Audi"];
 
   return (
     <div>
-      <Hero />
+      <Hero onRequestCallback={() => setIsCallbackOpen(true)} />
       
       {/* Brands Ticker - Compact */}
       <div className="bg-black border-b border-white/5 py-6 overflow-hidden relative">
@@ -217,6 +219,9 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
       {/* Chauffeur Modal */}
       {isChauffeurOpen && (
         <ChauffeurModal onClose={() => setIsChauffeurOpen(false)} />
+      )}
+      {isCallbackOpen && (
+        <CallbackModal onClose={() => setIsCallbackOpen(false)} />
       )}
     </div>
   );
