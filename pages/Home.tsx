@@ -12,7 +12,7 @@ interface HomeProps {
   onBookCar: (car: Car) => void;
 }
 
-const promoBg = "https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=2940&auto=format&fit=crop";
+const promoBg = "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=2941&auto=format&fit=crop";
 
 // Inline Contact Form Component - Compact
 const HomeContactForm = () => {
