@@ -33,8 +33,8 @@ export const Hero: React.FC<HeroProps> = ({ onRequestCallback }) => {
           </div>
 
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-6 leading-[0.9] tracking-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Premium <br />
-            <span className="text-white font-light italic">Car Rental.</span>
+            Премиум <br />
+            <span className="text-white font-light italic">Автопрокат.</span>
           </h1>
           
           <p className="text-gray-300 text-sm md:text-base mb-10 max-w-md font-light leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
