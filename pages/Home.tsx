@@ -13,8 +13,8 @@ interface HomeProps {
   onBookCar: (car: Car) => void;
 }
 
-// Night city view from luxury car backseat - perfect for chauffeur service context
-const promoBg = "https://images.unsplash.com/photo-1562426509-5044a121aa49?q=80&w=2940&auto=format&fit=crop";
+// Professional chauffeur opening car door - perfect for service context
+const promoBg = "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=2832&auto=format&fit=crop";
 
 // Inline Contact Form Component - Compact
 const HomeContactForm = () => {
