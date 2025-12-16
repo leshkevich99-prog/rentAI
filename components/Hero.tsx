@@ -3,7 +3,7 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const heroBg = "https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2940&auto=format&fit=crop";
+const heroBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/premium_luxury_car_hero_v3_1765910239466.png";
 
 export const Hero: React.FC = () => {
   return (
