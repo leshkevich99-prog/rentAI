@@ -14,7 +14,7 @@ interface HomeProps {
 }
 
 // Custom chauffeur service block image
-const promoBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/chauffeur_service_block.png";
+const promoBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/freepik__the-style-is-candid-image-photography-with-natural__33412.jpeg";
 
 // Inline Contact Form Component - Compact
 const HomeContactForm = () => {
