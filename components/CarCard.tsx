@@ -14,6 +14,15 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
   const { language, t } = useTranslation();
   const carName = language === 'en' && car.name_en ? car.name_en : car.name;
 
+  // Normalize category for lookup (uppercase)
+  const categoryKey = car.category ? car.category.toString().toUpperCase() : '';
+  const translatedCategory = t(`categories.${categoryKey}`);
+  
+  // If translation for the key exists, use it; otherwise fallback to the raw category string
+  const categoryDisplay = translatedCategory !== `categories.${categoryKey}` 
+    ? translatedCategory 
+    : car.category;
+
   return (
     <div className="group flex flex-col w-full h-full relative">
       <Link to={`/fleet/${car.id}`} className="block relative aspect-[16/9] overflow-hidden bg-dark-800 cursor-pointer">
@@ -45,9 +54,7 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
         <div className="flex justify-between items-start mb-2">
             <div>
                 <span className="text-[9px] text-gold-400 uppercase tracking-widest block mb-1">
-                    {t(`categories.${car.category}`) !== `categories.${car.category}` 
-                        ? t(`categories.${car.category}`) 
-                        : car.category}
+                    {categoryDisplay}
                 </span>
                 <Link to={`/fleet/${car.id}`}>
                     <h3 className="font-serif text-xl text-white group-hover:text-gold-300 transition-colors duration-300 truncate pr-4">
