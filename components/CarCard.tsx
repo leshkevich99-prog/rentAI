@@ -44,7 +44,7 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
         
         <div className="flex justify-between items-start mb-2">
             <div>
-                <span className="text-[9px] text-gold-400 uppercase tracking-widest block mb-1">{car.category}</span>
+                <span className="text-[9px] text-gold-400 uppercase tracking-widest block mb-1">{t(`categories.${car.category}`)}</span>
                 <Link to={`/fleet/${car.id}`}>
                     <h3 className="font-serif text-xl text-white group-hover:text-gold-300 transition-colors duration-300 truncate pr-4">
                         {carName}

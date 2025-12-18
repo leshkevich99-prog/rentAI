@@ -59,6 +59,12 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
 
   const categories = ['ALL', 'TODAY', ...Object.values(CarCategory)];
 
+  const getCategoryLabel = (cat: string) => {
+    if (cat === 'ALL') return t('fleet.all');
+    if (cat === 'TODAY') return t('fleet.availableToday');
+    return t(`categories.${cat}`);
+  };
+
   return (
     <section id="fleet" className="py-24 bg-dark-900 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,7 +89,7 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
                       : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                   } ${cat === 'TODAY' && activeCategory !== 'TODAY' ? 'border border-gold-400/30' : ''}`}
                 >
-                  {cat === 'ALL' ? t('fleet.all') : cat === 'TODAY' ? t('fleet.availableToday') : cat}
+                  {getCategoryLabel(cat)}
                 </button>
               ))}
             </div>

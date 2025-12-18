@@ -17,7 +17,7 @@ export const CARS: Car[] = [
     category: CarCategory.SPORT,
     pricePerDay: 3500,
     specs: { hp: 640, zeroToSixty: 2.9, maxSpeed: 325 },
-    imageUrl: 'https://images.unsplash.com/photo-1544602356-ac9c5220c57c?q=80&w=2940&auto=format&fit=crop', // Green/Black aggressive
+    imageUrl: 'https://images.unsplash.com/photo-1544602356-ac9c5220c57c?q=80&w=2940&auto=format&fit=crop', 
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -28,7 +28,7 @@ export const CARS: Car[] = [
     category: CarCategory.SUV,
     pricePerDay: 4200,
     specs: { hp: 563, zeroToSixty: 5.2, maxSpeed: 250 },
-    imageUrl: 'https://images.unsplash.com/photo-1631295868223-63265b40d9e4?q=80&w=2787&auto=format&fit=crop', // Black classy
+    imageUrl: 'https://images.unsplash.com/photo-1631295868223-63265b40d9e4?q=80&w=2787&auto=format&fit=crop', 
     available: true,
     description: "Роскошный внедорожник, который переопределяет понятие комфорта. Rolls-Royce Cullinan — это воплощение элегантности и мощи, способное покорить любые дороги с неизменным достоинством.",
     discountRules: DEFAULT_DISCOUNTS
@@ -39,7 +39,7 @@ export const CARS: Car[] = [
     category: CarCategory.SEDAN,
     pricePerDay: 2100,
     specs: { hp: 496, zeroToSixty: 4.8, maxSpeed: 250 },
-    imageUrl: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2940&auto=format&fit=crop', // Dark luxury interior/exterior vibe
+    imageUrl: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2940&auto=format&fit=crop', 
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -50,7 +50,7 @@ export const CARS: Car[] = [
     category: CarCategory.SPORT,
     pricePerDay: 3800,
     specs: { hp: 710, zeroToSixty: 2.9, maxSpeed: 340 },
-    imageUrl: 'https://images.unsplash.com/photo-1592198084033-aade902d1aae?q=80&w=2940&auto=format&fit=crop', // Red Ferrari
+    imageUrl: 'https://images.unsplash.com/photo-1592198084033-aade902d1aae?q=80&w=2940&auto=format&fit=crop', 
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -61,7 +61,7 @@ export const CARS: Car[] = [
     category: CarCategory.CONVERTIBLE,
     pricePerDay: 2800,
     specs: { hp: 650, zeroToSixty: 3.6, maxSpeed: 335 },
-    imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2940&auto=format&fit=crop', // Blue/Black vibe
+    imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2940&auto=format&fit=crop', 
     available: false,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS
@@ -72,7 +72,7 @@ export const CARS: Car[] = [
     category: CarCategory.SPORT,
     pricePerDay: 2900,
     specs: { hp: 640, zeroToSixty: 2.7, maxSpeed: 330 },
-    imageUrl: 'https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2940&auto=format&fit=crop', // Classic dark Porsche
+    imageUrl: 'https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2940&auto=format&fit=crop', 
     available: true,
     description: DEFAULT_DESCRIPTION,
     discountRules: DEFAULT_DISCOUNTS

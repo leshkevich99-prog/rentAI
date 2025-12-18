@@ -153,8 +153,6 @@ export const Admin: React.FC<AdminProps> = ({ cars, onAddCar, onUpdateCar, onDel
       if (currentCar.id && currentCar.id.length > 10) {
         onUpdateCar(currentCar as Car);
       } else {
-        // We'll need to refresh from DB anyway for the real ID, 
-        // but for UI update we can use a temp
         onAddCar(currentCar as Car);
       }
       setIsEditing(false);

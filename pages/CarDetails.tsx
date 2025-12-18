@@ -50,7 +50,7 @@ export const CarDetails: React.FC<CarDetailsProps> = ({ cars, onBookCar }) => {
                             className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute top-4 left-4 bg-black/60 backdrop-blur px-3 py-1 rounded border border-white/10">
-                            <span className="text-gold-400 font-bold uppercase text-xs tracking-wider">{car.category}</span>
+                            <span className="text-gold-400 font-bold uppercase text-xs tracking-wider">{t(`categories.${car.category}`)}</span>
                         </div>
                     </div>
 

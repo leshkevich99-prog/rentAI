@@ -8,6 +8,12 @@ export const translations = {
       about: 'О нас',
       contact: 'Контакты',
     },
+    categories: {
+      SPORT: 'Спорткары',
+      SUV: 'Внедорожники',
+      SEDAN: 'Представительские',
+      CONVERTIBLE: 'Кабриолеты',
+    },
     hero: {
       location: 'Минск, Беларусь',
       title: 'Премиум',
@@ -196,6 +202,12 @@ export const translations = {
       services: 'Services',
       about: 'About',
       contact: 'Contact',
+    },
+    categories: {
+      SPORT: 'Sports Cars',
+      SUV: 'SUVs',
+      SEDAN: 'Business',
+      CONVERTIBLE: 'Convertibles',
     },
     hero: {
       location: 'Minsk, Belarus',

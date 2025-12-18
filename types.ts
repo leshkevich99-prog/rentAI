@@ -1,9 +1,9 @@
 
 export enum CarCategory {
-  SPORT = 'Спорткары',
-  SUV = 'Внедорожники',
-  SEDAN = 'Представительские',
-  CONVERTIBLE = 'Кабриолеты'
+  SPORT = 'SPORT',
+  SUV = 'SUV',
+  SEDAN = 'SEDAN',
+  CONVERTIBLE = 'CONVERTIBLE'
 }
 
 export interface DiscountRule {
