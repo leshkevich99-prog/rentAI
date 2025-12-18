@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Phone, User, Loader2, CheckCircle, Send } from 'lucide-react';
+import { X, Phone, User, Loader2, CheckCircle, Send, MessageCircle } from 'lucide-react';
 
 interface CallbackModalProps {
   onClose: () => void;
@@ -48,12 +48,12 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
         onClick={onClose}
       />
 
-      <div className="relative bg-dark-900 border border-white/10 w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up">
+      <div className="relative bg-dark-900 border border-white/10 w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up rounded-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10 p-2 bg-white/5 rounded-full"
         >
-          <X size={24} strokeWidth={1} />
+          <X size={20} strokeWidth={1.5} />
         </button>
 
         {step === 'form' ? (
@@ -76,7 +76,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                     placeholder="Иван"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors text-sm"
+                    className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors text-sm rounded-lg"
                   />
                 </div>
               </div>
@@ -91,21 +91,21 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                     placeholder="+375..."
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors font-medium tracking-wide text-sm"
+                    className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors font-medium tracking-wide text-sm rounded-lg"
                   />
                 </div>
               </div>
 
               <button 
                 type="submit" 
-                className="w-full bg-gold-500 text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors text-xs"
+                className="w-full bg-gold-500 text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors text-xs rounded-lg"
               >
                 Жду звонка
               </button>
 
               <div className="flex items-center gap-4 py-2">
                 <div className="h-px bg-white/10 flex-1" />
-                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Или</span>
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Или напишите нам</span>
                 <div className="h-px bg-white/10 flex-1" />
               </div>
 
@@ -114,17 +114,19 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                     href="https://wa.me/375257422222"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2 bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#25D366]/20 transition-colors"
+                    className="flex items-center justify-center gap-2 bg-[#25D366] text-white font-bold uppercase text-[10px] tracking-widest py-3.5 hover:bg-[#20ba5a] transition-all rounded-lg shadow-lg shadow-[#25D366]/20 group"
                 >
+                    <MessageCircle size={16} className="group-hover:scale-110 transition-transform" /> 
                     WhatsApp
                 </a>
                 <a 
                     href="https://t.me/leonrental"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2 bg-[#0088cc]/10 border border-[#0088cc]/20 text-[#0088cc] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#0088cc]/20 transition-colors"
+                    className="flex items-center justify-center gap-2 bg-[#0088cc] text-white font-bold uppercase text-[10px] tracking-widest py-3.5 hover:bg-[#0077b5] transition-all rounded-lg shadow-lg shadow-[#0088cc]/20 group"
                 >
-                    <Send size={14} /> Telegram
+                    <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" /> 
+                    Telegram
                 </a>
               </div>
             </form>
@@ -145,7 +147,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
             </p>
             <button 
               onClick={onClose}
-              className="px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all uppercase tracking-widest text-xs font-bold"
+              className="px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all uppercase tracking-widest text-xs font-bold rounded-lg"
             >
               Закрыть
             </button>

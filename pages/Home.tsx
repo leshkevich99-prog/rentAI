@@ -4,7 +4,7 @@ import { Hero } from '../components/Hero';
 import { CarCard } from '../components/CarCard';
 import { Car } from '../types';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Building2, ShieldCheck, FileText, CheckCircle, ArrowRight } from 'lucide-react';
+import { ChevronRight, Building2, ShieldCheck, FileText, CheckCircle, ArrowRight, Send, MessageCircle } from 'lucide-react';
 import { ChauffeurModal } from '../components/ChauffeurModal';
 import { CallbackModal } from '../components/CallbackModal';
 
@@ -36,7 +36,7 @@ const HomeContactForm = () => {
   };
 
   return (
-    <div className="bg-dark-900/50 backdrop-blur-sm border border-white/5 p-8 relative overflow-hidden">
+    <div className="bg-dark-900/50 backdrop-blur-sm border border-white/5 p-8 relative overflow-hidden rounded-xl">
        {/* Background accent */}
        <div className="absolute top-0 right-0 w-48 h-48 bg-gold-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2" />
 
@@ -65,12 +65,12 @@ const HomeContactForm = () => {
                 onChange={e => setFormData({...formData, phone: e.target.value})}
               />
             </div>
-            <button className="w-full bg-white text-black font-bold uppercase tracking-widest py-3 hover:bg-gold-400 transition-colors text-[10px] mt-2">
+            <button className="w-full bg-white text-black font-bold uppercase tracking-widest py-3.5 hover:bg-gold-400 transition-colors text-[10px] mt-2 rounded-lg">
               Отправить
             </button>
          </form>
        ) : (
-         <div className="p-6 text-center border border-green-500/20 bg-green-500/5">
+         <div className="p-6 text-center border border-green-500/20 bg-green-500/5 rounded-lg">
             <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-3" strokeWidth={1} />
             <h4 className="text-white font-bold text-base font-serif">Принято</h4>
             <p className="text-gray-400 text-xs mt-2">Скоро свяжемся.</p>
@@ -78,13 +78,25 @@ const HomeContactForm = () => {
        )}
 
        <div className="mt-8 pt-6 border-t border-white/5">
-          <p className="text-[9px] uppercase text-gray-500 font-bold tracking-widest mb-4">Мессенджеры</p>
-          <div className="flex gap-6">
-             <a href="https://wa.me/375257422222" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white text-[10px] uppercase tracking-wider border-b border-transparent hover:border-white pb-0.5 transition-all">
-                WhatsApp
+          <p className="text-[9px] uppercase text-gray-500 font-bold tracking-widest mb-4">Напишите нам напрямую</p>
+          <div className="grid grid-cols-2 gap-3">
+             <a 
+                href="https://wa.me/375257422222" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-[#25D366]/20 group"
+             >
+                <MessageCircle size={16} className="group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">WhatsApp</span>
              </a>
-             <a href="https://t.me/leonrental" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white text-[10px] uppercase tracking-wider border-b border-transparent hover:border-white pb-0.5 transition-all">
-                Telegram
+             <a 
+                href="https://t.me/leonrental" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="flex items-center justify-center gap-2 bg-[#0088cc] hover:bg-[#0077b5] text-white py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-[#0088cc]/20 group"
+             >
+                <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Telegram</span>
              </a>
           </div>
        </div>
