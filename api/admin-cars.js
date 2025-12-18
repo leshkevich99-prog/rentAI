@@ -1,11 +1,16 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const findEnv = (possibleKeys) => {
-  for (const key of possibleKeys) {
-    if (process.env[key]) return process.env[key];
-    if (process.env[key.toLowerCase()]) return process.env[key.toLowerCase()];
-    if (process.env[key.toUpperCase()]) return process.env[key.toUpperCase()];
+const getEnv = (key) => {
+  const variations = [
+    key, 
+    key.toUpperCase(), 
+    key.toLowerCase(),
+    `VITE_${key}`,
+    `VITE_${key.toUpperCase()}`
+  ];
+  for (const v of variations) {
+    if (process.env[v]) return process.env[v].trim();
   }
   return null;
 };
@@ -30,15 +35,20 @@ export default async function handler(req, res) {
 
   const { action, password, car, id } = req.body;
 
+  if (action === 'get_status') {
+    return res.status(200).json({
+      supabaseUrl: !!getEnv('SUPABASE_URL'),
+      supabaseKey: !!(getEnv('SUPABASE_SERVICE_ROLE_KEY') || getEnv('SUPABASE_KEY')),
+      adminPassword: !!getEnv('ADMIN_PASSWORD')
+    });
+  }
+
   if (!password) {
     return res.status(401).json({ error: 'Password required' });
   }
 
-  const envPassword = findEnv(['ADMIN_PASSWORD', 'PASSWORD']);
-  const cleanInputPass = String(password).trim();
-  const cleanEnvPass = envPassword ? String(envPassword).trim() : 'admin';
-
-  if (cleanInputPass !== cleanEnvPass) {
+  const envPassword = getEnv('ADMIN_PASSWORD') || 'admin';
+  if (String(password).trim() !== String(envPassword).trim()) {
     return res.status(403).json({ error: 'Invalid password' });
   }
 
@@ -46,11 +56,11 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   }
 
-  const supabaseUrl = findEnv(['SUPABASE_URL']);
-  const supabaseServiceKey = findEnv(['SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_KEY']);
+  const supabaseUrl = getEnv('SUPABASE_URL');
+  const supabaseServiceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY') || getEnv('SUPABASE_KEY');
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    return res.status(500).json({ error: 'DB keys missing' });
+    return res.status(500).json({ error: 'DB keys missing. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel Env Vars.' });
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -64,8 +74,8 @@ export default async function handler(req, res) {
         price_per_day: car.price_per_day || car.pricePerDay,
         specs: car.specs,
         image_url: car.image_url || car.imageUrl,
-        available: car.available,
-        is_available_today: car.is_available_today || car.isAvailableToday,
+        available: car.available === true || car.available === 'true',
+        is_available_today: car.is_available_today === true || car.is_available_today === 'true',
         description: car.description,
         description_en: car.description_en,
         discount_rules: car.discount_rules || car.discountRules
