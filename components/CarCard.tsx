@@ -2,7 +2,7 @@
 import React from 'react';
 import { Car } from '../types';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Zap } from 'lucide-center';
+import { ArrowUpRight, Zap } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
 
 interface CarCardProps {
