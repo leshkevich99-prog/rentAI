@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { CarCategory, Car } from '../types';
 import { CarCard } from './CarCard';
-import { SlidersHorizontal, ArrowDownWideNarrow, ArrowUpNarrowWide, Zap, Gauge } from 'lucide-react';
+import { SlidersHorizontal, Zap } from 'lucide-react';
 import { useTranslation } from '../context/LanguageContext';
 
 interface FleetProps {
@@ -28,13 +28,34 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
     }
   }, [location.search]);
 
+  // Helper to check if a car's category matches the active filter
+  const isCategoryMatch = (carCategory: string, filter: string) => {
+    if (filter === 'ALL') return true;
+    
+    const normalizedCarCat = carCategory.toString().toUpperCase();
+    const normalizedFilter = filter.toString().toUpperCase();
+
+    // 1. Direct match (e.g., 'SPORT' === 'SPORT')
+    if (normalizedCarCat === normalizedFilter) return true;
+
+    // 2. Map Russian strings from DB to Enum keys
+    const categoryMapping: Record<string, string> = {
+      'СПОРТКАРЫ': 'SPORT',
+      'ВНЕДОРОЖНИКИ': 'SUV',
+      'ПРЕДСТАВИТЕЛЬСКИЕ': 'SEDAN',
+      'КАБРИОЛЕТЫ': 'CONVERTIBLE'
+    };
+
+    return categoryMapping[normalizedCarCat] === normalizedFilter;
+  };
+
   const filteredCars = useMemo(() => {
     let result = [...cars];
     
     if (activeCategory === 'TODAY') {
       result = result.filter(car => car.isAvailableToday && car.available);
     } else if (activeCategory !== 'ALL') {
-      result = result.filter(car => car.category === activeCategory);
+      result = result.filter(car => isCategoryMatch(car.category, activeCategory));
     }
 
     switch (sortBy) {
@@ -82,8 +103,11 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
               {categories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setIsFilterOpen(false);
+                  }}
+                  className={`px-5 py-2 rounded-sm text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${
                     activeCategory === cat
                       ? 'bg-gold-500 text-black'
                       : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
@@ -97,9 +121,9 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
             <div className="relative">
               <button 
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-2 text-sm text-gold-400 hover:text-white transition-colors uppercase font-bold tracking-wider"
+                className="flex items-center gap-2 text-[10px] text-gold-400 hover:text-white transition-colors uppercase font-bold tracking-widest"
               >
-                <SlidersHorizontal size={18} />
+                <SlidersHorizontal size={16} />
                 <span>{t('fleet.sort')}</span>
               </button>
 
@@ -108,9 +132,10 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
                 <div className="fixed inset-0 z-40" onClick={() => setIsFilterOpen(false)} />
                 <div className="absolute top-full right-0 mt-2 w-64 bg-dark-800 border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden backdrop-blur-xl">
                   <div className="py-1 text-left">
-                    <button onClick={() => { setSortBy('default'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'default' ? 'text-gold-400' : 'text-gray-300'}`}>Default</button>
-                    <button onClick={() => { setSortBy('price_asc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'price_asc' ? 'text-gold-400' : 'text-gray-300'}`}>Price Asc</button>
-                    <button onClick={() => { setSortBy('price_desc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'price_desc' ? 'text-gold-400' : 'text-gray-300'}`}>Price Desc</button>
+                    <button onClick={() => { setSortBy('default'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-xs uppercase tracking-widest font-bold hover:bg-white/5 ${sortBy === 'default' ? 'text-gold-400' : 'text-gray-300'}`}>Default</button>
+                    <button onClick={() => { setSortBy('price_asc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-xs uppercase tracking-widest font-bold hover:bg-white/5 ${sortBy === 'price_asc' ? 'text-gold-400' : 'text-gray-300'}`}>Price Asc</button>
+                    <button onClick={() => { setSortBy('price_desc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-xs uppercase tracking-widest font-bold hover:bg-white/5 ${sortBy === 'price_desc' ? 'text-gold-400' : 'text-gray-300'}`}>Price Desc</button>
+                    <button onClick={() => { setSortBy('power_desc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-xs uppercase tracking-widest font-bold hover:bg-white/5 ${sortBy === 'power_desc' ? 'text-gold-400' : 'text-gray-300'}`}>Power Desc</button>
                   </div>
                 </div>
                 </>
@@ -132,7 +157,7 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
             <p className="text-lg">{t('fleet.empty')}</p>
             <button 
                 onClick={() => setActiveCategory('ALL')} 
-                className="mt-4 text-gold-400 hover:text-white underline text-sm uppercase tracking-widest"
+                className="mt-4 text-gold-400 hover:text-white underline text-[10px] uppercase tracking-widest font-bold"
             >
                 {t('fleet.showAll')}
             </button>
