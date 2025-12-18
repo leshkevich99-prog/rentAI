@@ -4,7 +4,7 @@ import { ChevronRight, Zap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../context/LanguageContext';
 
-const heroBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/premium_luxury_car_hero_v3_1765910239466.png";
+const heroBg = "https://hntlasaimmgbiruvxzyf.supabase.co/storage/v1/object/public/car-images/premium_luxury_car_hero_v3_1765910239466-Picsart-AiImageEnhancer%20(1).jpg";
 
 interface HeroProps {
   onRequestCallback?: () => void;
