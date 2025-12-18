@@ -119,7 +119,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                     WhatsApp
                 </a>
                 <a 
-                    href="https://t.me/username"
+                    href="https://t.me/leonrental"
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-2 bg-[#0088cc]/10 border border-[#0088cc]/20 text-[#0088cc] font-bold uppercase text-[10px] tracking-widest py-3 hover:bg-[#0088cc]/20 transition-colors"

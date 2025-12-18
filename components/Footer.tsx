@@ -40,7 +40,7 @@ export const Footer: React.FC = () => {
               <a href="#" className="w-10 h-10 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-gold-400 hover:bg-gold-400/10 transition-all" title="Instagram">
                 <Instagram size={18} />
               </a>
-              <a href="#" className="w-10 h-10 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-gold-400 hover:bg-gold-400/10 transition-all" title="Telegram">
+              <a href="https://t.me/leonrental" className="w-10 h-10 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-gold-400 hover:bg-gold-400/10 transition-all" title="Telegram">
                 <Send size={18} />
               </a>
               <a href="#" className="w-10 h-10 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-gold-400 hover:bg-gold-400/10 transition-all" title="TikTok">

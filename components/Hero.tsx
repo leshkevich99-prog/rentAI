@@ -44,7 +44,7 @@ export const Hero: React.FC<HeroProps> = ({ onRequestCallback }) => {
           <div className="flex flex-col sm:flex-row gap-5 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
             <Link 
               to="/fleet"
-              className="group relative px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-widest overflow-hidden transition-all hover:bg-gold-400"
+              className="group relative px-8 py-4 bg-white/85 backdrop-blur-sm text-black font-bold text-xs uppercase tracking-widest overflow-hidden transition-all hover:bg-gold-400 hover:backdrop-blur-none"
             >
               <span className="relative z-10 flex items-center justify-center gap-3">
                 Выбрать Авто <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />

@@ -124,7 +124,7 @@ export const Navbar: React.FC = () => {
            </a>
            <div className="flex gap-6">
               <a href="#" className="text-gray-500 hover:text-white transition-colors"><Instagram size={20} /></a>
-              <a href="https://t.me/username" className="text-gray-500 hover:text-white transition-colors"><Send size={20} /></a>
+              <a href="https://t.me/leonrental" className="text-gray-500 hover:text-white transition-colors"><Send size={20} /></a>
            </div>
         </div>
       </div>

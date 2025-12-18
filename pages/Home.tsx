@@ -83,7 +83,7 @@ const HomeContactForm = () => {
              <a href="https://wa.me/375257422222" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white text-[10px] uppercase tracking-wider border-b border-transparent hover:border-white pb-0.5 transition-all">
                 WhatsApp
              </a>
-             <a href="https://t.me/username" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white text-[10px] uppercase tracking-wider border-b border-transparent hover:border-white pb-0.5 transition-all">
+             <a href="https://t.me/leonrental" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white text-[10px] uppercase tracking-wider border-b border-transparent hover:border-white pb-0.5 transition-all">
                 Telegram
              </a>
           </div>
