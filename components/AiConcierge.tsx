@@ -1,17 +1,22 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Sparkles, Loader2, Bot } from 'lucide-react';
 import { ChatMessage } from '../types';
 import { sendMessageToGemini } from '../services/geminiService';
+import { useTranslation } from '../context/LanguageContext';
 
 export const AiConcierge: React.FC = () => {
+  const { t, language } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: 'Здравствуйте! Я ваш персональный консьерж LÉON. Помочь вам с выбором автомобиля?' }
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMessages([{ role: 'model', text: t('ai.welcome') }]);
+  }, [language]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,7 +30,7 @@ export const AiConcierge: React.FC = () => {
     if (isOpen) {
       setTimeout(() => {
         inputRef.current?.focus();
-      }, 300); // Slight delay for animation
+      }, 300);
     }
   }, [isOpen]);
 
@@ -41,7 +46,7 @@ export const AiConcierge: React.FC = () => {
       const response = await sendMessageToGemini(userMessage);
       setMessages(prev => [...prev, { role: 'model', text: response }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'model', text: 'Прошу прощения, возникла ошибка связи. Пожалуйста, попробуйте позже.', isError: true }]);
+      setMessages(prev => [...prev, { role: 'model', text: t('ai.error'), isError: true }]);
     } finally {
       setIsLoading(false);
     }
@@ -53,18 +58,16 @@ export const AiConcierge: React.FC = () => {
 
   return (
     <>
-      {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
         className={`fixed bottom-8 left-8 z-40 bg-dark-900 border border-gold-400/50 text-gold-400 p-4 rounded-full shadow-lg shadow-gold-900/20 hover:bg-gold-400 hover:text-black hover:border-gold-400 transition-all duration-300 hover:scale-110 group ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
       >
         <Sparkles className="w-6 h-6 animate-pulse-slow" />
         <span className="absolute left-full ml-4 bg-white text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-          AI Консьерж
+          {t('ai.trigger')}
         </span>
       </button>
 
-      {/* Chat Window */}
       <div 
         className={`fixed z-50 transition-all duration-500 ease-in-out flex flex-col bg-dark-800/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden
           ${isOpen 
@@ -72,7 +75,6 @@ export const AiConcierge: React.FC = () => {
             : 'opacity-0 translate-y-10 pointer-events-none bottom-8 left-8 w-96 h-0'
           }`}
       >
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/10 bg-dark-900/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gold-500/10 rounded-full flex items-center justify-center border border-gold-400/20">
@@ -80,7 +82,7 @@ export const AiConcierge: React.FC = () => {
             </div>
             <div>
               <h3 className="font-serif font-bold text-white leading-none">LÉON AI</h3>
-              <span className="text-[10px] text-green-400 uppercase tracking-wider font-bold">Online</span>
+              <span className="text-[10px] text-green-400 uppercase tracking-wider font-bold">{t('ai.online')}</span>
             </div>
           </div>
           <button 
@@ -91,7 +93,6 @@ export const AiConcierge: React.FC = () => {
           </button>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
           {messages.map((msg, idx) => (
             <div 
@@ -110,7 +111,6 @@ export const AiConcierge: React.FC = () => {
             </div>
           ))}
           
-          {/* Typing Indicator */}
           {isLoading && (
             <div className="flex justify-start">
                <div className="bg-white/5 border border-white/5 rounded-2xl rounded-tl-none p-4 flex gap-1 items-center h-12">
@@ -123,7 +123,6 @@ export const AiConcierge: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
         <div className="p-4 border-t border-white/10 bg-dark-900/50">
           <div className="relative">
             <input
@@ -132,7 +131,7 @@ export const AiConcierge: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Спросите о наличии авто..."
+              placeholder={t('ai.placeholder')}
               className="w-full bg-dark-900 border border-white/10 text-white pl-4 pr-12 py-3 rounded-xl focus:outline-none focus:border-gold-400 transition-colors text-sm"
             />
             <button 

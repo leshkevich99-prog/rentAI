@@ -20,9 +20,11 @@ import { Car } from './types';
 import { CARS as MOCK_CARS } from './constants';
 import { fetchCars, isConfigured } from './services/supabase';
 import { Phone } from 'lucide-react';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useTranslation } from './context/LanguageContext';
+import { AiConcierge } from './components/AiConcierge';
 
-function App() {
+function AppContent() {
+  const { t } = useTranslation();
   const [cars, setCars] = useState<Car[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
@@ -81,61 +83,68 @@ function App() {
   const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
-    <LanguageProvider>
-      <div className="bg-black min-h-screen flex flex-col font-sans text-gray-100">
-        {!isAdminPage && <Navbar />}
-        
-        <div className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home cars={cars} onBookCar={handleBookCar} />} />
-            <Route path="/fleet" element={<div className="pt-20"><Fleet cars={cars} onBookCar={handleBookCar} /></div>} />
-            <Route path="/fleet/:id" element={<CarDetails cars={cars} onBookCar={handleBookCar} />} />
-            
-            <Route path="/services" element={<div className="pt-20"><Services /></div>} />
-            <Route path="/about" element={<div className="pt-20"><About /></div>} />
-            <Route path="/contact" element={<div className="pt-20"><Contact /></div>} />
-            <Route path="/terms" element={<div className="pt-20"><Terms /></div>} />
-            
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/user-agreement" element={<UserAgreement />} />
-            
-            <Route path="/admin" element={
-              <Admin 
-                cars={cars} 
-                onAddCar={handleAddCar} 
-                onUpdateCar={handleUpdateCar} 
-                onDeleteCar={handleDeleteCar} 
-              />
-            } />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-
-        {!isAdminPage && <Footer />}
-
-        {selectedCar && (
-          <BookingModal car={selectedCar} onClose={handleCloseModal} />
-        )}
-        
-        {!isAdminPage && (
-          <>
-            <button
-              onClick={() => setIsCallbackOpen(true)}
-              className="fixed bottom-8 right-8 z-40 bg-gold-500 text-black p-4 rounded-full shadow-lg shadow-gold-500/20 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
-            >
-              <Phone className="w-6 h-6 animate-pulse" />
-              <span className="absolute right-full mr-4 bg-white text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                Заказать звонок
-              </span>
-            </button>
-            
-            {isCallbackOpen && (
-              <CallbackModal onClose={() => setIsCallbackOpen(false)} />
-            )}
-          </>
-        )}
+    <div className="bg-black min-h-screen flex flex-col font-sans text-gray-100">
+      {!isAdminPage && <Navbar />}
+      
+      <div className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home cars={cars} onBookCar={handleBookCar} />} />
+          <Route path="/fleet" element={<div className="pt-20"><Fleet cars={cars} onBookCar={handleBookCar} /></div>} />
+          <Route path="/fleet/:id" element={<CarDetails cars={cars} onBookCar={handleBookCar} />} />
+          
+          <Route path="/services" element={<div className="pt-20"><Services /></div>} />
+          <Route path="/about" element={<div className="pt-20"><About /></div>} />
+          <Route path="/contact" element={<div className="pt-20"><Contact /></div>} />
+          <Route path="/terms" element={<div className="pt-20"><Terms /></div>} />
+          
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/user-agreement" element={<UserAgreement />} />
+          
+          <Route path="/admin" element={
+            <Admin 
+              cars={cars} 
+              onAddCar={handleAddCar} 
+              onUpdateCar={handleUpdateCar} 
+              onDeleteCar={handleDeleteCar} 
+            />
+          } />
+          
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </div>
+
+      {!isAdminPage && <Footer />}
+
+      {selectedCar && (
+        <BookingModal car={selectedCar} onClose={handleCloseModal} />
+      )}
+      
+      {!isAdminPage && (
+        <>
+          <AiConcierge />
+          <button
+            onClick={() => setIsCallbackOpen(true)}
+            className="fixed bottom-8 right-8 z-40 bg-gold-500 text-black p-4 rounded-full shadow-lg shadow-gold-500/20 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+          >
+            <Phone className="w-6 h-6 animate-pulse" />
+            <span className="absolute right-full mr-4 bg-white text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              {t('booking.floatingBtn')}
+            </span>
+          </button>
+          
+          {isCallbackOpen && (
+            <CallbackModal onClose={() => setIsCallbackOpen(false)} />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
     </LanguageProvider>
   );
 }
