@@ -2,7 +2,7 @@
 import React from 'react';
 import { Car } from '../types';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Zap } from 'lucide-react';
+import { ArrowUpRight, Zap } from 'lucide-center';
 import { useTranslation } from '../context/LanguageContext';
 
 interface CarCardProps {
@@ -44,7 +44,11 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
         
         <div className="flex justify-between items-start mb-2">
             <div>
-                <span className="text-[9px] text-gold-400 uppercase tracking-widest block mb-1">{t(`categories.${car.category}`)}</span>
+                <span className="text-[9px] text-gold-400 uppercase tracking-widest block mb-1">
+                    {t(`categories.${car.category}`) !== `categories.${car.category}` 
+                        ? t(`categories.${car.category}`) 
+                        : car.category}
+                </span>
                 <Link to={`/fleet/${car.id}`}>
                     <h3 className="font-serif text-xl text-white group-hover:text-gold-300 transition-colors duration-300 truncate pr-4">
                         {carName}
@@ -63,12 +67,12 @@ export const CarCard: React.FC<CarCardProps> = ({ car, onBook }) => {
         <div className="flex justify-between items-end mt-auto">
             <div>
                 <p className="text-white text-base font-light">
-                    {car.pricePerDay.toLocaleString('ru-RU')} <span className="text-[10px] text-gold-400 align-top">BYN</span>
+                    {car.pricePerDay.toLocaleString('ru-RU')} <span className="text-[10px] text-gold-400 align-top">{t('carCard.currency')}</span>
                 </p>
                 <div className="flex gap-3 mt-1 text-[9px] text-gray-500 font-medium tracking-wide">
-                    <span>{car.specs.zeroToSixty}s</span>
+                    <span>{car.specs.zeroToSixty}{t('carCard.acceleration')}</span>
                     <span className="w-px h-2.5 bg-white/10"></span>
-                    <span>{car.specs.hp} HP</span>
+                    <span>{car.specs.hp} {t('carCard.hp').toUpperCase()}</span>
                 </div>
             </div>
 

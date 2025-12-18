@@ -21,7 +21,6 @@ import { CARS as MOCK_CARS } from './constants';
 import { fetchCars, isConfigured } from './services/supabase';
 import { Phone } from 'lucide-react';
 import { LanguageProvider, useTranslation } from './context/LanguageContext';
-import { AiConcierge } from './components/AiConcierge';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -121,7 +120,6 @@ function AppContent() {
       
       {!isAdminPage && (
         <>
-          <AiConcierge />
           <button
             onClick={() => setIsCallbackOpen(true)}
             className="fixed bottom-8 right-8 z-40 bg-gold-500 text-black p-4 rounded-full shadow-lg shadow-gold-500/20 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
