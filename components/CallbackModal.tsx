@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
 import { X, Phone, User, Loader2, CheckCircle, Send, MessageCircle } from 'lucide-react';
+import { useTranslation } from '../context/LanguageContext';
 
 interface CallbackModalProps {
   onClose: () => void;
 }
 
 export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<'form' | 'sending' | 'success'>('form');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -31,12 +33,12 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
       if (response.ok) {
         setStep('success');
       } else {
-        alert('Ошибка отправки. Попробуйте позже.');
+        alert('Error sending. Please try again later.');
         setStep('form');
       }
     } catch (error) {
       console.error(error);
-      alert('Ошибка соединения.');
+      alert('Network connection error.');
       setStep('form');
     }
   };
@@ -59,21 +61,21 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
         {step === 'form' ? (
           <div className="p-8">
             <div className="mb-8 text-center">
-              <h3 className="font-serif text-2xl text-white mb-2">Обратный звонок</h3>
+              <h3 className="font-serif text-2xl text-white mb-2">{t('home.callback')}</h3>
               <p className="text-gray-400 text-sm font-light">
-                Оставьте номер, и мы перезвоним в ближайшее время.
+                {t('home.callbackDesc')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">Ваше имя</label>
+                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">{t('home.formName')}</label>
                 <div className="relative group">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                   <input 
                     type="text" 
                     required 
-                    placeholder="Иван"
+                    placeholder={t('home.formNamePlaceholder')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full h-12 bg-dark-950 border border-white/10 pl-10 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors text-sm rounded-lg"
@@ -82,7 +84,7 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">Телефон</label>
+                <label className="text-[10px] uppercase text-gray-500 tracking-widest font-bold">{t('home.formPhone')}</label>
                 <div className="relative group">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                   <input 
@@ -100,12 +102,12 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
                 type="submit" 
                 className="w-full bg-gold-500 text-black font-bold uppercase tracking-widest py-4 hover:bg-gold-400 transition-colors text-xs rounded-lg"
               >
-                Жду звонка
+                {t('home.formSend')}
               </button>
 
               <div className="flex items-center gap-4 py-2">
                 <div className="h-px bg-white/10 flex-1" />
-                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Или напишите нам</span>
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">{t('home.orWrite')}</span>
                 <div className="h-px bg-white/10 flex-1" />
               </div>
 
@@ -134,22 +136,22 @@ export const CallbackModal: React.FC<CallbackModalProps> = ({ onClose }) => {
         ) : step === 'sending' ? (
           <div className="p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
              <Loader2 className="w-10 h-10 text-gold-400 animate-spin mb-4" />
-             <p className="text-white font-serif">Отправляем запрос...</p>
+             <p className="text-white font-serif">{t('booking.processing')}</p>
           </div>
         ) : (
           <div className="p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
             <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-6 animate-fade-in-up">
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
-            <h3 className="font-serif text-2xl text-white mb-2">Запрос отправлен</h3>
+            <h3 className="font-serif text-2xl text-white mb-2">{t('booking.successTitle')}</h3>
             <p className="text-gray-400 mb-6 text-sm">
-              Скоро с вами свяжется наш менеджер.
+              {t('booking.successDesc')}
             </p>
             <button 
               onClick={onClose}
               className="px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all uppercase tracking-widest text-xs font-bold rounded-lg"
             >
-              Закрыть
+              {t('booking.close')}
             </button>
           </div>
         )}

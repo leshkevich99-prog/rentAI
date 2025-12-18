@@ -62,7 +62,7 @@ export const About: React.FC = () => {
             </div>
 
             <div className="border-t border-white/10 pt-6">
-               <div className="font-serif italic text-xl text-gray-500 opacity-50">Roman Romanov</div>
+               <div className="font-serif italic text-xl text-gray-500 opacity-50">{t('about.ceo_name')}</div>
                <p className="text-gray-500 text-[10px] mt-1 uppercase tracking-widest">{t('about.ceo')}</p>
             </div>
           </div>

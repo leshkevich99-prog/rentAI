@@ -35,12 +35,14 @@ export const translations = {
       promoBtn: 'Оставить заявку',
       directContact: 'Напишите нам напрямую',
       callback: 'Обратный звонок',
-      callbackDesc: 'Перезвоним в течение 15 минут.',
+      callbackDesc: 'Оставьте номер, и мы перезвоним в ближайшее время.',
       formName: 'Имя',
+      formNamePlaceholder: 'Иван',
       formPhone: 'Телефон',
-      formSend: 'Отправить',
+      formSend: 'Жду звонка',
       formAccepted: 'Принято',
       formSuccess: 'Скоро свяжемся.',
+      orWrite: 'Или напишите нам',
     },
     fleet: {
       title: 'Наш Автопарк',
@@ -94,8 +96,10 @@ export const translations = {
       use3: 'Курение в салоне автомобиля запрещено.',
       insTitle: 'Страхование',
       insDesc: 'Все автомобили застрахованы по системе КАСКО и ОСАГО. Ваша ответственность минимальна.',
-      privacyTitle: 'Политика обработки персональных данных',
+      privacyTitle: 'Политика конфиденциальности',
+      privacyP1: 'Настоящая Политика обработки персональных данных действует в отношении всех персональных данных, которые ООО "ЛЕОН АВТО" может получить от пользователя во время использования сайта LÉON.',
       agreementTitle: 'Пользовательское соглашение',
+      agreementP1: 'Настоящее Пользовательское соглашение регулирует отношения между ООО "ЛЕОН АВТО" и пользователем сети Интернет по использованию сайта LÉON.',
     },
     services: {
       title: 'Наши Преимущества',
@@ -117,7 +121,8 @@ export const translations = {
       p2: 'В нашем автопарке собраны лучшие образцы мирового автопрома. Каждый автомобиль — это шедевр инженерной мысли, готовый стать вашим надежным спутником.',
       cars: 'Автомобилей',
       clients: 'Клиентов',
-      ceo: 'Роман Романов, CEO LÉON',
+      ceo: 'Роман Батуро, CEO LÉON',
+      ceo_name: 'Роман Батуро',
     },
     contact: {
       title: 'Контакты',
@@ -177,6 +182,11 @@ export const translations = {
       placeholder: 'Куда ехать, какое авто предпочитаете...',
       submit: 'Отправить заявку',
       success: 'Мы скоро свяжемся с вами.',
+    },
+    error: {
+      notfound: 'Страница не найдена',
+      notfoundDesc: 'К сожалению, запрашиваемая вами страница не существует или была перемещена.',
+      backHome: 'Вернуться на главную',
     }
   },
   en: {
@@ -214,12 +224,14 @@ export const translations = {
       promoBtn: 'Submit Inquiry',
       directContact: 'Write to us directly',
       callback: 'Callback Request',
-      callbackDesc: 'We will call you back within 15 minutes.',
+      callbackDesc: 'Leave your number and we will call you back shortly.',
       formName: 'Name',
+      formNamePlaceholder: 'John',
       formPhone: 'Phone',
-      formSend: 'Send',
+      formSend: 'Call me back',
       formAccepted: 'Accepted',
       formSuccess: 'Will contact you soon.',
+      orWrite: 'Or write to us',
     },
     fleet: {
       title: 'Our Fleet',
@@ -274,7 +286,9 @@ export const translations = {
       insTitle: 'Insurance',
       insDesc: 'All cars are covered by CASCO and OSAGO. Your liability is minimal.',
       privacyTitle: 'Privacy Policy',
+      privacyP1: 'This Privacy Policy applies to all personal data that LEON AUTO LLC may receive from the user during the use of the LÉON website.',
       agreementTitle: 'User Agreement',
+      agreementP1: 'This User Agreement regulates the relationship between LEON AUTO LLC and the Internet user regarding the use of the LÉON website.',
     },
     services: {
       title: 'Our Benefits',
@@ -282,7 +296,7 @@ export const translations = {
       items: [
         { title: 'Full Insurance', desc: 'All cars are fully insured (CASCO) with no deductible. Your peace of mind is our priority.' },
         { title: '24/7 Support', desc: 'A personal manager is available round the clock to resolve any issues on the road.' },
-        { title: 'Impeccable Condition', desc: 'Each car undergoes detailing and technical inspection before delivery.' },
+        { title: 'Imпеccable Condition', desc: 'Each car undergoes detailing and technical inspection before delivery.' },
         { title: 'For Corporate Clients', desc: 'Special conditions for business, including VAT and full documentation package.' },
         { title: 'Weddings & Events', desc: 'Luxury convoys for special occasions. Professional chauffeur services available.' },
         { title: 'VIP Transfer', desc: 'Airport pick-up in a premium car. Flight waiting is free of charge.' }
@@ -296,7 +310,8 @@ export const translations = {
       p2: 'Our fleet contains the best examples of the global automotive industry. Each car is a masterpiece of engineering, ready to be your reliable companion.',
       cars: 'Vehicles',
       clients: 'Clients',
-      ceo: 'Roman Romanov, CEO LÉON',
+      ceo: 'Roman Baturo, CEO LÉON',
+      ceo_name: 'Roman Baturo',
     },
     contact: {
       title: 'Contacts',
@@ -356,6 +371,11 @@ export const translations = {
       placeholder: 'Where to go, which car you prefer...',
       submit: 'Submit Inquiry',
       success: 'We will contact you shortly.',
+    },
+    error: {
+      notfound: 'Page not found',
+      notfoundDesc: 'Unfortunately, the page you requested does not exist or has been moved.',
+      backHome: 'Back to home',
     }
   }
 };
