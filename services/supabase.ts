@@ -2,40 +2,34 @@
 import { createClient } from '@supabase/supabase-js';
 import { Car } from '../types';
 
-// В Vite проектах переменные окружения доступны через import.meta.env
-// Vercel автоматически подставляет их во время сборки, если они начинаются с VITE_
 const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL;
 const supabaseKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
 
-// 2. Проверяем статус конфигурации
-// Если ключи не найдены, клиент переходит в режим работы через API прокси
 export const isConfigured = !!(supabaseUrl && supabaseKey);
 export const isUsingEnv = true;
 
-// 3. Создаем клиент (только если ключи есть)
 const supabase = isConfigured 
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 
-// Helper to map DB response to App types
 const mapCarsData = (data: any[]): Car[] => {
   return data.map((car: any) => ({
     id: car.id,
     name: car.name,
+    name_en: car.name_en,
     category: car.category,
     pricePerDay: car.price_per_day,
     specs: car.specs,
     imageUrl: car.image_url,
     available: car.available,
+    isAvailableToday: car.is_available_today,
     description: car.description,
+    description_en: car.description_en,
     discountRules: car.discount_rules || []
   }));
 };
 
-// --- CARS API ---
-
 export const fetchCars = async (): Promise<Car[]> => {
-  // 1. Попытка загрузить напрямую через Supabase Client (быстрее, если настроен)
   if (isConfigured && supabase) {
     const { data, error } = await supabase
       .from('cars')
@@ -45,10 +39,8 @@ export const fetchCars = async (): Promise<Car[]> => {
     if (!error && data) {
       return mapCarsData(data);
     }
-    console.warn("Direct DB fetch failed, falling back to API proxy...", error);
   }
   
-  // 2. Фолбэк: загрузка через серверный API (если ключи на клиенте отсутствуют, но есть на сервере)
   try {
     const response = await fetch('/api/get-cars');
     if (response.ok) {
@@ -59,13 +51,9 @@ export const fetchCars = async (): Promise<Car[]> => {
     console.error("API fetch failed", e);
   }
   
-  // 3. Если ничего не помогло, выбрасываем ошибку (App.tsx подставит Mock)
   throw new Error("Could not fetch cars from DB or API");
 };
 
-/**
- * Безопасное сохранение через серверный API.
- */
 export const saveCarSecure = async (car: Car, password: string) => {
   const response = await fetch('/api/admin-cars', {
     method: 'POST',
@@ -73,7 +61,14 @@ export const saveCarSecure = async (car: Car, password: string) => {
     body: JSON.stringify({
       action: 'save',
       password: password,
-      car: car
+      car: {
+        ...car,
+        // Map to DB column names for server side
+        price_per_day: car.pricePerDay,
+        image_url: car.imageUrl,
+        is_available_today: car.isAvailableToday,
+        discount_rules: car.discountRules
+      }
     })
   });
 
@@ -83,9 +78,6 @@ export const saveCarSecure = async (car: Car, password: string) => {
   }
 };
 
-/**
- * Безопасное удаление через серверный API.
- */
 export const deleteCarSecure = async (id: string, password: string) => {
   const response = await fetch('/api/admin-cars', {
     method: 'POST',
@@ -102,16 +94,6 @@ export const deleteCarSecure = async (id: string, password: string) => {
     throw new Error(err.error || `Failed to delete car (Status ${response.status})`);
   }
 };
-
-// Deprecated direct client calls
-export const saveCar = async (car: Car) => {
-   console.warn("Direct client saveCar is deprecated. Use saveCarSecure via Admin panel.");
-};
-export const deleteCarById = async (id: string) => {
-   console.warn("Direct client deleteCarById is deprecated. Use deleteCarSecure via Admin panel.");
-};
-
-// --- STORAGE API ---
 
 export const uploadCarImage = async (file: File): Promise<string> => {
   const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -143,8 +125,6 @@ export const uploadCarImage = async (file: File): Promise<string> => {
   return data.publicUrl;
 };
 
-// --- AUTH API ---
-
 export const checkAdminPassword = async (password: string): Promise<boolean> => {
   try {
     const response = await fetch('/api/admin-cars', {
@@ -155,28 +135,9 @@ export const checkAdminPassword = async (password: string): Promise<boolean> => 
         password: password
       })
     });
-
     return response.ok;
   } catch (e) {
     console.error("Auth check failed", e);
-    // Fallback только для локальной разработки, если API не отвечает
     return password === 'admin';
   }
-};
-
-export const updateAdminPassword = async (newPassword: string) => {
-  throw new Error("Пароль управляется через переменные окружения Vercel (ADMIN_PASSWORD).");
-};
-
-// --- TELEGRAM API ---
-
-export const getTelegramSettings = async () => {
-  // Настройки больше не хранятся в БД и недоступны клиенту.
-  // Возвращаем заглушку, чтобы интерфейс не ломался при инициализации,
-  // но реальные данные используются только на бэкенде.
-  return { botToken: '', chatId: '' };
-};
-
-export const saveTelegramSettings = async (token: string, chatId: string) => {
-  throw new Error("Настройки Telegram управляются через переменные окружения Vercel.");
 };

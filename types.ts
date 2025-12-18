@@ -1,3 +1,4 @@
+
 export enum CarCategory {
   SPORT = 'Спорткары',
   SUV = 'Внедорожники',
@@ -6,23 +7,26 @@ export enum CarCategory {
 }
 
 export interface DiscountRule {
-  days: number; // Больше этого количества дней
-  discount: number; // Процент скидки (0-100)
+  days: number;
+  discount: number;
 }
 
 export interface Car {
   id: string;
   name: string;
+  name_en?: string;
   category: CarCategory;
   pricePerDay: number;
   specs: {
     hp: number;
-    zeroToSixty: number; // in seconds
-    maxSpeed: number; // km/h
+    zeroToSixty: number;
+    maxSpeed: number;
   };
   imageUrl: string;
   available: boolean;
+  isAvailableToday?: boolean;
   description?: string;
+  description_en?: string;
   discountRules?: DiscountRule[];
 }
 

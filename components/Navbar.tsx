@@ -1,13 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Phone, Instagram, Send } from 'lucide-react';
+import { Menu, X, Phone, Instagram, Send, Globe } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
+import { useTranslation } from '../context/LanguageContext';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { language, setLanguage, t } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,12 +19,10 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Prevent scrolling when menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -33,14 +33,18 @@ export const Navbar: React.FC = () => {
   }, [isMobileMenuOpen]);
 
   const navLinks = [
-    { name: 'Автопарк', path: '/fleet' },
-    { name: 'Условия', path: '/terms' },
-    { name: 'Услуги', path: '/services' },
-    { name: 'О нас', path: '/about' },
-    { name: 'Контакты', path: '/contact' },
+    { name: t('nav.fleet'), path: '/fleet' },
+    { name: t('nav.terms'), path: '/terms' },
+    { name: t('nav.services'), path: '/services' },
+    { name: t('nav.about'), path: '/about' },
+    { name: t('nav.contact'), path: '/contact' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'ru' ? 'en' : 'ru');
+  };
 
   return (
     <>
@@ -57,7 +61,6 @@ export const Navbar: React.FC = () => {
               <Logo />
             </Link>
 
-            {/* Desktop Menu */}
             <div className="hidden lg:block">
               <div className="flex items-center gap-12">
                 {navLinks.map((link) => (
@@ -76,11 +79,25 @@ export const Navbar: React.FC = () => {
                     />
                   </Link>
                 ))}
+                
+                {/* Language Switcher */}
+                <button 
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest border border-white/10 px-3 py-1.5 rounded"
+                >
+                  <Globe size={14} />
+                  <span>{language === 'ru' ? 'EN' : 'RU'}</span>
+                </button>
               </div>
             </div>
 
-            {/* Mobile Toggle */}
-            <div className="lg:hidden z-50 relative">
+            <div className="lg:hidden flex items-center gap-4 z-50 relative">
+              <button 
+                onClick={toggleLanguage}
+                className="text-gray-400 hover:text-white p-2"
+              >
+                <Globe size={20} strokeWidth={1} />
+              </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-white hover:text-gold-400 transition-colors p-2"
@@ -92,7 +109,6 @@ export const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      {/* Simplified Mobile Menu Overlay */}
       <div 
         className={`fixed inset-0 z-40 bg-black flex flex-col items-center justify-center transition-all duration-300 ${
             isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'

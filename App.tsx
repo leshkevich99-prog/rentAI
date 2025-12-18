@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
@@ -19,6 +20,7 @@ import { Car } from './types';
 import { CARS as MOCK_CARS } from './constants';
 import { fetchCars, isConfigured } from './services/supabase';
 import { Phone } from 'lucide-react';
+import { LanguageProvider } from './context/LanguageContext';
 
 function App() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -27,28 +29,22 @@ function App() {
   const [isCallbackOpen, setIsCallbackOpen] = useState(false);
   const location = useLocation();
 
-  // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Load cars from Supabase
   useEffect(() => {
     const loadCars = async () => {
-      // Check configuration first to avoid console errors
       if (!isConfigured) {
-        console.log("Supabase not configured, using mock data");
         setCars(MOCK_CARS);
         setIsLoading(false);
         return;
       }
-
       try {
         const data = await fetchCars();
         if (data.length > 0) {
           setCars(data);
         } else {
-          // Fallback if DB is empty, use mock but generally we want DB
           setCars(MOCK_CARS); 
         }
       } catch (error) {
@@ -69,7 +65,6 @@ function App() {
     setSelectedCar(null);
   };
 
-  // Admin handlers wrapper (Optimistic UI updates)
   const handleAddCar = async (newCar: Car) => {
     const tempCar = { ...newCar, id: newCar.id || Math.random().toString(36).substring(7) };
     setCars(prev => [tempCar, ...prev]);
@@ -83,66 +78,65 @@ function App() {
     setCars(prev => prev.filter(c => c.id !== id));
   };
 
-  // Check if we are on the admin page to hide global Nav/Footer
   const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
-    <div className="bg-black min-h-screen flex flex-col font-sans text-gray-100">
-      {!isAdminPage && <Navbar />}
-      
-      <div className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home cars={cars} onBookCar={handleBookCar} />} />
-          <Route path="/fleet" element={<div className="pt-20"><Fleet cars={cars} onBookCar={handleBookCar} /></div>} />
-          <Route path="/fleet/:id" element={<CarDetails cars={cars} onBookCar={handleBookCar} />} />
-          
-          <Route path="/services" element={<div className="pt-20"><Services /></div>} />
-          <Route path="/about" element={<div className="pt-20"><About /></div>} />
-          <Route path="/contact" element={<div className="pt-20"><Contact /></div>} />
-          <Route path="/terms" element={<div className="pt-20"><Terms /></div>} />
-          
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/user-agreement" element={<UserAgreement />} />
-          
-          <Route path="/admin" element={
-            <Admin 
-              cars={cars} 
-              onAddCar={handleAddCar} 
-              onUpdateCar={handleUpdateCar} 
-              onDeleteCar={handleDeleteCar} 
-            />
-          } />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+    <LanguageProvider>
+      <div className="bg-black min-h-screen flex flex-col font-sans text-gray-100">
+        {!isAdminPage && <Navbar />}
+        
+        <div className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home cars={cars} onBookCar={handleBookCar} />} />
+            <Route path="/fleet" element={<div className="pt-20"><Fleet cars={cars} onBookCar={handleBookCar} /></div>} />
+            <Route path="/fleet/:id" element={<CarDetails cars={cars} onBookCar={handleBookCar} />} />
+            
+            <Route path="/services" element={<div className="pt-20"><Services /></div>} />
+            <Route path="/about" element={<div className="pt-20"><About /></div>} />
+            <Route path="/contact" element={<div className="pt-20"><Contact /></div>} />
+            <Route path="/terms" element={<div className="pt-20"><Terms /></div>} />
+            
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/user-agreement" element={<UserAgreement />} />
+            
+            <Route path="/admin" element={
+              <Admin 
+                cars={cars} 
+                onAddCar={handleAddCar} 
+                onUpdateCar={handleUpdateCar} 
+                onDeleteCar={handleDeleteCar} 
+              />
+            } />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+
+        {!isAdminPage && <Footer />}
+
+        {selectedCar && (
+          <BookingModal car={selectedCar} onClose={handleCloseModal} />
+        )}
+        
+        {!isAdminPage && (
+          <>
+            <button
+              onClick={() => setIsCallbackOpen(true)}
+              className="fixed bottom-8 right-8 z-40 bg-gold-500 text-black p-4 rounded-full shadow-lg shadow-gold-500/20 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+            >
+              <Phone className="w-6 h-6 animate-pulse" />
+              <span className="absolute right-full mr-4 bg-white text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                Заказать звонок
+              </span>
+            </button>
+            
+            {isCallbackOpen && (
+              <CallbackModal onClose={() => setIsCallbackOpen(false)} />
+            )}
+          </>
+        )}
       </div>
-
-      {!isAdminPage && <Footer />}
-
-      {/* Global Modals */}
-      {selectedCar && (
-        <BookingModal car={selectedCar} onClose={handleCloseModal} />
-      )}
-      
-      {/* Floating Callback Button (Visible on all pages except Admin) */}
-      {!isAdminPage && (
-        <>
-          <button
-            onClick={() => setIsCallbackOpen(true)}
-            className="fixed bottom-8 right-8 z-40 bg-gold-500 text-black p-4 rounded-full shadow-lg shadow-gold-500/20 hover:bg-gold-400 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
-          >
-            <Phone className="w-6 h-6 animate-pulse" />
-            <span className="absolute right-full mr-4 bg-white text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-              Заказать звонок
-            </span>
-          </button>
-          
-          {isCallbackOpen && (
-            <CallbackModal onClose={() => setIsCallbackOpen(false)} />
-          )}
-        </>
-      )}
-    </div>
+    </LanguageProvider>
   );
 }
 
