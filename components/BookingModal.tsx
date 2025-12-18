@@ -4,6 +4,7 @@ import { X, Calendar, User, Phone, CheckCircle, Loader2 } from 'lucide-react';
 import { Car } from '../types';
 import { BookingDetails } from '../types';
 import { sendTelegramBooking } from '../services/telegram';
+import { useTranslation } from '../context/LanguageContext';
 
 interface BookingModalProps {
   car: Car | null;
@@ -11,6 +12,7 @@ interface BookingModalProps {
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<'form' | 'sending' | 'success'>('form');
   const [formData, setFormData] = useState<Partial<BookingDetails>>({
     name: '',
@@ -93,7 +95,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     const booking: BookingDetails = {
       carId: car.id,
       name: formData.name || '',
-      phone: formData.phone || '', // Raw input
+      phone: formData.phone || '',
       startDate: formData.startDate || '',
       endDate: formData.endDate || '',
       totalPrice: calc?.finalTotal,
@@ -106,7 +108,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
     if (success) {
         setStep('success');
     } else {
-        alert('Не удалось отправить заявку. Пожалуйста, проверьте соединение или свяжитесь с нами по телефону.');
+        alert('Error sending request. Please contact us directly.');
         setStep('form');
     }
   };
@@ -143,10 +145,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
 
       <div className="relative bg-dark-800 border-t sm:border border-white/10 w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up sm:rounded-xl rounded-t-2xl max-h-[95vh] flex flex-col h-auto">
         
-        {/* HEADER - Fixed */}
         <div className="flex items-center justify-between p-4 border-b border-white/5 bg-dark-900 shrink-0">
             <div className="flex-1 min-w-0 pr-4">
-              <h3 className="font-serif text-xl sm:text-2xl text-white leading-none mb-1">Бронирование</h3>
+              <h3 className="font-serif text-xl sm:text-2xl text-white leading-none mb-1">{t('booking.title')}</h3>
               <p className="text-gold-400 text-xs font-bold uppercase tracking-widest truncate">{car.name}</p>
             </div>
             <button
@@ -157,19 +158,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
             </button>
         </div>
 
-        {/* BODY - Scrollable */}
         <div className="overflow-y-auto p-4 space-y-4 flex-1">
           {step === 'form' ? (
             <form id="booking-form" onSubmit={handleSubmit} className="space-y-4">
               
               <div className="space-y-1">
-                <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">Ваше имя</label>
+                <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">{t('booking.name')}</label>
                 <div className="relative group">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                   <input 
                     type="text" 
                     required 
-                    placeholder="Александр"
+                    placeholder={t('booking.namePlaceholder')}
                     value={formData.name || ''}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full h-12 bg-dark-900 border border-white/10 pl-9 pr-4 text-white focus:outline-none focus:border-gold-400 transition-colors rounded-lg text-sm"
@@ -178,7 +178,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">Телефон (любая страна)</label>
+                <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">{t('booking.phone')}</label>
                 <div className="relative group">
                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 group-focus-within:text-gold-400 transition-colors" />
                   <input 
@@ -192,10 +192,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                 </div>
               </div>
 
-              {/* Date Inputs - Always Grid (Side-by-side on mobile) */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1 min-w-0">
-                  <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">Начало</label>
+                  <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">{t('booking.start')}</label>
                   <div className="relative w-full group">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none group-focus-within:text-gold-400" />
                     <input 
@@ -210,7 +209,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                   </div>
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">Окончание</label>
+                  <label className="text-[10px] uppercase text-gray-500 tracking-wider font-bold">{t('booking.end')}</label>
                   <div className="relative w-full group">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none group-focus-within:text-gold-400" />
                     <input 
@@ -230,50 +229,42 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
               {calc && (
                   <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-4 rounded-xl space-y-2">
                       <div className="flex justify-between text-xs text-gray-400">
-                          <span>Цена за {calc.days} дн.</span>
+                          <span>{t('booking.price')} {calc.days} {t('booking.days')}</span>
                           <span>{calc.originalTotal.toLocaleString()} BYN</span>
                       </div>
                       
                       {calc.discountPercent > 0 && (
                           <div className="flex justify-between text-xs text-green-400">
-                              <span>Скидка ({calc.discountPercent}%)</span>
+                              <span>{t('booking.discount')} ({calc.discountPercent}%)</span>
                               <span>- {calc.discountAmount.toLocaleString()} BYN</span>
                           </div>
                       )}
                       
                       <div className="flex justify-between items-center border-t border-white/10 pt-2 mt-1">
-                          <span className="text-white font-medium uppercase text-xs tracking-wider">Итого</span>
+                          <span className="text-white font-medium uppercase text-xs tracking-wider">{t('booking.total')}</span>
                           <span className="text-xl font-serif text-gold-400">{calc.finalTotal.toLocaleString()} <span className="text-[10px] align-top">BYN</span></span>
                       </div>
                   </div>
-              )}
-
-              {!calc && (
-                   <div className="bg-white/5 p-3 rounded-lg flex items-center justify-between">
-                        <span className="text-gray-400 text-xs">Стоимость</span>
-                        <span className="text-white font-bold text-sm">{car.pricePerDay.toLocaleString()} BYN / сутки</span>
-                   </div>
               )}
             </form>
           ) : step === 'sending' ? (
              <div className="flex flex-col items-center justify-center py-10">
                  <Loader2 className="w-12 h-12 text-gold-400 animate-spin mb-4" />
-                 <p className="text-white text-lg font-serif">Обработка заявки...</p>
+                 <p className="text-white text-lg font-serif">{t('booking.processing')}</p>
              </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-6 text-center">
                 <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4 animate-fade-in-up">
                   <CheckCircle className="w-8 h-8 text-green-500" />
                 </div>
-                <h3 className="font-serif text-2xl text-white mb-2">Заявка Принята</h3>
+                <h3 className="font-serif text-2xl text-white mb-2">{t('booking.successTitle')}</h3>
                 <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                  Менеджер свяжется с вами в течение 15 минут.
+                  {t('booking.successDesc')}
                 </p>
             </div>
           )}
         </div>
 
-        {/* FOOTER - Fixed Button */}
         <div className="p-4 border-t border-white/5 bg-dark-900 shrink-0 z-10 pb-6 sm:pb-4">
             {step === 'form' ? (
                 <button 
@@ -281,18 +272,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({ car, onClose }) => {
                   type="submit" 
                   className="w-full font-bold uppercase tracking-widest py-3.5 bg-gold-500 text-black hover:bg-gold-400 rounded-lg shadow-lg hover:shadow-gold-500/20 transition-all active:scale-[0.98] text-sm"
                 >
-                  {calc ? 'Подтвердить бронирование' : 'Отправить заявку'}
+                  {calc ? t('booking.confirm') : t('booking.send')}
                 </button>
             ) : step === 'success' ? (
                 <button 
                   onClick={onClose}
                   className="w-full font-bold uppercase tracking-widest py-3.5 border border-white/20 text-white hover:bg-white hover:text-black rounded-lg transition-all text-sm"
                 >
-                  Закрыть
+                  {t('booking.close')}
                 </button>
             ) : (
                 <button disabled className="w-full py-3.5 bg-white/5 text-gray-500 rounded-lg text-sm uppercase font-bold tracking-widest cursor-not-allowed">
-                    Подождите...
+                    Wait...
                 </button>
             )}
         </div>

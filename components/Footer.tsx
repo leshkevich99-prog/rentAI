@@ -3,8 +3,11 @@ import React from 'react';
 import { Instagram, Send, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Logo } from './Logo';
+import { useTranslation } from '../context/LanguageContext';
 
 export const Footer: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-dark-900 border-t border-white/5 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,28 +17,29 @@ export const Footer: React.FC = () => {
               <Logo />
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed">
-              Предоставляем исключительный сервис аренды премиальных автомобилей в Минске. Каждый момент за рулем — это искусство.
+              {t('footer.desc')}
             </p>
           </div>
 
           <div>
-            <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Компания</h4>
+            <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">{t('footer.company')}</h4>
             <ul className="space-y-3 text-sm text-gray-500">
-              <li><Link to="/about" className="hover:text-gold-400 transition-colors">О нас</Link></li>
+              <li><Link to="/about" className="hover:text-gold-400 transition-colors">{t('nav.about')}</Link></li>
+              <li><Link to="/fleet" className="hover:text-gold-400 transition-colors">{t('nav.fleet')}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Поддержка</h4>
+            <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">{t('footer.support')}</h4>
             <ul className="space-y-3 text-sm text-gray-500">
-              <li><Link to="/terms" className="hover:text-gold-400 transition-colors">Правила аренды</Link></li>
-              <li><Link to="/services" className="hover:text-gold-400 transition-colors">Страхование</Link></li>
-              <li><Link to="/contact" className="hover:text-gold-400 transition-colors">Контакты</Link></li>
+              <li><Link to="/terms" className="hover:text-gold-400 transition-colors">{t('nav.terms')}</Link></li>
+              <li><Link to="/services" className="hover:text-gold-400 transition-colors">{t('nav.services')}</Link></li>
+              <li><Link to="/contact" className="hover:text-gold-400 transition-colors">{t('nav.contact')}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Мы в соцсетях</h4>
+            <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">{t('footer.social')}</h4>
             <div className="flex gap-4">
               <a href="#" className="w-10 h-10 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-gold-400 hover:bg-gold-400/10 transition-all" title="Instagram">
                 <Instagram size={18} />
@@ -51,10 +55,10 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600">
-          <p>© 2025 LÉON Belarus. Все права защищены.</p>
+          <p>{t('footer.rights')}</p>
           <div className="flex gap-6">
-            <Link to="/privacy" className="hover:text-gray-400">Политика конфиденциальности</Link>
-            <Link to="/user-agreement" className="hover:text-gray-400">Пользовательское соглашение</Link>
+            <Link to="/privacy" className="hover:text-gray-400">{t('footer.privacy')}</Link>
+            <Link to="/user-agreement" className="hover:text-gray-400">{t('footer.agreement')}</Link>
           </div>
         </div>
       </div>

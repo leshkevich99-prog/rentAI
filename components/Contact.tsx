@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { useTranslation } from '../context/LanguageContext';
 
 export const Contact: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <section id="contact" className="py-20 bg-dark-950 border-t border-white/5">
       <div className="max-w-[1920px] mx-auto px-6 lg:px-12">
@@ -10,13 +13,13 @@ export const Contact: React.FC = () => {
           
           <div>
             <h2 className="text-gold-400 font-semibold uppercase tracking-luxury text-[10px] mb-2">
-              Свяжитесь с Нами
+              {t('contact.subtitle')}
             </h2>
             <h3 className="font-serif text-3xl md:text-4xl text-white mb-6">
-              Контакты
+              {t('contact.title')}
             </h3>
             <p className="text-gray-400 mb-8 font-light leading-relaxed max-w-md text-sm">
-              Мы всегда рады ответить на ваши вопросы и помочь с выбором автомобиля. Наш офис находится в престижном районе Минска.
+              {t('contact.desc')}
             </p>
 
             <div className="space-y-6">
@@ -25,8 +28,8 @@ export const Contact: React.FC = () => {
                   <MapPin size={24} strokeWidth={1} />
                 </div>
                 <div>
-                  <h4 className="text-white font-serif text-base mb-1">Наш Офис</h4>
-                  <p className="text-gray-400 text-sm font-light">г. Минск, Dana Center<br />ул. П. Мстиславца, 9</p>
+                  <h4 className="text-white font-serif text-base mb-1">{t('contact.office')}</h4>
+                  <p className="text-gray-400 text-sm font-light">{t('contact.address')}</p>
                 </div>
               </div>
 
@@ -35,7 +38,7 @@ export const Contact: React.FC = () => {
                   <Phone size={24} strokeWidth={1} />
                 </div>
                 <div>
-                  <h4 className="text-white font-serif text-base mb-1">Телефон</h4>
+                  <h4 className="text-white font-serif text-base mb-1">{t('contact.phone')}</h4>
                   <a href="tel:+375257422222" className="text-gray-400 text-sm hover:text-white transition-colors font-light">
                     +375 (25) 742-22-22
                   </a>
@@ -47,7 +50,7 @@ export const Contact: React.FC = () => {
                   <Mail size={24} strokeWidth={1} />
                 </div>
                 <div>
-                  <h4 className="text-white font-serif text-base mb-1">Email</h4>
+                  <h4 className="text-white font-serif text-base mb-1">{t('contact.email')}</h4>
                   <a href="mailto:avtoprokat.minsk@yandex.by" className="text-gray-400 text-sm hover:text-white transition-colors font-light">
                     avtoprokat.minsk@yandex.by
                   </a>
@@ -59,8 +62,8 @@ export const Contact: React.FC = () => {
                   <Clock size={24} strokeWidth={1} />
                 </div>
                 <div>
-                  <h4 className="text-white font-serif text-base mb-1">Время работы</h4>
-                  <p className="text-gray-400 text-sm font-light">Ежедневно: 09:00 - 22:00<br />Поддержка: 24/7</p>
+                  <h4 className="text-white font-serif text-base mb-1">{t('contact.hours')}</h4>
+                  <p className="text-gray-400 text-sm font-light">{t('contact.hoursVal')}<br />{t('contact.support')}</p>
                 </div>
               </div>
             </div>

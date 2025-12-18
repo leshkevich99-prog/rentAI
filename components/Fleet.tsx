@@ -1,5 +1,6 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { CarCategory, Car } from '../types';
 import { CarCard } from './CarCard';
 import { SlidersHorizontal, ArrowDownWideNarrow, ArrowUpNarrowWide, Zap, Gauge } from 'lucide-react';
@@ -13,10 +14,19 @@ interface FleetProps {
 type SortType = 'default' | 'price_asc' | 'price_desc' | 'power_desc' | 'acceleration_asc';
 
 export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
+  const location = useLocation();
+  const { t } = useTranslation();
+  
   const [activeCategory, setActiveCategory] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<SortType>('default');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const { t } = useTranslation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('filter') === 'today') {
+      setActiveCategory('TODAY');
+    }
+  }, [location.search]);
 
   const filteredCars = useMemo(() => {
     let result = [...cars];
@@ -92,10 +102,9 @@ export const Fleet: React.FC<FleetProps> = ({ cars, onBookCar }) => {
                 <div className="fixed inset-0 z-40" onClick={() => setIsFilterOpen(false)} />
                 <div className="absolute top-full right-0 mt-2 w-64 bg-dark-800 border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden backdrop-blur-xl">
                   <div className="py-1 text-left">
-                    {/* Simplified for brevity, normally translations for sort options too */}
                     <button onClick={() => { setSortBy('default'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'default' ? 'text-gold-400' : 'text-gray-300'}`}>Default</button>
-                    <button onClick={() => { setSortBy('price_asc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'price_asc' ? 'text-gold-400' : 'text-gray-300'}`}>Cheapest first</button>
-                    <button onClick={() => { setSortBy('price_desc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'price_desc' ? 'text-gold-400' : 'text-gray-300'}`}>Most expensive</button>
+                    <button onClick={() => { setSortBy('price_asc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'price_asc' ? 'text-gold-400' : 'text-gray-300'}`}>Price Asc</button>
+                    <button onClick={() => { setSortBy('price_desc'); setIsFilterOpen(false); }} className={`w-full px-4 py-3 text-sm hover:bg-white/5 ${sortBy === 'price_desc' ? 'text-gold-400' : 'text-gray-300'}`}>Price Desc</button>
                   </div>
                 </div>
                 </>
