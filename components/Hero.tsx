@@ -46,7 +46,7 @@ export const Hero: React.FC<HeroProps> = ({ onRequestCallback }) => {
           <div className="flex flex-col sm:flex-row flex-wrap gap-5 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
             <Link 
               to="/fleet"
-              className="group relative px-8 py-4 bg-white/85 backdrop-blur-sm text-black font-bold text-xs uppercase tracking-widest overflow-hidden transition-all hover:bg-gold-400 hover:backdrop-blur-none"
+              className="group relative px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-xs uppercase tracking-widest overflow-hidden transition-all hover:bg-white hover:text-black"
             >
               <span className="relative z-10 flex items-center justify-center gap-3">
                 {t('hero.chooseBtn')} <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
@@ -55,7 +55,7 @@ export const Hero: React.FC<HeroProps> = ({ onRequestCallback }) => {
 
             <button 
               onClick={() => navigate('/fleet?filter=today')}
-              className="group relative px-8 py-4 bg-gold-500/10 backdrop-blur-sm border border-gold-400/30 text-gold-400 font-bold text-xs uppercase tracking-widest overflow-hidden transition-all hover:bg-gold-500 hover:text-black"
+              className="group relative px-8 py-4 bg-gold-500/5 backdrop-blur-sm border border-gold-400/20 text-gold-400 font-bold text-xs uppercase tracking-widest overflow-hidden transition-all hover:bg-gold-500 hover:text-black"
             >
                <span className="relative z-10 flex items-center justify-center gap-2">
                  <Zap size={14} fill="currentColor" />
@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({ onRequestCallback }) => {
             
             <button 
               onClick={onRequestCallback}
-              className="group px-8 py-4 border border-white/20 text-white font-bold text-xs uppercase tracking-widest hover:border-white hover:bg-white/5 transition-all text-center flex items-center justify-center gap-2"
+              className="group px-8 py-4 border border-white/10 text-gray-400 font-bold text-xs uppercase tracking-widest hover:border-white hover:text-white hover:bg-white/5 transition-all text-center flex items-center justify-center gap-2"
             >
               <span>{t('hero.contactBtn')}</span>
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>

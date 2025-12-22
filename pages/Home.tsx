@@ -64,7 +64,7 @@ const HomeContactForm = () => {
                 onChange={e => setFormData({...formData, phone: e.target.value})}
               />
             </div>
-            <button className="w-full bg-white text-black font-bold uppercase tracking-widest py-3.5 hover:bg-gold-400 transition-colors text-[10px] mt-2 rounded-lg">
+            <button className="w-full bg-transparent border border-white/30 text-white font-bold uppercase tracking-widest py-3.5 hover:bg-white hover:text-black transition-all text-[10px] mt-2 rounded-lg">
               {t('home.formSend')}
             </button>
          </form>
@@ -83,7 +83,7 @@ const HomeContactForm = () => {
                 href="https://wa.me/375257422222" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-[#25D366]/20 group"
+                className="flex items-center justify-center gap-2 bg-[#25D366]/10 border border-[#25D366]/30 hover:bg-[#25D366] text-white py-2.5 rounded-lg transition-all duration-300 group"
              >
                 <MessageCircle size={16} className="group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">WhatsApp</span>
@@ -92,7 +92,7 @@ const HomeContactForm = () => {
                 href="https://t.me/leonrental" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="flex items-center justify-center gap-2 bg-[#0088cc] hover:bg-[#0077b5] text-white py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-[#0088cc]/20 group"
+                className="flex items-center justify-center gap-2 bg-[#0088cc]/10 border border-[#0088cc]/30 hover:bg-[#0088cc] text-white py-2.5 rounded-lg transition-all duration-300 group"
              >
                 <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Telegram</span>
@@ -216,7 +216,7 @@ export const Home: React.FC<HomeProps> = ({ cars, onBookCar }) => {
              </p>
              <button 
                onClick={() => setIsChauffeurOpen(true)}
-               className="bg-white text-black px-8 py-4 font-bold uppercase tracking-widest hover:bg-gold-400 transition-colors text-[10px]"
+               className="bg-transparent border border-white/40 text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all text-[10px]"
              >
                {t('home.promoBtn')}
              </button>
