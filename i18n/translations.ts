@@ -20,8 +20,8 @@ export const translations = {
     },
     hero: {
       location: 'Минск, Беларусь',
-      title: 'Премиум',
-      subtitle: 'Автопрокат.',
+      title: 'Прокат',
+      subtitle: 'премиум авто',
       description: 'Аренда автомобилей премиум-класса в Минске. Lamborghini, Rolls-Royce, Bentley для тех, кто ценит статус и комфорт.',
       chooseBtn: 'Выбрать Авто',
       contactBtn: 'Связаться',
